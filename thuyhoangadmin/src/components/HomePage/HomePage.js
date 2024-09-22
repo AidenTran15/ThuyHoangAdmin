@@ -1,10 +1,11 @@
 import React from 'react';
-import CustomerTable from '../CustomerTable/CustomerTable';  // Import the CustomerTable component
-
+import CustomerTable from '../CustomerTable/CustomerTable'; 
+import PantsProduct from '../PantsProduct/PantsProduct'; 
 const HomePage = () => {
   return (
     <div>
-      <CustomerTable />  {/* Display the CustomerTable component */}
+      <CustomerTable />
+      <PantsProduct/> 
     </div>
   );
 };
