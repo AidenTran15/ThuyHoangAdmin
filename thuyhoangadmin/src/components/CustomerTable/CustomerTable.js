@@ -90,9 +90,10 @@ const CustomerTable = () => {
 
   return (
     <div className="customer-table">
-      <h2>Manage Customers</h2>
-      <button onClick={handleAddNewCustomerClick} className="add-new-button">Add New Customer</button>
-      
+  <div className="header-container">
+    <h2>Manage Customers</h2>
+    <button onClick={handleAddNewCustomerClick} className="add-new-button">Add New</button>
+  </div>
       <table>
         <thead>
           <tr>
