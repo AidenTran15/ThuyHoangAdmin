@@ -1,36 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './CustomerTable.css';  // Ensure you have the relevant CSS
+import './CustomerTable.css';  // Make sure you link the CSS
 
 const CustomerTable = () => {
   const [customers, setCustomers] = useState([]);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [updatedCustomer, setUpdatedCustomer] = useState({});
 
-  // Fetch the customer data when the component mounts
   useEffect(() => {
-    axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers', {
-      headers: {
-        'x-api-key': 'YOUR_API_KEY' // Add your API key here if required
-      }
-    })
-    .then(response => {
-      // Parse the response body as a JSON array
-      const customerData = JSON.parse(response.data.body);
-      setCustomers(Array.isArray(customerData) ? customerData : []);
-    })
-    .catch(error => {
-      console.error("Error fetching the customers!", error);
-    });
+    axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers')
+      .then(response => {
+        const customerData = JSON.parse(response.data.body);
+        setCustomers(Array.isArray(customerData) ? customerData : []);
+      })
+      .catch(error => {
+        console.error("Error fetching the customers!", error);
+      });
   }, []);
 
-  // Triggered when the Edit button is clicked
   const handleEditClick = (customer) => {
     setEditingCustomer(customer['phone_number']);
     setUpdatedCustomer(customer); // Set the selected customer to be edited
   };
 
-  // Handle input changes during editing
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedCustomer({
@@ -39,24 +31,30 @@ const CustomerTable = () => {
     });
   };
 
-  // Save the updated customer data
   const handleSaveClick = () => {
-    axios.put('https://3dm9uksgnf.execute-api.ap-southeast-2.amazonaws.com/prod/update', updatedCustomer, {
-      headers: {
-        'x-api-key': 'YOUR_API_KEY', 
-        'Content-Type': 'application/json'
-      }
+    axios.put('https://3dm9uksgnf.execute-api.ap-southeast-2.amazonaws.com/prod/update', updatedCustomer)  // Add your PUT endpoint
+      .then(() => {
+        setEditingCustomer(null);
+        setCustomers((prevCustomers) => prevCustomers.map(c => 
+          c['phone_number'] === updatedCustomer['phone_number'] ? updatedCustomer : c
+        ));
+      })
+      .catch(error => {
+        console.error("Error updating the customer!", error);
+      });
+  };
+
+  // New function to handle delete
+  const handleDeleteClick = (phone_number) => {
+    axios.delete('https://htjd8snvtc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
+      data: { phone_number }  // Pass phone number in the request body
     })
-    .then(() => {
-      // Set editing state back to null and update customer list with new values
-      setEditingCustomer(null);
-      setCustomers((prevCustomers) => prevCustomers.map(c =>
-        c['phone_number'] === updatedCustomer['phone_number'] ? updatedCustomer : c
-      ));
-    })
-    .catch(error => {
-      console.error("Error updating the customer!", error);
-    });
+      .then(() => {
+        setCustomers(prevCustomers => prevCustomers.filter(c => c['phone_number'] !== phone_number));
+      })
+      .catch(error => {
+        console.error("Error deleting the customer!", error);
+      });
   };
 
   return (
@@ -130,7 +128,15 @@ const CustomerTable = () => {
                   {editingCustomer === customer['phone_number'] ? (
                     <button onClick={handleSaveClick}>Save</button>
                   ) : (
-                    <button onClick={() => handleEditClick(customer)}>Edit</button>
+                    <>
+                      <button onClick={() => handleEditClick(customer)}>Edit</button>
+                      <button 
+                        onClick={() => handleDeleteClick(customer['phone_number'])} 
+                        style={{ backgroundColor: 'red', color: 'white', marginLeft: '5px' }}
+                      >
+                        Delete
+                      </button>
+                    </>
                   )}
                 </td>
               </tr>
