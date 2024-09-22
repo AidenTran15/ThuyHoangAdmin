@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './CustomerTable.css';
+import './CustomerTable.css'; // Ensure this file contains the updated CSS
 
 const CustomerTable = () => {
   const [customers, setCustomers] = useState([]);
