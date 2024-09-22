@@ -8,6 +8,9 @@ const CustomerTable = () => {
   const [updatedCustomer, setUpdatedCustomer] = useState({});
   const [newCustomer, setNewCustomer] = useState({});
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isDeleteConfirmation, setIsDeleteConfirmation] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState('');
+  const [confirmationInput, setConfirmationInput] = useState(''); // State for confirmation input
 
   useEffect(() => {
     axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers')
@@ -43,18 +46,6 @@ const CustomerTable = () => {
       });
   };
 
-  const handleDeleteClick = (phone_number) => {
-    axios.delete('https://htjd8snvtc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
-      data: { phone_number }
-    })
-      .then(() => {
-        setCustomers(prevCustomers => prevCustomers.filter(c => c['phone_number'] !== phone_number));
-      })
-      .catch(error => {
-        console.error("Error deleting the customer!", error);
-      });
-  };
-
   const handleNewCustomerInputChange = (e) => {
     const { name, value } = e.target;
     setNewCustomer(prev => ({ ...prev, [name]: value }));
@@ -73,6 +64,28 @@ const CustomerTable = () => {
       .catch(error => {
         console.error("Error adding new customer!", error);
       });
+  };
+
+  const handleDeleteClick = (phone_number) => {
+    setCustomerToDelete(phone_number);
+    setIsDeleteConfirmation(true); // Show delete confirmation modal
+  };
+
+  const confirmDelete = () => {
+    if (confirmationInput === "Confirm") {
+      axios.delete('https://htjd8snvtc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
+        data: { phone_number: customerToDelete }
+      })
+        .then(() => {
+          setCustomers(prevCustomers => prevCustomers.filter(c => c['phone_number'] !== customerToDelete));
+          setCustomerToDelete('');
+          setConfirmationInput(''); // Reset confirmation input
+        })
+        .catch(error => {
+          console.error("Error deleting the customer!", error);
+        });
+    }
+    setIsDeleteConfirmation(false); // Close confirmation modal
   };
 
   return (
@@ -181,6 +194,22 @@ const CustomerTable = () => {
             <input type="number" name="dress_price" placeholder="Shirt Price" onChange={handleNewCustomerInputChange} />
             <button onClick={handleAddCustomerSaveClick}>Save</button>
             <button onClick={() => setIsAddingNew(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteConfirmation && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p>Type "Confirm" to delete this customer:</p>
+            <input 
+              type="text" 
+              onChange={(e) => setConfirmationInput(e.target.value)} 
+            />
+            <button onClick={confirmDelete}>Delete</button>
+            <button onClick={() => setIsDeleteConfirmation(false)}>Cancel</button>
           </div>
         </div>
       )}
