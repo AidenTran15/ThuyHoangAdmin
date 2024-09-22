@@ -4,7 +4,6 @@ import CustomerTable from '../CustomerTable/CustomerTable';  // Import the Custo
 const HomePage = () => {
   return (
     <div>
-      <h1>Home Page</h1>
       <CustomerTable />  {/* Display the CustomerTable component */}
     </div>
   );
