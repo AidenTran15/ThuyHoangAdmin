@@ -6,6 +6,8 @@ const CustomerTable = () => {
   const [customers, setCustomers] = useState([]);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [updatedCustomer, setUpdatedCustomer] = useState({});
+  const [newCustomer, setNewCustomer] = useState({});  // For adding a new customer
+  const [isAddingNew, setIsAddingNew] = useState(false); // Toggle for the add new modal
 
   useEffect(() => {
     axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers')
@@ -32,7 +34,7 @@ const CustomerTable = () => {
   };
 
   const handleSaveClick = () => {
-    axios.put('https://3dm9uksgnf.execute-api.ap-southeast-2.amazonaws.com/prod/update', updatedCustomer)  // Add your PUT endpoint
+    axios.put('https://3dm9uksgnf.execute-api.ap-southeast-2.amazonaws.com/prod/update', updatedCustomer)
       .then(() => {
         setEditingCustomer(null);
         setCustomers((prevCustomers) => prevCustomers.map(c => 
@@ -44,10 +46,9 @@ const CustomerTable = () => {
       });
   };
 
-  // New function to handle delete
   const handleDeleteClick = (phone_number) => {
     axios.delete('https://htjd8snvtc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
-      data: { phone_number }  // Pass phone number in the request body
+      data: { phone_number }
     })
       .then(() => {
         setCustomers(prevCustomers => prevCustomers.filter(c => c['phone_number'] !== phone_number));
@@ -57,9 +58,35 @@ const CustomerTable = () => {
       });
   };
 
+  // Handle new customer addition
+  const handleNewCustomerInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewCustomer({
+      ...newCustomer,
+      [name]: value
+    });
+  };
+
+  const handleAddNewCustomerClick = () => {
+    setIsAddingNew(true); // Show the modal to add new customer
+  };
+
+  const handleAddCustomerSaveClick = () => {
+    axios.post('https://52s91z2sse.execute-api.ap-southeast-2.amazonaws.com/prod/add', newCustomer)
+      .then(() => {
+        setIsAddingNew(false);
+        setCustomers(prevCustomers => [...prevCustomers, newCustomer]); // Add new customer to the table
+      })
+      .catch(error => {
+        console.error("Error adding new customer!", error);
+      });
+  };
+
   return (
     <div className="customer-table">
       <h2>Manage Customers</h2>
+      <button onClick={handleAddNewCustomerClick} className="add-new-button">Add New Customer</button>
+      
       <table>
         <thead>
           <tr>
@@ -148,6 +175,19 @@ const CustomerTable = () => {
           )}
         </tbody>
       </table>
+
+      {/* Add New Customer Modal */}
+      {isAddingNew && (
+        <div className="modal">
+          <h3>Add New Customer</h3>
+          <input type="text" name="name" placeholder="Name" onChange={handleNewCustomerInputChange} />
+          <input type="text" name="phone_number" placeholder="Phone Number" onChange={handleNewCustomerInputChange} />
+          <input type="text" name="address" placeholder="Address" onChange={handleNewCustomerInputChange} />
+          <input type="number" name="short_price" placeholder="Pant Price" onChange={handleNewCustomerInputChange} />
+          <input type="number" name="dress_price" placeholder="Shirt Price" onChange={handleNewCustomerInputChange} />
+          <button onClick={handleAddCustomerSaveClick}>Save</button>
+        </div>
+      )}
     </div>
   );
 };
