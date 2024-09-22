@@ -1,7 +1,7 @@
 .customer-table {
-  margin: 20px;
+  margin: 20px auto; /* Center the table horizontally */
   font-family: Arial, sans-serif;
-  width: 100%;
+  width: 80%; /* Decrease the table width to 80% */
   border-collapse: collapse;
 }
 
@@ -10,10 +10,15 @@
   font-size: 24px;
   margin-bottom: 10px;
   font-weight: bold;
+  background-color: #f2f2f2;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px 8px 0 0;
+  text-align: left;
 }
 
 .customer-table table {
-  width: 100%;
+  width: 100%; /* Keep the table's internal layout full width */
   border-collapse: collapse;
   margin-top: 10px;
   border: 1px solid #ddd;
@@ -33,8 +38,7 @@
 
 .customer-table td {
   background-color: #fff;
-  text-align: left;
-  padding: 10px;
+  text-align: center;
 }
 
 .customer-table tr:nth-child(even) {
@@ -48,7 +52,6 @@
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 4px;
-  text-align: center;
 }
 
 .customer-table button:hover {
@@ -69,39 +72,7 @@
   text-align: center;
 }
 
-/* Style for the Invalid Date text */
 .customer-table .invalid-date {
   color: #d9534f;
   font-weight: bold;
-}
-
-/* Table Header Alignment and Style */
-.customer-table th {
-  padding: 15px;
-  font-size: 16px;
-  background-color: #f2f2f2;
-  text-align: center;
-  color: #333;
-}
-
-/* Table Row Styling */
-.customer-table tr {
-  background-color: #fff;
-}
-
-.customer-table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-/* Action Button Style */
-.customer-table button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-}
-
-.customer-table button:hover {
-  background-color: #45a049;
 }

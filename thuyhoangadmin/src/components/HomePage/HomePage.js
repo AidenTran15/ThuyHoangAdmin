@@ -1,4 +1,3 @@
-
 import './HomePage.css'; 
 
 import React, { useEffect, useState } from 'react';
@@ -8,12 +7,10 @@ const CustomerTable = () => {
   const [customers, setCustomers] = useState([]);
 
   useEffect(() => {
-    // Fetch the customers from the API Gateway
     axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers')
       .then(response => {
-        console.log(response.data); // Inspect the structure of the response
-        const customerData = JSON.parse(response.data.body);  // Parse the body if it's a string
-        setCustomers(Array.isArray(customerData) ? customerData : []);  // Ensure it's an array
+        const customerData = JSON.parse(response.data.body);
+        setCustomers(Array.isArray(customerData) ? customerData : []);
       })
       .catch(error => {
         console.error("There was an error fetching the customers!", error);
@@ -35,7 +32,7 @@ const CustomerTable = () => {
           </tr>
         </thead>
         <tbody>
-          {Array.isArray(customers) && customers.length > 0 ? (
+          {customers.length > 0 ? (
             customers.map(customer => (
               <tr key={customer['phone_number']}>
                 <td>{customer.name}</td>
