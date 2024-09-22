@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './CustomerTable.css';  // Make sure you link the CSS
+import './CustomerTable.css';
 
 const CustomerTable = () => {
   const [customers, setCustomers] = useState([]);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [updatedCustomer, setUpdatedCustomer] = useState({});
-  const [newCustomer, setNewCustomer] = useState({});  // For adding a new customer
-  const [isAddingNew, setIsAddingNew] = useState(false); // Toggle for the add new modal
+  const [newCustomer, setNewCustomer] = useState({});
+  const [isAddingNew, setIsAddingNew] = useState(false);
 
   useEffect(() => {
     axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers')
@@ -22,22 +22,19 @@ const CustomerTable = () => {
 
   const handleEditClick = (customer) => {
     setEditingCustomer(customer['phone_number']);
-    setUpdatedCustomer(customer); // Set the selected customer to be edited
+    setUpdatedCustomer(customer);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setUpdatedCustomer({
-      ...updatedCustomer,
-      [name]: value
-    });
+    setUpdatedCustomer(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSaveClick = () => {
     axios.put('https://3dm9uksgnf.execute-api.ap-southeast-2.amazonaws.com/prod/update', updatedCustomer)
       .then(() => {
         setEditingCustomer(null);
-        setCustomers((prevCustomers) => prevCustomers.map(c => 
+        setCustomers(prevCustomers => prevCustomers.map(c =>
           c['phone_number'] === updatedCustomer['phone_number'] ? updatedCustomer : c
         ));
       })
@@ -58,24 +55,20 @@ const CustomerTable = () => {
       });
   };
 
-  // Handle new customer addition
   const handleNewCustomerInputChange = (e) => {
     const { name, value } = e.target;
-    setNewCustomer({
-      ...newCustomer,
-      [name]: value
-    });
+    setNewCustomer(prev => ({ ...prev, [name]: value }));
   };
 
   const handleAddNewCustomerClick = () => {
-    setIsAddingNew(true); // Show the modal to add new customer
+    setIsAddingNew(true);
   };
 
   const handleAddCustomerSaveClick = () => {
     axios.post('https://52s91z2sse.execute-api.ap-southeast-2.amazonaws.com/prod/add', newCustomer)
       .then(() => {
         setIsAddingNew(false);
-        setCustomers(prevCustomers => [...prevCustomers, newCustomer]); // Add new customer to the table
+        setCustomers(prevCustomers => [...prevCustomers, newCustomer]);
       })
       .catch(error => {
         console.error("Error adding new customer!", error);
@@ -179,13 +172,16 @@ const CustomerTable = () => {
       {/* Add New Customer Modal */}
       {isAddingNew && (
         <div className="modal">
-          <h3>Add New Customer</h3>
-          <input type="text" name="name" placeholder="Name" onChange={handleNewCustomerInputChange} />
-          <input type="text" name="phone_number" placeholder="Phone Number" onChange={handleNewCustomerInputChange} />
-          <input type="text" name="address" placeholder="Address" onChange={handleNewCustomerInputChange} />
-          <input type="number" name="short_price" placeholder="Pant Price" onChange={handleNewCustomerInputChange} />
-          <input type="number" name="dress_price" placeholder="Shirt Price" onChange={handleNewCustomerInputChange} />
-          <button onClick={handleAddCustomerSaveClick}>Save</button>
+          <div className="modal-content">
+            <h3>Add New Customer</h3>
+            <input type="text" name="name" placeholder="Name" onChange={handleNewCustomerInputChange} />
+            <input type="text" name="phone_number" placeholder="Phone Number" onChange={handleNewCustomerInputChange} />
+            <input type="text" name="address" placeholder="Address" onChange={handleNewCustomerInputChange} />
+            <input type="number" name="short_price" placeholder="Pant Price" onChange={handleNewCustomerInputChange} />
+            <input type="number" name="dress_price" placeholder="Shirt Price" onChange={handleNewCustomerInputChange} />
+            <button onClick={handleAddCustomerSaveClick}>Save</button>
+            <button onClick={() => setIsAddingNew(false)}>Cancel</button>
+          </div>
         </div>
       )}
     </div>
