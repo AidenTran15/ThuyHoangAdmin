@@ -90,10 +90,10 @@ const CustomerTable = () => {
 
   return (
     <div className="customer-table">
-  <div className="header-container">
-    <h2>Manage Customers</h2>
-    <button onClick={handleAddNewCustomerClick} className="add-new-button">Add New</button>
-  </div>
+      <div className="header-container">
+        <h2>Manage Customers</h2>
+        <button onClick={handleAddNewCustomerClick} className="add-new-button">Add New</button>
+      </div>
       <table>
         <thead>
           <tr>
@@ -102,6 +102,7 @@ const CustomerTable = () => {
             <th>Address</th>
             <th>Pant Price</th>
             <th>Shirt Price</th>
+            <th>Password</th> {/* New Password column */}
             <th>Actions</th>
           </tr>
         </thead>
@@ -160,6 +161,18 @@ const CustomerTable = () => {
                 </td>
                 <td>
                   {editingCustomer === customer['phone_number'] ? (
+                    <input
+                      type="password"
+                      name="password"
+                      value={updatedCustomer.password}
+                      onChange={handleInputChange}
+                    />
+                  ) : (
+                    customer.password
+                  )}
+                </td>
+                <td>
+                  {editingCustomer === customer['phone_number'] ? (
                     <button onClick={handleSaveClick}>Save</button>
                   ) : (
                     <>
@@ -177,7 +190,7 @@ const CustomerTable = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="6">No customers found</td>
+              <td colSpan="7">No customers found</td>
             </tr>
           )}
         </tbody>
@@ -193,6 +206,7 @@ const CustomerTable = () => {
             <input type="text" name="address" placeholder="Address" onChange={handleNewCustomerInputChange} />
             <input type="number" name="short_price" placeholder="Pant Price" onChange={handleNewCustomerInputChange} />
             <input type="number" name="dress_price" placeholder="Shirt Price" onChange={handleNewCustomerInputChange} />
+            <input type="password" name="password" placeholder="Password" onChange={handleNewCustomerInputChange} /> {/* Password input field */}
             <button onClick={handleAddCustomerSaveClick}>Save</button>
             <button onClick={() => setIsAddingNew(false)}>Cancel</button>
           </div>
