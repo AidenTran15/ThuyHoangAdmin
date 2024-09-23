@@ -13,6 +13,9 @@ const PantsProduct = () => {
     Quantity: 0
   });
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isDeleteConfirmation, setIsDeleteConfirmation] = useState(false);
+  const [productToDelete, setProductToDelete] = useState('');
+  const [confirmationInput, setConfirmationInput] = useState(''); // State for delete confirmation input
 
   useEffect(() => {
     // Fetch data from the Lambda function via API Gateway
@@ -55,15 +58,25 @@ const PantsProduct = () => {
   };
 
   const handleDeleteClick = (productID) => {
-    axios.delete('https://d28pbjftsc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
-      data: { ProductID: productID }
-    })
+    setProductToDelete(productID);
+    setIsDeleteConfirmation(true); // Show delete confirmation modal
+  };
+
+  const confirmDelete = () => {
+    if (confirmationInput === "Confirm") {
+      axios.delete('https://d28pbjftsc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
+        data: { ProductID: productToDelete }
+      })
       .then(() => {
-        setProducts(prevProducts => prevProducts.filter(p => p.ProductID !== productID));
+        setProducts(prevProducts => prevProducts.filter(p => p.ProductID !== productToDelete));
+        setProductToDelete('');
+        setConfirmationInput(''); // Reset confirmation input
       })
       .catch(error => {
         console.error("Error deleting the product!", error);
       });
+    }
+    setIsDeleteConfirmation(false); // Close confirmation modal
   };
 
   const handleAddNewClick = () => {
@@ -198,6 +211,22 @@ const PantsProduct = () => {
             />
             <button onClick={handleAddProductSave}>Save</button>
             <button onClick={() => setIsAddingNew(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteConfirmation && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p>Type "Confirm" to delete this product:</p>
+            <input 
+              type="text" 
+              onChange={(e) => setConfirmationInput(e.target.value)} 
+            />
+            <button onClick={confirmDelete}>Delete</button>
+            <button onClick={() => setIsDeleteConfirmation(false)}>Cancel</button>
           </div>
         </div>
       )}
