@@ -5,20 +5,26 @@ import './PantsProduct.css'; // Ensure this file contains the appropriate stylin
 const PantsProduct = () => {
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [updatedProduct, setUpdatedProduct] = useState({});
+  const [updatedProduct, setUpdatedProduct] = useState({
+    ProductID: '',
+    Color: '',
+    Size: 0,
+    Quantity: 0,
+  });
+
   const [newProduct, setNewProduct] = useState({
     ProductID: '',
     Color: '',
     Size: 0,
     Quantity: 0
   });
-  const [isAddingNew, setIsAddingNew] = useState(false);
-  const [isDeleteConfirmation, setIsDeleteConfirmation] = useState(false);
-  const [productToDelete, setProductToDelete] = useState('');
-  const [confirmationInput, setConfirmationInput] = useState(''); // State for delete confirmation input
 
   useEffect(() => {
-    // Fetch data from the Lambda function via API Gateway
+    fetchProducts();
+  }, []);
+
+  // Fetch all products from the Lambda function via API Gateway
+  const fetchProducts = () => {
     axios.get('https://jic2uc8adb.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then(response => {
         const productData = JSON.parse(response.data.body);  // Ensure response is parsed correctly
@@ -27,86 +33,163 @@ const PantsProduct = () => {
       .catch(error => {
         console.error("Error fetching the pants products!", error);
       });
-  }, []);
-
-  const handleEditClick = (product) => {
-    setEditingProduct(product.ProductID);
-    setUpdatedProduct(product); // Set the product to be edited
   };
 
+  // Set the product for editing and copy its data into the updatedProduct state
+  const handleEditClick = (product) => {
+    setEditingProduct(product.ProductID);
+    setUpdatedProduct({ ...product }); // Ensure ProductID is included
+  };
+
+  // Update the input fields in the updatedProduct state
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedProduct(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'Size' || name === 'Quantity' ? Number(value) : value,  // Ensure Size and Quantity are numbers
+      ProductID: prev.ProductID // Ensure ProductID stays intact
     }));
   };
 
+  // Save the updated product to the API
   const handleSaveClick = () => {
-    axios.put('https://0wg7yclqgf.execute-api.ap-southeast-2.amazonaws.com/prod/update', updatedProduct)
-      .then(() => {
-        setEditingProduct(null);
-        setProducts((prevProducts) =>
-          prevProducts.map(p => 
-            p.ProductID === updatedProduct.ProductID ? updatedProduct : p
-          )
-        );
-      })
-      .catch(error => {
-        console.error("Error updating the product!", error);
-      });
-  };
-
-  const handleDeleteClick = (productID) => {
-    setProductToDelete(productID);
-    setIsDeleteConfirmation(true); // Show delete confirmation modal
-  };
-
-  const confirmDelete = () => {
-    if (confirmationInput === "Confirm") {
-      axios.delete('https://d28pbjftsc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
-        data: { ProductID: productToDelete }
-      })
-      .then(() => {
-        setProducts(prevProducts => prevProducts.filter(p => p.ProductID !== productToDelete));
-        setProductToDelete('');
-        setConfirmationInput(''); // Reset confirmation input
-      })
-      .catch(error => {
-        console.error("Error deleting the product!", error);
-      });
+    console.log("Updating product:", updatedProduct);  // Log the updated product before the request
+  
+    // Ensure ProductID is present
+    if (!updatedProduct.ProductID) {
+      console.error("ProductID is missing!");  // Log if ProductID is missing
+      return;
     }
-    setIsDeleteConfirmation(false); // Close confirmation modal
+  
+    // Use axios.put for updating the product
+    axios.put('https://0wg7yclqgf.execute-api.ap-southeast-2.amazonaws.com/prod/update', 
+      { body: JSON.stringify(updatedProduct) }, // Wrap the data under "body"
+      {
+        headers: {
+          'Content-Type': 'application/json'  // Ensure Content-Type is JSON
+        }
+      }
+    )
+    .then(response => {
+      console.log("Product update response:", response.data);  // Log the response from the server
+      setEditingProduct(null);  // Exit edit mode
+      fetchProducts();  // Re-fetch the product list after the update
+    })
+    .catch(error => {
+      console.error("Error updating the product:", error.response ? error.response.data : error.message);  // Log detailed error message
+    });
   };
 
-  const handleAddNewClick = () => {
-    setIsAddingNew(true);
-  };
-
+  // Handle adding a new product
   const handleNewProductChange = (e) => {
     const { name, value } = e.target;
     setNewProduct(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'Size' || name === 'Quantity' ? Number(value) : value  // Ensure Size and Quantity are numbers
     }));
   };
 
-  const handleAddProductSave = () => {
-    axios.post('https://a1h71clwgl.execute-api.ap-southeast-2.amazonaws.com/prod/add', newProduct)
-      .then(() => {
-        setProducts(prevProducts => [...prevProducts, newProduct]);
-        setIsAddingNew(false);
-        setNewProduct({ ProductID: '', Color: '', Size: 0, Quantity: 0 }); // Reset form
-      })
-      .catch(error => {
-        console.error("Error adding the new product!", error);
-      });
+  const handleAddClick = () => {
+    console.log("Adding new product:", newProduct);
+
+    // Ensure that ProductID is not empty
+    if (!newProduct.ProductID) {
+      console.error("ProductID is required for adding a product!");
+      return;
+    }
+
+    axios.post('https://a1h71clwgl.execute-api.ap-southeast-2.amazonaws.com/prod/add', 
+      { body: JSON.stringify(newProduct) }, // Wrap data under "body"
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    .then(response => {
+      console.log("Product added successfully:", response.data);
+      fetchProducts();  // Refresh the product list
+      setNewProduct({ ProductID: '', Color: '', Size: 0, Quantity: 0 }); // Reset form
+    })
+    .catch(error => {
+      console.error("Error adding the product:", error.response ? error.response.data : error.message);
+    });
   };
+
+  // Handle deleting a product
+  const handleDeleteClick = (productID) => {
+    if (!window.confirm(`Are you sure you want to delete product ${productID}?`)) return;
+  
+    // Log the API URL and productID for debugging
+    const apiUrl = `https://d28pbjftsc.execute-api.ap-southeast-2.amazonaws.com/prod/delete`;
+    console.log(`Attempting to delete product with ID: ${productID}`);
+    console.log(`Calling API URL: ${apiUrl}`);
+  
+    // Format the request body as expected by the Lambda function
+    const requestBody = JSON.stringify({
+      body: JSON.stringify({ ProductID: productID })  // Send the ProductID inside a "body" field as a JSON string
+    });
+  
+    // Send the DELETE request
+    axios.delete(apiUrl, {
+      data: requestBody,  // Pass the formatted request body
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      console.log(`Product ${productID} deleted successfully! Response:`, response.data);
+      fetchProducts();  // Refresh the product list
+    })
+    .catch(error => {
+      // Log any error that occurs
+      if (error.response) {
+        console.error(`Error deleting product ${productID}. Status: ${error.response.status}`, error.response.data);
+      } else {
+        console.error(`Error deleting product ${productID}. Message: ${error.message}`);
+      }
+    });
+  };
+  
+
 
   return (
     <div className="pants-product-table">
       <h2>Manage Pants Products</h2>
-      <button onClick={handleAddNewClick} className="add-new-button">Add New Product</button>
+
+      {/* Form for adding new products */}
+      <div className="add-new-product">
+        <h3>Add New Product</h3>
+        <input 
+          type="text" 
+          name="ProductID" 
+          placeholder="Product ID" 
+          value={newProduct.ProductID} 
+          onChange={handleNewProductChange} 
+        />
+        <input 
+          type="text" 
+          name="Color" 
+          placeholder="Color" 
+          value={newProduct.Color} 
+          onChange={handleNewProductChange} 
+        />
+        <input 
+          type="number" 
+          name="Size" 
+          placeholder="Size" 
+          value={newProduct.Size} 
+          onChange={handleNewProductChange} 
+        />
+        <input 
+          type="number" 
+          name="Quantity" 
+          placeholder="Quantity" 
+          value={newProduct.Quantity} 
+          onChange={handleNewProductChange} 
+        />
+        <button onClick={handleAddClick}>Add Product</button>
+      </div>
 
       <table>
         <thead>
@@ -127,7 +210,7 @@ const PantsProduct = () => {
                   <input
                     type="text"
                     name="Color"
-                    value={updatedProduct.Color}
+                    value={updatedProduct.Color || ''}
                     onChange={handleInputChange}
                   />
                 ) : (
@@ -137,7 +220,7 @@ const PantsProduct = () => {
                   <input
                     type="number"
                     name="Size"
-                    value={updatedProduct.Size}
+                    value={updatedProduct.Size || 0}
                     onChange={handleInputChange}
                   />
                 ) : (
@@ -147,25 +230,22 @@ const PantsProduct = () => {
                   <input
                     type="number"
                     name="Quantity"
-                    value={updatedProduct.Quantity}
+                    value={updatedProduct.Quantity || 0}
                     onChange={handleInputChange}
                   />
                 ) : (
                   product.Quantity
                 )}</td>
-                <td>{editingProduct === product.ProductID ? (
-                  <button onClick={handleSaveClick}>Save</button>
-                ) : (
-                  <>
-                    <button onClick={() => handleEditClick(product)}>Edit</button>
-                    <button
-                      onClick={() => handleDeleteClick(product.ProductID)}
-                      style={{ backgroundColor: 'red', color: 'white', marginLeft: '5px' }}
-                    >
-                      Delete
-                    </button>
-                  </>
-                )}</td>
+                <td>
+                  {editingProduct === product.ProductID ? (
+                    <button onClick={handleSaveClick}>Save</button>
+                  ) : (
+                    <>
+                      <button onClick={() => handleEditClick(product)}>Edit</button>
+                      <button onClick={() => handleDeleteClick(product.ProductID)} style={{ backgroundColor: 'red', color: 'white', marginLeft: '5px' }}>Delete</button>
+                    </>
+                  )}
+                </td>
               </tr>
             ))
           ) : (
@@ -175,61 +255,6 @@ const PantsProduct = () => {
           )}
         </tbody>
       </table>
-
-      {/* Modal for adding a new product */}
-      {isAddingNew && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Add New Product</h3>
-            <input 
-              type="text" 
-              name="ProductID" 
-              placeholder="Product ID" 
-              value={newProduct.ProductID} 
-              onChange={handleNewProductChange} 
-            />
-            <input 
-              type="text" 
-              name="Color" 
-              placeholder="Color" 
-              value={newProduct.Color} 
-              onChange={handleNewProductChange} 
-            />
-            <input 
-              type="number" 
-              name="Size" 
-              placeholder="Size" 
-              value={newProduct.Size} 
-              onChange={handleNewProductChange} 
-            />
-            <input 
-              type="number" 
-              name="Quantity" 
-              placeholder="Quantity" 
-              value={newProduct.Quantity} 
-              onChange={handleNewProductChange} 
-            />
-            <button onClick={handleAddProductSave}>Save</button>
-            <button onClick={() => setIsAddingNew(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {isDeleteConfirmation && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>Type "Confirm" to delete this product:</p>
-            <input 
-              type="text" 
-              onChange={(e) => setConfirmationInput(e.target.value)} 
-            />
-            <button onClick={confirmDelete}>Delete</button>
-            <button onClick={() => setIsDeleteConfirmation(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
