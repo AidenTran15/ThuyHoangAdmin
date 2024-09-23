@@ -18,7 +18,10 @@ const PantsProduct = () => {
     Size: 0,
     Quantity: 0
   });
-  const [isAddingNew, setIsAddingNew] = useState(false); // Modal state
+
+  const [isAddingNew, setIsAddingNew] = useState(false); // State to manage add product modal visibility
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // State to manage delete confirmation modal visibility
+  const [productToDelete, setProductToDelete] = useState(null); // Store the productID of the product to be deleted
 
   useEffect(() => {
     fetchProducts();
@@ -119,41 +122,36 @@ const PantsProduct = () => {
     });
   };
 
-  // Handle deleting a product
+  // Handle deleting a product (with confirmation modal)
   const handleDeleteClick = (productID) => {
-    if (!window.confirm(`Are you sure you want to delete product ${productID}?`)) return;
-  
-    // Log the API URL and productID for debugging
+    setProductToDelete(productID);  // Set the product ID to be deleted
+    setIsDeleteModalVisible(true);  // Show the delete confirmation modal
+  };
+
+  // Confirm deletion of the product
+  const confirmDeleteProduct = () => {
     const apiUrl = `https://d28pbjftsc.execute-api.ap-southeast-2.amazonaws.com/prod/delete`;
-    console.log(`Attempting to delete product with ID: ${productID}`);
-    console.log(`Calling API URL: ${apiUrl}`);
+    console.log(`Attempting to delete product with ID: ${productToDelete}`);
   
-    // Format the request body as expected by the Lambda function
-    const requestBody = JSON.stringify({
-      body: JSON.stringify({ ProductID: productID })  // Send the ProductID inside a "body" field as a JSON string
-    });
-  
-    // Send the DELETE request
     axios.delete(apiUrl, {
-      data: requestBody,  // Pass the formatted request body
+      data: JSON.stringify({
+        body: JSON.stringify({ ProductID: productToDelete })
+      }),
       headers: {
         'Content-Type': 'application/json'
       }
     })
     .then(response => {
-      console.log(`Product ${productID} deleted successfully! Response:`, response.data);
+      console.log(`Product ${productToDelete} deleted successfully! Response:`, response.data);
       fetchProducts();  // Refresh the product list
+      setIsDeleteModalVisible(false);  // Close the delete confirmation modal
+      setProductToDelete(null);  // Reset the product to delete
     })
     .catch(error => {
-      // Log any error that occurs
-      if (error.response) {
-        console.error(`Error deleting product ${productID}. Status: ${error.response.status}`, error.response.data);
-      } else {
-        console.error(`Error deleting product ${productID}. Message: ${error.message}`);
-      }
+      console.error(`Error deleting product ${productToDelete}`, error);
     });
   };
-  
+
   return (
     <div className="pants-product-table">
       <h2>Manage Pants Products</h2>
@@ -259,6 +257,18 @@ const PantsProduct = () => {
             />
             <button onClick={handleAddProductSaveClick}>Save</button>
             <button onClick={() => setIsAddingNew(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalVisible && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete product {productToDelete}?</p>
+            <button onClick={confirmDeleteProduct}>Yes, Delete</button>
+            <button onClick={() => setIsDeleteModalVisible(false)}>Cancel</button>
           </div>
         </div>
       )}
