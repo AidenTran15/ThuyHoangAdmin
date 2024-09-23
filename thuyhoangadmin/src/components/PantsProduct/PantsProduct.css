@@ -119,3 +119,18 @@
   max-width: 90%;
   text-align: center;
 }
+
+.plus-icon {
+  font-size: 24px;
+  color: white;
+  background-color: green;
+  border: none;
+  cursor: pointer;
+  width: 40px;  /* Define the width of the button */
+  height: 40px;  /* Make sure the height matches the width to create a perfect circle */
+  border-radius: 100%;  /* This creates the circular shape */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
