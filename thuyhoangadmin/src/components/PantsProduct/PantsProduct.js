@@ -154,9 +154,11 @@ const PantsProduct = () => {
 
   return (
     <div className="pants-product-table">
-      <h2>Manage Pants Products</h2>
-      <button onClick={() => setIsAddingNew(true)} className="add-new-button">Add New Product</button>
-
+      <div className="header-container">
+        <h2>Manage Pants Products</h2>
+        <button onClick={() => setIsAddingNew(true)} className="add-new-button">Add New Product</button>
+      </div>
+  
       <table>
         <thead>
           <tr>
@@ -221,7 +223,7 @@ const PantsProduct = () => {
           )}
         </tbody>
       </table>
-
+  
       {/* Add New Product Modal */}
       {isAddingNew && (
         <div className="modal">
@@ -260,7 +262,7 @@ const PantsProduct = () => {
           </div>
         </div>
       )}
-
+  
       {/* Delete Confirmation Modal */}
       {isDeleteModalVisible && (
         <div className="modal">
@@ -274,6 +276,7 @@ const PantsProduct = () => {
       )}
     </div>
   );
+  
 };
 
 export default PantsProduct;
