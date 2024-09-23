@@ -18,6 +18,7 @@ const PantsProduct = () => {
     Size: 0,
     Quantity: 0
   });
+  const [isAddingNew, setIsAddingNew] = useState(false); // Modal state
 
   useEffect(() => {
     fetchProducts();
@@ -80,7 +81,7 @@ const PantsProduct = () => {
     });
   };
 
-  // Handle adding a new product
+  // Handle changes for adding a new product
   const handleNewProductChange = (e) => {
     const { name, value } = e.target;
     setNewProduct(prev => ({
@@ -89,7 +90,8 @@ const PantsProduct = () => {
     }));
   };
 
-  const handleAddClick = () => {
+  // Add a new product
+  const handleAddProductSaveClick = () => {
     console.log("Adding new product:", newProduct);
 
     // Ensure that ProductID is not empty
@@ -110,6 +112,7 @@ const PantsProduct = () => {
       console.log("Product added successfully:", response.data);
       fetchProducts();  // Refresh the product list
       setNewProduct({ ProductID: '', Color: '', Size: 0, Quantity: 0 }); // Reset form
+      setIsAddingNew(false); // Close modal
     })
     .catch(error => {
       console.error("Error adding the product:", error.response ? error.response.data : error.message);
@@ -151,45 +154,10 @@ const PantsProduct = () => {
     });
   };
   
-
-
   return (
     <div className="pants-product-table">
       <h2>Manage Pants Products</h2>
-
-      {/* Form for adding new products */}
-      <div className="add-new-product">
-        <h3>Add New Product</h3>
-        <input 
-          type="text" 
-          name="ProductID" 
-          placeholder="Product ID" 
-          value={newProduct.ProductID} 
-          onChange={handleNewProductChange} 
-        />
-        <input 
-          type="text" 
-          name="Color" 
-          placeholder="Color" 
-          value={newProduct.Color} 
-          onChange={handleNewProductChange} 
-        />
-        <input 
-          type="number" 
-          name="Size" 
-          placeholder="Size" 
-          value={newProduct.Size} 
-          onChange={handleNewProductChange} 
-        />
-        <input 
-          type="number" 
-          name="Quantity" 
-          placeholder="Quantity" 
-          value={newProduct.Quantity} 
-          onChange={handleNewProductChange} 
-        />
-        <button onClick={handleAddClick}>Add Product</button>
-      </div>
+      <button onClick={() => setIsAddingNew(true)} className="add-new-button">Add New Product</button>
 
       <table>
         <thead>
@@ -255,6 +223,45 @@ const PantsProduct = () => {
           )}
         </tbody>
       </table>
+
+      {/* Add New Product Modal */}
+      {isAddingNew && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Add New Product</h3>
+            <input 
+              type="text" 
+              name="ProductID" 
+              placeholder="Product ID" 
+              value={newProduct.ProductID} 
+              onChange={handleNewProductChange} 
+            />
+            <input 
+              type="text" 
+              name="Color" 
+              placeholder="Color" 
+              value={newProduct.Color} 
+              onChange={handleNewProductChange} 
+            />
+            <input 
+              type="number" 
+              name="Size" 
+              placeholder="Size" 
+              value={newProduct.Size} 
+              onChange={handleNewProductChange} 
+            />
+            <input 
+              type="number" 
+              name="Quantity" 
+              placeholder="Quantity" 
+              value={newProduct.Quantity} 
+              onChange={handleNewProductChange} 
+            />
+            <button onClick={handleAddProductSaveClick}>Save</button>
+            <button onClick={() => setIsAddingNew(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
