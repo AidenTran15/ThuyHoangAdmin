@@ -156,8 +156,8 @@ const PantsProduct = () => {
     <div className="pants-product-table">
       <div className="header-container">
         <h2>Manage Pants Products</h2>
-        {/* <button onClick={() => setIsAddingNew(true)} className="add-new-button">Add New Product</button> */}
-        <button onClick={() => setIsAddingNew(true)} class="plus-icon">+</button>
+        <button onClick={() => setIsAddingNew(true)} className="add-new-button">Add New</button>
+        {/* <button onClick={() => setIsAddingNew(true)} class="plus-icon">+</button> */}
 
       </div>
   

@@ -4,7 +4,12 @@ import PantsProduct from '../PantsProduct/PantsProduct';
 const HomePage = () => {
   return (
     <div>
+      <br/>
+      <br/>
       <CustomerTable />
+      <br/>
+      <br/>
+      <br/>
       <PantsProduct/> 
     </div>
   );
