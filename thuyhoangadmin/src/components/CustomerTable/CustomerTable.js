@@ -12,6 +12,7 @@ const CustomerTable = () => {
   const [customerToDelete, setCustomerToDelete] = useState('');
   const [confirmationInput, setConfirmationInput] = useState(''); // State for confirmation input
 
+  // Fetch all customers on component mount
   useEffect(() => {
     axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers')
       .then(response => {
@@ -23,20 +24,28 @@ const CustomerTable = () => {
       });
   }, []);
 
+  // Set the customer for editing and pre-fill their details in the form
   const handleEditClick = (customer) => {
     setEditingCustomer(customer['phone_number']);
     setUpdatedCustomer(customer);
   };
 
+  // Handle input changes for updated customer details
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedCustomer(prev => ({ ...prev, [name]: value }));
   };
 
+  // Save updated customer details
   const handleSaveClick = () => {
-    axios.put('https://3dm9uksgnf.execute-api.ap-southeast-2.amazonaws.com/prod/update', updatedCustomer)
+    console.log("Updating customer:", updatedCustomer);
+    const requestBody = { body: JSON.stringify(updatedCustomer) }; // Format the request body
+
+    axios.put('https://3dm9uksgnf.execute-api.ap-southeast-2.amazonaws.com/prod/update', requestBody, {
+      headers: { 'Content-Type': 'application/json' }
+    })
       .then(() => {
-        setEditingCustomer(null);
+        setEditingCustomer(null); // Exit editing mode
         setCustomers(prevCustomers => prevCustomers.map(c =>
           c['phone_number'] === updatedCustomer['phone_number'] ? updatedCustomer : c
         ));
@@ -46,19 +55,27 @@ const CustomerTable = () => {
       });
   };
 
+  // Handle input for adding new customer details
   const handleNewCustomerInputChange = (e) => {
     const { name, value } = e.target;
     setNewCustomer(prev => ({ ...prev, [name]: value }));
   };
 
+  // Open modal for adding a new customer
   const handleAddNewCustomerClick = () => {
     setIsAddingNew(true);
   };
 
+  // Save new customer details
   const handleAddCustomerSaveClick = () => {
-    axios.post('https://52s91z2sse.execute-api.ap-southeast-2.amazonaws.com/prod/add', newCustomer)
+    console.log("Adding new customer:", newCustomer);
+    const requestBody = { body: JSON.stringify(newCustomer) }; // Format the request body
+
+    axios.post('https://52s91z2sse.execute-api.ap-southeast-2.amazonaws.com/prod/add', requestBody, {
+      headers: { 'Content-Type': 'application/json' }
+    })
       .then(() => {
-        setIsAddingNew(false);
+        setIsAddingNew(false); // Close add modal
         setCustomers(prevCustomers => [...prevCustomers, newCustomer]);
       })
       .catch(error => {
@@ -66,15 +83,20 @@ const CustomerTable = () => {
       });
   };
 
+  // Handle delete customer action
   const handleDeleteClick = (phone_number) => {
     setCustomerToDelete(phone_number);
     setIsDeleteConfirmation(true); // Show delete confirmation modal
   };
 
+  // Confirm and delete customer
   const confirmDelete = () => {
     if (confirmationInput === "Confirm") {
+      const requestBody = { body: JSON.stringify({ phone_number: customerToDelete }) }; // Format the request body
+
       axios.delete('https://htjd8snvtc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
-        data: { phone_number: customerToDelete }
+        data: requestBody,
+        headers: { 'Content-Type': 'application/json' }
       })
         .then(() => {
           setCustomers(prevCustomers => prevCustomers.filter(c => c['phone_number'] !== customerToDelete));
@@ -85,7 +107,7 @@ const CustomerTable = () => {
           console.error("Error deleting the customer!", error);
         });
     }
-    setIsDeleteConfirmation(false); // Close confirmation modal
+    setIsDeleteConfirmation(false); // Close delete confirmation modal
   };
 
   return (
@@ -102,7 +124,7 @@ const CustomerTable = () => {
             <th>Address</th>
             <th>Pant Price</th>
             <th>Shirt Price</th>
-            <th>Password</th> {/* New Password column */}
+            <th>Password</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -115,7 +137,7 @@ const CustomerTable = () => {
                     <input
                       type="text"
                       name="name"
-                      value={updatedCustomer.name}
+                      value={updatedCustomer.name || ''}
                       onChange={handleInputChange}
                     />
                   ) : (
@@ -128,7 +150,7 @@ const CustomerTable = () => {
                     <input
                       type="text"
                       name="address"
-                      value={updatedCustomer.address}
+                      value={updatedCustomer.address || ''}
                       onChange={handleInputChange}
                     />
                   ) : (
@@ -140,7 +162,7 @@ const CustomerTable = () => {
                     <input
                       type="number"
                       name="short_price"
-                      value={updatedCustomer.short_price}
+                      value={updatedCustomer.short_price || 0}
                       onChange={handleInputChange}
                     />
                   ) : (
@@ -152,7 +174,7 @@ const CustomerTable = () => {
                     <input
                       type="number"
                       name="dress_price"
-                      value={updatedCustomer.dress_price}
+                      value={updatedCustomer.dress_price || 0}
                       onChange={handleInputChange}
                     />
                   ) : (
@@ -164,7 +186,7 @@ const CustomerTable = () => {
                     <input
                       type="password"
                       name="password"
-                      value={updatedCustomer.password}
+                      value={updatedCustomer.password || ''}
                       onChange={handleInputChange}
                     />
                   ) : (
@@ -177,8 +199,8 @@ const CustomerTable = () => {
                   ) : (
                     <>
                       <button onClick={() => handleEditClick(customer)}>Edit</button>
-                      <button 
-                        onClick={() => handleDeleteClick(customer['phone_number'])} 
+                      <button
+                        onClick={() => handleDeleteClick(customer['phone_number'])}
                         style={{ backgroundColor: 'red', color: 'white', marginLeft: '5px' }}
                       >
                         Delete
@@ -206,7 +228,7 @@ const CustomerTable = () => {
             <input type="text" name="address" placeholder="Address" onChange={handleNewCustomerInputChange} />
             <input type="number" name="short_price" placeholder="Pant Price" onChange={handleNewCustomerInputChange} />
             <input type="number" name="dress_price" placeholder="Shirt Price" onChange={handleNewCustomerInputChange} />
-            <input type="password" name="password" placeholder="Password" onChange={handleNewCustomerInputChange} /> {/* Password input field */}
+            <input type="password" name="password" placeholder="Password" onChange={handleNewCustomerInputChange} />
             <button onClick={handleAddCustomerSaveClick}>Save</button>
             <button onClick={() => setIsAddingNew(false)}>Cancel</button>
           </div>
@@ -219,9 +241,9 @@ const CustomerTable = () => {
           <div className="modal-content">
             <h3>Confirm Deletion</h3>
             <p>Type "Confirm" to delete this customer:</p>
-            <input 
-              type="text" 
-              onChange={(e) => setConfirmationInput(e.target.value)} 
+            <input
+              type="text"
+              onChange={(e) => setConfirmationInput(e.target.value)}
             />
             <button onClick={confirmDelete}>Delete</button>
             <button onClick={() => setIsDeleteConfirmation(false)}>Cancel</button>
