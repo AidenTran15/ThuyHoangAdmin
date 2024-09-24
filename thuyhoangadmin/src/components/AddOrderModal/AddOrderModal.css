@@ -9,9 +9,9 @@
     justify-content: center;
     align-items: center;
     z-index: 999;
-  }
+}
   
-  .modal-content {
+.modal-content {
     background-color: #f4f7f6;
     padding: 40px;
     border-radius: 10px;
@@ -20,31 +20,31 @@
     max-width: 90%;
     animation: fadeIn 0.3s ease;
     font-family: 'Arial', sans-serif;
-  }
+}
   
-  .modal-title {
+.modal-title {
     font-size: 28px;
     margin-bottom: 30px;
     color: #343a40;
     font-weight: bold;
     text-align: center;
-  }
+}
   
-  /* Align inputs and labels inline */
-  .input-group-inline {
+.input-group-inline {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-  }
+    gap: 10px;
+}
   
-  .input-label {
+.input-label {
     font-size: 14px;
     color: #6c757d;
     margin-right: 10px;
-  }
+}
   
-  .input-field {
+.input-field {
     width: 120px;
     padding: 8px;
     border-radius: 5px;
@@ -52,101 +52,87 @@
     font-size: 16px;
     background-color: #ffffff;
     transition: border-color 0.3s;
-  }
+    height: 38px; /* Ensure all inputs have the same height */
+    box-sizing: border-box;
+}
+
+.input-field[type="number"] {
+    -moz-appearance: textfield; /* Removes up/down arrows in Firefox */
+    height: 38px; /* Match the height for number inputs */
+}
+
+input[type="number"]::-webkit-inner-spin-button, 
+input[type="number"]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; /* Removes up/down arrows in Chrome */
+    margin: 0;
+}
   
-  .input-field:focus {
+.input-field:focus {
     border-color: #007bff;
     outline: none;
-  }
+}
   
-  /* Row for product details */
-  .product-details-row {
+.product-details-row {
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: baseline; /* Aligns items properly with labels */
+    gap: 15px;
     margin-bottom: 20px;
-  }
-  
-  .product-details-row .input-field {
-    width: 120px;
-  }
-  
-  /* Align buttons inline */
-  .button-row {
+}
+
+/* Move the quantity input field down slightly */
+.input-group-quantity {
+    margin-top: 6px; /* Adjust this value to move the box down */
+}
+
+button.confirm-product-button {
+    height: 38px; /* Align buttons with input field height */
     display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
+    justify-content: center;
+    align-items: center;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
   
-  .add-product-button,
-  .confirm-product-button,
-  .save-button,
-  .cancel-button {
+.add-product-button,
+.save-button,
+.cancel-button {
     padding: 12px 24px;
     font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
-  }
-  
-  .add-product-button {
+    height: 38px; /* Set a height for buttons to match the input fields */
+}
+
+.add-product-button {
     background-color: #28a745;
     color: white;
-  }
-  
-  .add-product-button:hover {
+}
+
+.add-product-button:hover {
     background-color: #218838;
-  }
-  
-  .confirm-product-button {
-    background-color: #ff4d4f;
-    color: white;
-    margin-left: 10px;
-  }
-  
-  .confirm-product-button:hover {
-    opacity: 0.85;
-  }
-  
-  .save-button {
+}
+
+.save-button {
     background-color: #28a745;
     color: white;
-  }
-  
-  .cancel-button {
+}
+
+.cancel-button {
     background-color: #ff4d4f;
     color: white;
-  }
-  
-  /* Flex align total amount, total quantity, and order status */
-  .flex-align {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-  
-  .input-flex {
-    display: flex;
-    flex-direction: column;
-    margin-right: 20px;
-  }
-  
-  .input-flex .input-label {
-    margin-bottom: 5px;
-  }
-  
-  .input-flex .input-field {
-    width: 100%;
-  }
-  
-  @keyframes fadeIn {
+}
+
+@keyframes fadeIn {
     from {
       opacity: 0;
     }
     to {
       opacity: 1;
     }
-  }
-  
+}

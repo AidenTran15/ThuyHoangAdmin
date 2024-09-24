@@ -109,7 +109,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
                     </select>
                   </div>
 
-                  <div className="input-group">
+                  <div className="input-group input-group-quantity">
                     <label className="input-label">Quantity</label>
                     <input
                       type="number"
