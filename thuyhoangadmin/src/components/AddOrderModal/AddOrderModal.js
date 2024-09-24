@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import './AddOrderModal.css';
 
-const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAddingNew }) => {
+const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleClose }) => {
   // Initialize with one empty product if the productList is empty
   useEffect(() => {
     if (newOrder.productList.length === 0) {
@@ -195,7 +195,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
           <button className="save-button" onClick={handleAddOrderSaveClick}>
             Save
           </button>
-          <button className="cancel-button" onClick={() => setIsAddingNew(false)}>
+          <button className="cancel-button" onClick={handleClose}>
             Cancel
           </button>
         </div>
