@@ -1,7 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios'; // Make sure to import axios
 import './AddOrderModal.css';
 
 const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleClose }) => {
+  // State to store the list of customers
+  const [customers, setCustomers] = useState([]);
+  const [loadingCustomers, setLoadingCustomers] = useState(true);
+  const [customerError, setCustomerError] = useState(null);
+
+  // Fetch customers when the component mounts
+  useEffect(() => {
+    axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers')
+      .then(response => {
+        const customerData = JSON.parse(response.data.body);
+        setCustomers(customerData);
+        setLoadingCustomers(false);
+      })
+      .catch(error => {
+        console.error('Error fetching customers:', error);
+        setCustomerError('Error fetching customers');
+        setLoadingCustomers(false);
+      });
+  }, []);
+
   // Initialize with one empty product if the productList is empty
   useEffect(() => {
     if (newOrder.productList.length === 0) {
@@ -42,11 +63,21 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
     setNewOrder({ ...newOrder, productList: updatedProducts });
   };
 
+  // Handle changes to the new order inputs
   const handleNewOrderInputChange = (e) => {
     const { name, value } = e.target;
     setNewOrder((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  // Handle customer selection from the dropdown
+  const handleCustomerChange = (e) => {
+    const selectedCustomerName = e.target.value;
+    setNewOrder((prev) => ({
+      ...prev,
+      customer: selectedCustomerName,
     }));
   };
 
@@ -57,14 +88,25 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
 
         <div className="input-group">
           <label className="input-label">Customer Name</label>
-          <input
-            type="text"
-            name="customer"
-            placeholder="Enter customer name"
-            value={newOrder.customer}
-            onChange={handleNewOrderInputChange}
-            className="input-field"
-          />
+          {loadingCustomers ? (
+            <p>Loading customers...</p>
+          ) : customerError ? (
+            <p>{customerError}</p>
+          ) : (
+            <select
+              name="customer"
+              value={newOrder.customer || ''}
+              onChange={handleCustomerChange}
+              className="input-field"
+            >
+              <option value="" disabled>Select a customer</option>
+              {customers.map((customer) => (
+                <option key={customer.phone_number} value={customer.name}>
+                  {customer.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {newOrder.productList.map((product, index) => (
