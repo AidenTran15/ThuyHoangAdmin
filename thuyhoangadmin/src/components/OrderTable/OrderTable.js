@@ -13,16 +13,31 @@ const OrderTable = () => {
     totalQuantity: 0,
     status: ''
   });
+  
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [error, setError] = useState(null);     // Add error state
 
   // Fetch all orders on component mount
   useEffect(() => {
-    axios.get('https://your-api-endpoint.com/orders') // Replace with your actual API endpoint
+    axios.get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your actual API endpoint
       .then(response => {
-        const orderData = response.data; // Assuming the response is already in JSON format
+        console.log(response.data); // Log the response to check if it's structured as expected
+
+        // Check if the response body needs to be parsed from JSON
+        let orderData;
+        if (typeof response.data.body === 'string') {
+          orderData = JSON.parse(response.data.body); // Parse if it's a string
+        } else {
+          orderData = response.data.body; // Otherwise, use as is
+        }
+
         setOrders(Array.isArray(orderData) ? orderData : []);
+        setLoading(false); // Stop loading when data is fetched
       })
       .catch(error => {
         console.error("Error fetching the orders!", error);
+        setError("Error fetching the orders."); // Set the error message
+        setLoading(false); // Stop loading in case of error
       });
   }, []);
 
@@ -56,36 +71,43 @@ const OrderTable = () => {
         <h2>Manage Orders</h2>
         <button onClick={() => setIsAddingNew(true)} className="add-new-button">Add New Order</button>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Products</th>
-            <th>Total</th>
-            <th>Total Quantity</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.length > 0 ? (
-            orders.map(order => (
-              <tr key={order.orderID}>
-                <td>{order.orderID}</td>
-                <td>{order.customer}</td>
-                <td>{order.productList.join(', ')}</td> {/* Display product list as a comma-separated string */}
-                <td>{order.total}</td>
-                <td>{order.totalQuantity}</td>
-                <td>{order.status}</td>
-              </tr>
-            ))
-          ) : (
+
+      {loading ? (
+        <p>Loading orders...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        <table>
+          <thead>
             <tr>
-              <td colSpan="6">No orders found</td>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Products</th>
+              <th>Total</th>
+              <th>Total Quantity</th>
+              <th>Status</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {orders.length > 0 ? (
+              orders.map(order => (
+                <tr key={order.orderID}>
+                  <td>{order.orderID}</td>
+                  <td>{order.Customer}</td>
+                  <td>{order.ProductList ? order.ProductList.join(', ') : 'No products'}</td>
+                  <td>{order.Total}</td>
+                  <td>{order.TotalQuantity}</td>
+                  <td>{order.Status}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6">No orders found</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      )}
 
       {/* Add New Order Modal */}
       {isAddingNew && (
