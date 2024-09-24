@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './OrderTable.css'; // Make sure to include your custom CSS file
+import './OrderTable.css';
+import AddOrderModal from '../AddOrderModal/AddOrderModal'; // Import the new modal component
 
 const OrderTable = () => {
   const [orders, setOrders] = useState([]);
@@ -8,57 +9,47 @@ const OrderTable = () => {
   const [newOrder, setNewOrder] = useState({
     orderID: '',
     customer: '',
-    productList: [],
+    productList: [{ color: 'Red', size: 30, quantity: 1 }],
     total: 0,
     totalQuantity: 0,
     status: ''
   });
-  
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(null);     // Add error state
 
-  // Fetch all orders on component mount
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const generateOrderID = () => {
+    return Math.floor(10000 + Math.random() * 90000).toString();
+  };
+
   useEffect(() => {
-    axios.get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your actual API endpoint
+    axios.get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then(response => {
-        console.log(response.data); // Log the response to check if it's structured as expected
-
-        // Check if the response body needs to be parsed from JSON
+        console.log(response.data);
         let orderData;
         if (typeof response.data.body === 'string') {
-          orderData = JSON.parse(response.data.body); // Parse if it's a string
+          orderData = JSON.parse(response.data.body);
         } else {
-          orderData = response.data.body; // Otherwise, use as is
+          orderData = response.data.body;
         }
-
         setOrders(Array.isArray(orderData) ? orderData : []);
-        setLoading(false); // Stop loading when data is fetched
+        setLoading(false);
       })
       .catch(error => {
         console.error("Error fetching the orders!", error);
-        setError("Error fetching the orders."); // Set the error message
-        setLoading(false); // Stop loading in case of error
+        setError("Error fetching the orders.");
+        setLoading(false);
       });
   }, []);
 
-  // Handle input changes for new order details
-  const handleNewOrderInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewOrder(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Save new order details
   const handleAddOrderSaveClick = () => {
-    console.log("Adding new order:", newOrder);
-    axios.post('https://your-api-endpoint.com/orders', newOrder, {
+    const orderWithID = { ...newOrder, orderID: generateOrderID() };
+    axios.post('https://your-api-endpoint.com/orders', orderWithID, {
       headers: { 'Content-Type': 'application/json' }
     })
       .then(() => {
-        setIsAddingNew(false); // Close add modal
-        setOrders(prevOrders => [...prevOrders, newOrder]);
+        setIsAddingNew(false);
+        setOrders(prevOrders => [...prevOrders, orderWithID]);
       })
       .catch(error => {
         console.error("Error adding new order!", error);
@@ -109,57 +100,13 @@ const OrderTable = () => {
         </table>
       )}
 
-      {/* Add New Order Modal */}
       {isAddingNew && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Add New Order</h3>
-            <input 
-              type="text" 
-              name="orderID" 
-              placeholder="Order ID" 
-              value={newOrder.orderID} 
-              onChange={handleNewOrderInputChange} 
-            />
-            <input 
-              type="text" 
-              name="customer" 
-              placeholder="Customer" 
-              value={newOrder.customer} 
-              onChange={handleNewOrderInputChange} 
-            />
-            <input 
-              type="text" 
-              name="productList" 
-              placeholder="Product List (comma separated)" 
-              value={newOrder.productList} 
-              onChange={(e) => setNewOrder({ ...newOrder, productList: e.target.value.split(',') })}
-            />
-            <input 
-              type="number" 
-              name="total" 
-              placeholder="Total" 
-              value={newOrder.total} 
-              onChange={handleNewOrderInputChange} 
-            />
-            <input 
-              type="number" 
-              name="totalQuantity" 
-              placeholder="Total Quantity" 
-              value={newOrder.totalQuantity} 
-              onChange={handleNewOrderInputChange} 
-            />
-            <input 
-              type="text" 
-              name="status" 
-              placeholder="Status" 
-              value={newOrder.status} 
-              onChange={handleNewOrderInputChange} 
-            />
-            <button onClick={handleAddOrderSaveClick}>Save</button>
-            <button onClick={() => setIsAddingNew(false)}>Cancel</button>
-          </div>
-        </div>
+        <AddOrderModal 
+          newOrder={newOrder}
+          setNewOrder={setNewOrder}
+          handleAddOrderSaveClick={handleAddOrderSaveClick}
+          handleClose={() => setIsAddingNew(false)}
+        />
       )}
     </div>
   );
