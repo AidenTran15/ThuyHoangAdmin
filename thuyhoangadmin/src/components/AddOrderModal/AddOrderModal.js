@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './AddOrderModal.css';
 
 const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAddingNew }) => {
@@ -57,84 +57,86 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
 
         {newOrder.productList.map((product, index) => (
           <div key={index} className="product-card">
-            <div className="product-details-row">
-              {/* If the product is not confirmed, allow editing; otherwise, display details */}
-              {product.isConfirmed ? (
-                <>
-                  <div className="input-group">
-                    <span className="input-label">Color</span>
-                    <span className="locked-field">{product.color}</span>
-                  </div>
-                  <div className="input-group">
-                    <span className="input-label">Size</span>
-                    <span className="locked-field">{product.size}</span>
-                  </div>
-                  <div className="input-group">
-                    <span className="input-label">Quantity</span>
-                    <span className="locked-field">{product.quantity}</span>
-                  </div>
+            <div className="product-row">
+              {/* Color Field */}
+              <div className="product-field-group">
+                <label className="input-label">Color</label>
+                {product.isConfirmed ? (
+                  <span className="locked-field">{product.color}</span>
+                ) : (
+                  <select
+                    value={product.color}
+                    onChange={(e) => handleProductChange(index, 'color', e.target.value)}
+                    className="input-field"
+                  >
+                    <option value="red">Red</option>
+                    <option value="blue">Blue</option>
+                    <option value="yellow">Yellow</option>
+                  </select>
+                )}
+              </div>
+
+              {/* Size Field */}
+              <div className="product-field-group">
+                <label className="input-label">Size</label>
+                {product.isConfirmed ? (
+                  <span className="locked-field">{product.size}</span>
+                ) : (
+                  <select
+                    value={product.size}
+                    onChange={(e) => handleProductChange(index, 'size', e.target.value)}
+                    className="input-field"
+                  >
+                    <option value={30}>30</option>
+                    <option value={32}>32</option>
+                    <option value={33}>33</option>
+                    <option value={34}>34</option>
+                  </select>
+                )}
+              </div>
+
+              {/* Quantity Field */}
+              <div className="product-field-group">
+                <label className="input-label">Quantity</label>
+                {product.isConfirmed ? (
+                  <span className="locked-field">{product.quantity}</span>
+                ) : (
+                  <input
+                    type="number"
+                    value={product.quantity}
+                    onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
+                    className="input-field"
+                  />
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div className="button-group">
+                {!product.isConfirmed ? (
+                  <button
+                    className="confirm-product-button"
+                    onClick={() => confirmProduct(index)}
+                  >
+                    Add
+                  </button>
+                ) : (
                   <button
                     className="remove-product-button"
                     onClick={() => removeProduct(index)}
                   >
                     Remove
                   </button>
-                </>
-              ) : (
-                <>
-                  <div className="input-group">
-                    <label className="input-label">Color</label>
-                    <select
-                      value={product.color}
-                      onChange={(e) => handleProductChange(index, 'color', e.target.value)}
-                      className="input-field"
-                    >
-                      <option value="red">Red</option>
-                      <option value="blue">Blue</option>
-                      <option value="yellow">Yellow</option>
-                    </select>
-                  </div>
-
-                  <div className="input-group">
-                    <label className="input-label">Size</label>
-                    <select
-                      value={product.size}
-                      onChange={(e) => handleProductChange(index, 'size', e.target.value)}
-                      className="input-field"
-                    >
-                      <option value={30}>30</option>
-                      <option value={32}>32</option>
-                      <option value={33}>33</option>
-                      <option value={34}>34</option>
-                    </select>
-                  </div>
-
-                  <div className="input-group input-group-quantity">
-                    <label className="input-label">Quantity</label>
-                    <input
-                      type="number"
-                      value={product.quantity}
-                      onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
-                      className="input-field"
-                    />
-                  </div>
-
-                  <button
-                    className="confirm-product-button"
-                    onClick={() => confirmProduct(index)}
-                  >
-                    Add 
-                  </button>
-                </>
-              )}
+                )}
+              </div>
             </div>
           </div>
         ))}
 
         <button className="add-product-button" onClick={addProduct}>
-           Add More 
+          Add More
         </button>
 
+        {/* Other Input Fields */}
         <div className="input-group">
           <label className="input-label">Total Amount</label>
           <input

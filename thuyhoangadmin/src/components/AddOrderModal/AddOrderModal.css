@@ -1,121 +1,157 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Modal Overlay */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 999;
+    animation: fadeIn 0.3s ease;
 }
-  
+
+/* Modal Content */
 .modal-content {
-    background-color: #f4f7f6;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     width: 600px;
     max-width: 90%;
-    animation: fadeIn 0.3s ease;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    position: relative;
+    animation: slideUp 0.3s ease;
 }
-  
+
 .modal-title {
-    font-size: 28px;
-    margin-bottom: 30px;
-    color: #343a40;
-    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333333;
+    font-weight: 500;
     text-align: center;
 }
-  
-.input-group-inline {
+
+/* Input Groups */
+.input-group {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     margin-bottom: 20px;
-    gap: 10px;
 }
-  
+
 .input-label {
     font-size: 14px;
-    color: #6c757d;
-    margin-right: 10px;
+    color: #555555;
+    margin-bottom: 6px;
 }
-  
+
 .input-field {
-    width: 120px;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ced4da;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #dddddd;
     font-size: 16px;
-    background-color: #ffffff;
-    transition: border-color 0.3s;
-    height: 38px; /* Ensure all inputs have the same height */
-    box-sizing: border-box;
+    background-color: #fafafa;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.input-field[type="number"] {
-    -moz-appearance: textfield; /* Removes up/down arrows in Firefox */
-    height: 38px; /* Match the height for number inputs */
-}
-
-input[type="number"]::-webkit-inner-spin-button, 
-input[type="number"]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; /* Removes up/down arrows in Chrome */
-    margin: 0;
-}
-  
 .input-field:focus {
     border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     outline: none;
 }
-  
-.product-details-row {
+
+/* Product Row */
+.product-row {
     display: flex;
-    justify-content: flex-start;
-    align-items: baseline; /* Aligns items properly with labels */
+    align-items: center;
     gap: 15px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
 }
 
-/* Move the quantity input field down slightly */
-.input-group-quantity {
-    margin-top: 6px; /* Adjust this value to move the box down */
-}
-
-button.confirm-product-button {
-    height: 38px; /* Align buttons with input field height */
+/* Product Field Group */
+.product-field-group {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #ff4d4f;
+    flex-direction: column;
+    flex: 1;
+    min-width: 100px;
+}
+
+.locked-field {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #dddddd;
+    font-size: 16px;
+    background-color: #f5f5f5;
+    color: #777777;
+}
+
+/* Button Group */
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.confirm-product-button,
+.remove-product-button {
+    padding: 8px 16px;
+    font-size: 14px;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
-  
+
+.confirm-product-button {
+    background-color: #28a745;
+}
+
+.confirm-product-button:hover {
+    background-color: #218838;
+}
+
+.remove-product-button {
+    background-color: #dc3545;
+}
+
+.remove-product-button:hover {
+    background-color: #c82333;
+}
+
+/* Additional Buttons */
 .add-product-button,
 .save-button,
 .cancel-button {
     padding: 12px 24px;
     font-size: 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s;
-    height: 38px; /* Set a height for buttons to match the input fields */
+    margin-right: 10px;
 }
 
 .add-product-button {
-    background-color: #28a745;
+    background-color: #007bff;
     color: white;
 }
 
 .add-product-button:hover {
-    background-color: #218838;
+    background-color: #0069d9;
 }
 
 .save-button {
@@ -123,16 +159,78 @@ button.confirm-product-button {
     color: white;
 }
 
+.save-button:hover {
+    background-color: #218838;
+}
+
 .cancel-button {
-    background-color: #ff4d4f;
+    background-color: #6c757d;
     color: white;
 }
 
+.cancel-button:hover {
+    background-color: #5a6268;
+}
+
+/* Modal Footer */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+/* Animations */
 @keyframes fadeIn {
     from {
-      opacity: 0;
+        opacity: 0;
     }
+
     to {
-      opacity: 1;
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .modal-content {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .product-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .product-field-group {
+        min-width: 100%;
+    }
+
+    .button-group {
+        flex-direction: row;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .add-product-button,
+    .save-button,
+    .cancel-button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
