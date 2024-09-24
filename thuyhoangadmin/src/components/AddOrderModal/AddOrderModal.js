@@ -3,7 +3,6 @@ import axios from 'axios'; // Make sure to import axios
 import './AddOrderModal.css';
 
 const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleClose }) => {
-  // State to store the list of customers
   const [customers, setCustomers] = useState([]);
   const [loadingCustomers, setLoadingCustomers] = useState(true);
   const [customerError, setCustomerError] = useState(null);
@@ -35,6 +34,15 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
     }
   }, [newOrder.productList.length, setNewOrder]);
 
+  // Automatically update the total quantity when the product list changes
+  useEffect(() => {
+    const totalQuantity = newOrder.productList.reduce((total, product) => total + parseInt(product.quantity || 0), 0);
+    setNewOrder((prev) => ({
+      ...prev,
+      totalQuantity,
+    }));
+  }, [newOrder.productList, setNewOrder]);
+
   // Handle product changes
   const handleProductChange = (index, field, value) => {
     const updatedProducts = [...newOrder.productList];
@@ -63,7 +71,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
     setNewOrder({ ...newOrder, productList: updatedProducts });
   };
 
-  // Handle changes to the new order inputs
   const handleNewOrderInputChange = (e) => {
     const { name, value } = e.target;
     setNewOrder((prev) => ({
@@ -72,7 +79,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
     }));
   };
 
-  // Handle customer selection from the dropdown
   const handleCustomerChange = (e) => {
     const selectedCustomerName = e.target.value;
     setNewOrder((prev) => ({
@@ -189,14 +195,12 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
           </div>
         ))}
 
-        {/* Show the "Add More" button only after the first product is confirmed */}
         {newOrder.productList.some((product) => product.isConfirmed) && (
           <button className="add-product-button" onClick={addProduct}>
             Add More
           </button>
         )}
 
-        {/* Other Input Fields */}
         <div className="input-group">
           <label className="input-label">Total Amount</label>
           <input
@@ -209,14 +213,14 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
           />
         </div>
 
+        {/* Automatically calculated total quantity */}
         <div className="input-group">
           <label className="input-label">Total Quantity</label>
           <input
             type="number"
             name="totalQuantity"
-            placeholder="Enter total quantity"
             value={newOrder.totalQuantity}
-            onChange={handleNewOrderInputChange}
+            readOnly
             className="input-field"
           />
         </div>
