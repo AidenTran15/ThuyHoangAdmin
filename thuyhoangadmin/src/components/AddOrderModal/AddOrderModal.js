@@ -7,6 +7,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
   const [loadingCustomers, setLoadingCustomers] = useState(true);
   const [customerError, setCustomerError] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [uniqueColors, setUniqueColors] = useState([]); // State to store unique colors
 
   // Fetch customers when the component mounts
   useEffect(() => {
@@ -20,6 +21,20 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
         console.error('Error fetching customers:', error);
         setCustomerError('Error fetching customers');
         setLoadingCustomers(false);
+      });
+  }, []);
+
+  // Fetch products to get the colors
+  useEffect(() => {
+    axios.get('https://jic2uc8adb.execute-api.ap-southeast-2.amazonaws.com/prod/get')
+      .then(response => {
+        const productData = JSON.parse(response.data.body);
+        // Extract unique colors from product data
+        const colors = [...new Set(productData.map(product => product.Color))];
+        setUniqueColors(colors);
+      })
+      .catch(error => {
+        console.error('Error fetching products:', error);
       });
   }, []);
 
@@ -70,7 +85,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
       ...prev,
       productList: [
         ...prev.productList,
-        { color: 'red', size: 30, quantity: 10, isConfirmed: false },
+        { color: uniqueColors[0] || 'red', size: 30, quantity: 10, isConfirmed: false },
       ],
     }));
   };
@@ -98,7 +113,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
   const handleCustomerChange = (e) => {
     const selectedCustomerName = e.target.value;
     const customer = customers.find(c => c.name === selectedCustomerName);
-    setSelectedCustomer(customer);  // Set the selected customer for later use
+    setSelectedCustomer(customer);
     setNewOrder((prev) => ({
       ...prev,
       customer: selectedCustomerName,
@@ -147,9 +162,11 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
                     onChange={(e) => handleProductChange(index, 'color', e.target.value)}
                     className="input-field"
                   >
-                    <option value="red">Red</option>
-                    <option value="blue">Blue</option>
-                    <option value="yellow">Yellow</option>
+                    {uniqueColors.map((color) => (
+                      <option key={color} value={color}>
+                        {color}
+                      </option>
+                    ))}
                   </select>
                 )}
               </div>
