@@ -23,7 +23,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
       });
   }, []);
 
-  // Initialize with one empty product if the productList is empty
+  // Initialize with one empty product and default status if the productList is empty
   useEffect(() => {
     if (newOrder.productList.length === 0) {
       setNewOrder((prev) => ({
@@ -31,6 +31,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
         productList: [
           { color: 'red', size: 30, quantity: 10, isConfirmed: false },
         ],
+        status: 'pending', // Set default status to 'pending'
       }));
     }
   }, [newOrder.productList.length, setNewOrder]);
@@ -38,7 +39,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
   // Automatically update the total quantity when the product list changes
   useEffect(() => {
     const totalQuantity = newOrder.productList.reduce((total, product) => total + parseInt(product.quantity || 0), 0);
-    console.log('Calculated Total Quantity:', totalQuantity);  // Log total quantity
     setNewOrder((prev) => ({
       ...prev,
       totalQuantity,
@@ -50,10 +50,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
     if (selectedCustomer && newOrder.totalQuantity) {
       const pantsPrice = selectedCustomer.short_price || 0;  // Use the correct field for pants price
       const totalAmount = newOrder.totalQuantity * pantsPrice;
-      
-      console.log('Pants Price:', pantsPrice);  // Log to check the pants price
-      console.log('Total Quantity:', newOrder.totalQuantity);  // Log to check the total quantity
-      console.log('Total Amount:', totalAmount);  // Log to check the calculated total amount
 
       setNewOrder((prev) => ({
         ...prev,
@@ -236,18 +232,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
             name="total"
             value={newOrder.total}
             readOnly
-            className="input-field"
-          />
-        </div>
-
-        <div className="input-group">
-          <label className="input-label">Order Status</label>
-          <input
-            type="text"
-            name="status"
-            placeholder="Order status"
-            value={newOrder.status}
-            onChange={handleNewOrderInputChange}
             className="input-field"
           />
         </div>
