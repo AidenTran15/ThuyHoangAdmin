@@ -30,7 +30,6 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     width: 600px;
     max-width: 90%;
-    font-family: 'Roboto', sans-serif;
     position: relative;
     animation: slideUp 0.3s ease;
 }
@@ -103,11 +102,12 @@ body {
 }
 
 /* Buttons within Product Row */
-.confirm-product-button,
+.add-button,
 .remove-product-button {
     padding: 8px 16px;
     font-size: 14px;
     color: white;
+    /* Text color */
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -118,16 +118,26 @@ body {
     /* Match the height of input fields */
 }
 
-.confirm-product-button {
+/* Add Button - Changed to green */
+.add-button {
     background-color: #28a745;
+    /* Green color */
 }
 
-.confirm-product-button:hover {
+.add-button:hover {
     background-color: #218838;
+    /* Darker green on hover */
 }
 
+.add-button:disabled {
+    background-color: #a5d6a7;
+    cursor: not-allowed;
+}
+
+/* Remove Button */
 .remove-product-button {
     background-color: #dc3545;
+    /* Red color */
 }
 
 .remove-product-button:hover {
@@ -140,6 +150,7 @@ body {
 .cancel-button {
     padding: 12px 24px;
     font-size: 16px;
+    color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -149,7 +160,7 @@ body {
 
 .add-product-button {
     background-color: #007bff;
-    color: white;
+    /* Blue background color */
 }
 
 .add-product-button:hover {
@@ -158,7 +169,7 @@ body {
 
 .save-button {
     background-color: #28a745;
-    color: white;
+    /* Green background color */
 }
 
 .save-button:hover {
@@ -167,7 +178,7 @@ body {
 
 .cancel-button {
     background-color: #6c757d;
-    color: white;
+    /* Gray background color */
 }
 
 .cancel-button:hover {
@@ -218,7 +229,7 @@ body {
         min-width: 100%;
     }
 
-    .confirm-product-button,
+    .add-button,
     .remove-product-button {
         width: 100%;
         margin-top: 10px;

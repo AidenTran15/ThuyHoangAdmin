@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './AddOrderModal.css';
 
 const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAddingNew }) => {
+  // Initialize with one empty product if the productList is empty
+  useEffect(() => {
+    if (newOrder.productList.length === 0) {
+      setNewOrder((prev) => ({
+        ...prev,
+        productList: [
+          { color: 'red', size: 30, quantity: 10, isConfirmed: false },
+        ],
+      }));
+    }
+  }, [newOrder.productList.length, setNewOrder]);
+
   // Handle product changes
   const handleProductChange = (index, field, value) => {
     const updatedProducts = [...newOrder.productList];
@@ -14,7 +26,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
       ...prev,
       productList: [
         ...prev.productList,
-        { color: 'red', size: 30, quantity: 10, isConfirmed: false }, // Default quantity is now 10
+        { color: 'red', size: 30, quantity: 10, isConfirmed: false },
       ],
     }));
   };
@@ -95,7 +107,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
                 )}
               </div>
 
-              {/* Quantity Field (Changed to Select) */}
+              {/* Quantity Field */}
               <div className="product-field-group">
                 <label className="input-label">Quantity</label>
                 {product.isConfirmed ? (
@@ -118,7 +130,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
               {/* Add or Remove Button */}
               {!product.isConfirmed ? (
                 <button
-                  className="confirm-product-button"
+                  className="add-button"
                   onClick={() => confirmProduct(index)}
                 >
                   Add
@@ -135,9 +147,12 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
           </div>
         ))}
 
-        <button className="add-product-button" onClick={addProduct}>
-          Add More
-        </button>
+        {/* Show the "Add More" button only after the first product is confirmed */}
+        {newOrder.productList.some((product) => product.isConfirmed) && (
+          <button className="add-product-button" onClick={addProduct}>
+            Add More
+          </button>
+        )}
 
         {/* Other Input Fields */}
         <div className="input-group">
