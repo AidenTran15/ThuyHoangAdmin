@@ -10,6 +10,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
   const [uniqueColors, setUniqueColors] = useState([]); // Unique colors from the product table
   const [filteredSizes, setFilteredSizes] = useState({}); // Store available sizes based on selected color
   const [products, setProducts] = useState([]); // Store product list
+  const [maxQuantities, setMaxQuantities] = useState({}); // Store max quantity based on selected color and size
 
   // Fetch customers when the component mounts
   useEffect(() => {
@@ -26,12 +27,13 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
       });
   }, []);
 
-  // Fetch products to get colors and sizes
+  // Fetch products to get colors, sizes, and quantities
   useEffect(() => {
     axios.get('https://jic2uc8adb.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then(response => {
         const productData = JSON.parse(response.data.body);
         setProducts(productData);
+        console.log('Products array:', productData); // Debugging log to view products array
 
         // Extract unique colors from product data
         const colors = [...new Set(productData.map(product => product.Color))];
@@ -48,6 +50,28 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
       .filter((product) => product.Color === color)
       .map((product) => product.Size);
     setFilteredSizes({ [color]: [...new Set(sizesForColor)] }); // Set unique sizes for the selected color
+  };
+
+  // Get max quantity based on selected color and size by querying products array
+  const getMaxQuantity = (color, size) => {
+    console.log("Checking for color:", color, "and size:", size); // Debugging log
+
+    // Ensure consistent data types: both color and size should be strings
+    const normalizedColor = color.toString().toLowerCase();
+    const normalizedSize = size.toString();
+
+    // Find the product that matches the selected color and size
+    const product = products.find((product) => 
+      product.Color.toLowerCase() === normalizedColor && product.Size.toString() === normalizedSize
+    );
+
+    if (product) {
+      console.log("Found product:", product); // Debugging log
+      return product.Quantity; // Return the product's quantity
+    } else {
+      console.log("Product not found"); // Debugging log
+      return 0; // If product not found, return 0
+    }
   };
 
   // Initialize with one empty product and default status if the productList is empty
@@ -93,6 +117,14 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
 
     if (field === 'color') {
       filterSizesByColor(value); // Filter sizes when the color changes
+      updatedProducts[index].size = ''; // Reset size when the color changes
+    }
+
+    if (field === 'size') {
+      const color = updatedProducts[index].color;
+      const maxQuantity = getMaxQuantity(color, value);
+      console.log(`Max quantity for color: ${color}, size: ${value} is ${maxQuantity}`); // Debugging log
+      setMaxQuantities((prev) => ({ ...prev, [`${color}-${value}`]: maxQuantity }));
     }
   };
 
@@ -209,7 +241,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
 
               {/* Quantity Field */}
               <div className="product-field-group">
-                <label className="input-label">Quantity</label>
+                <label className="input-label">Quantity (Max: {maxQuantities[`${product.color}-${product.size}`] || 0})</label>
                 {product.isConfirmed ? (
                   <span className="locked-field">{product.quantity}</span>
                 ) : (
@@ -218,11 +250,11 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
                     onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
                     className="input-field"
                   >
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={30}>30</option>
-                    <option value={40}>40</option>
-                    <option value={50}>50</option>
+                    {[...Array(maxQuantities[`${product.color}-${product.size}`] || 0).keys()].map((q) => (
+                      <option key={q + 1} value={q + 1}>
+                        {q + 1}
+                      </option>
+                    ))}
                   </select>
                 )}
               </div>
