@@ -77,7 +77,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
                     className="remove-product-button"
                     onClick={() => removeProduct(index)}
                   >
-                    ❌ Remove
+                    Remove
                   </button>
                 </>
               ) : (
@@ -109,7 +109,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
                     </select>
                   </div>
 
-                  <div className="input-group quantity-group">
+                  <div className="input-group">
                     <label className="input-label">Quantity</label>
                     <input
                       type="number"
@@ -123,7 +123,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
                     className="confirm-product-button"
                     onClick={() => confirmProduct(index)}
                   >
-                    ✔️ Add Product
+                    Add 
                   </button>
                 </>
               )}
@@ -132,7 +132,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
         ))}
 
         <button className="add-product-button" onClick={addProduct}>
-          ➕ Add Product
+           Add More 
         </button>
 
         <div className="input-group">

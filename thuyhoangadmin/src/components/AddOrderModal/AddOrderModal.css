@@ -27,21 +27,25 @@
     margin-bottom: 30px;
     color: #343a40;
     font-weight: bold;
+    text-align: center;
   }
   
-  .input-group {
+  /* Align inputs and labels inline */
+  .input-group-inline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
   }
   
   .input-label {
-    display: block;
     font-size: 14px;
     color: #6c757d;
-    margin-bottom: 8px;
+    margin-right: 10px;
   }
   
   .input-field {
-    width: 100%;
+    width: 120px;
     padding: 8px;
     border-radius: 5px;
     border: 1px solid #ced4da;
@@ -55,64 +59,28 @@
     outline: none;
   }
   
+  /* Row for product details */
   .product-details-row {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    gap: 10px;
     align-items: center;
-    padding: 10px;
-  }
-  
-  .locked-field {
-    font-size: 16px;
-    padding: 8px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-  }
-  
-  .confirm-product-button,
-  .remove-product-button {
-    background-color: #28a745;
-    color: white;
-    padding: 8px 16px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .remove-product-button {
-    background-color: #ff4d4f;
-  }
-  
-  .remove-product-button:hover, .confirm-product-button:hover {
-    opacity: 0.85;
-  }
-  
-  .add-product-button {
-    background-color: #007bff;
-    color: white;
-    padding: 12px 24px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
     margin-bottom: 20px;
-    transition: background-color 0.3s;
   }
   
-  .add-product-button:hover {
-    background-color: #0056b3;
+  .product-details-row .input-field {
+    width: 120px;
   }
   
-  .modal-footer {
+  /* Align buttons inline */
+  .button-row {
     display: flex;
-    justify-content: flex-end;
-    gap: 20px;
+    justify-content: space-between;
+    margin-top: 20px;
   }
   
+  .add-product-button,
+  .confirm-product-button,
   .save-button,
   .cancel-button {
     padding: 12px 24px;
@@ -120,6 +88,26 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .add-product-button {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .add-product-button:hover {
+    background-color: #218838;
+  }
+  
+  .confirm-product-button {
+    background-color: #ff4d4f;
+    color: white;
+    margin-left: 10px;
+  }
+  
+  .confirm-product-button:hover {
+    opacity: 0.85;
   }
   
   .save-button {
@@ -128,7 +116,37 @@
   }
   
   .cancel-button {
-    background-color: #6c757d;
+    background-color: #ff4d4f;
     color: white;
+  }
+  
+  /* Flex align total amount, total quantity, and order status */
+  .flex-align {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .input-flex {
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+  }
+  
+  .input-flex .input-label {
+    margin-bottom: 5px;
+  }
+  
+  .input-flex .input-field {
+    width: 100%;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   
