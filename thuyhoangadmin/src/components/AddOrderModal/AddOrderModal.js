@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; // Make sure to import axios
+import axios from 'axios';
 import './AddOrderModal.css';
 
 const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleClose }) => {
   const [customers, setCustomers] = useState([]);
   const [loadingCustomers, setLoadingCustomers] = useState(true);
   const [customerError, setCustomerError] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   // Fetch customers when the component mounts
   useEffect(() => {
     axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers')
       .then(response => {
         const customerData = JSON.parse(response.data.body);
-        setCustomers(customerData);
+        setCustomers(Array.isArray(customerData) ? customerData : []);
         setLoadingCustomers(false);
       })
       .catch(error => {
@@ -37,11 +38,29 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
   // Automatically update the total quantity when the product list changes
   useEffect(() => {
     const totalQuantity = newOrder.productList.reduce((total, product) => total + parseInt(product.quantity || 0), 0);
+    console.log('Calculated Total Quantity:', totalQuantity);  // Log total quantity
     setNewOrder((prev) => ({
       ...prev,
       totalQuantity,
     }));
   }, [newOrder.productList, setNewOrder]);
+
+  // Calculate the total amount based on total quantity and selected customer's pants price
+  useEffect(() => {
+    if (selectedCustomer && newOrder.totalQuantity) {
+      const pantsPrice = selectedCustomer.short_price || 0;  // Use the correct field for pants price
+      const totalAmount = newOrder.totalQuantity * pantsPrice;
+      
+      console.log('Pants Price:', pantsPrice);  // Log to check the pants price
+      console.log('Total Quantity:', newOrder.totalQuantity);  // Log to check the total quantity
+      console.log('Total Amount:', totalAmount);  // Log to check the calculated total amount
+
+      setNewOrder((prev) => ({
+        ...prev,
+        total: totalAmount,
+      }));
+    }
+  }, [selectedCustomer, newOrder.totalQuantity, setNewOrder]);
 
   // Handle product changes
   const handleProductChange = (index, field, value) => {
@@ -62,7 +81,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
 
   const confirmProduct = (index) => {
     const updatedProducts = [...newOrder.productList];
-    updatedProducts[index].isConfirmed = true; // Lock the product after confirmation
+    updatedProducts[index].isConfirmed = true;
     setNewOrder({ ...newOrder, productList: updatedProducts });
   };
 
@@ -79,8 +98,11 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
     }));
   };
 
+  // Handle customer selection from the dropdown and find selected customer details
   const handleCustomerChange = (e) => {
     const selectedCustomerName = e.target.value;
+    const customer = customers.find(c => c.name === selectedCustomerName);
+    setSelectedCustomer(customer);  // Set the selected customer for later use
     setNewOrder((prev) => ({
       ...prev,
       customer: selectedCustomerName,
@@ -177,17 +199,11 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
 
               {/* Add or Remove Button */}
               {!product.isConfirmed ? (
-                <button
-                  className="add-button"
-                  onClick={() => confirmProduct(index)}
-                >
+                <button className="add-button" onClick={() => confirmProduct(index)}>
                   Add
                 </button>
               ) : (
-                <button
-                  className="remove-product-button"
-                  onClick={() => removeProduct(index)}
-                >
+                <button className="remove-product-button" onClick={() => removeProduct(index)}>
                   Remove
                 </button>
               )}
@@ -202,24 +218,23 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
         )}
 
         <div className="input-group">
-          <label className="input-label">Total Amount</label>
-          <input
-            type="number"
-            name="total"
-            placeholder="Enter total amount"
-            value={newOrder.total}
-            onChange={handleNewOrderInputChange}
-            className="input-field"
-          />
-        </div>
-
-        {/* Automatically calculated total quantity */}
-        <div className="input-group">
           <label className="input-label">Total Quantity</label>
           <input
             type="number"
             name="totalQuantity"
             value={newOrder.totalQuantity}
+            readOnly
+            className="input-field"
+          />
+        </div>
+
+        {/* Automatically calculated total amount */}
+        <div className="input-group">
+          <label className="input-label">Total Amount</label>
+          <input
+            type="number"
+            name="total"
+            value={newOrder.total}
             readOnly
             className="input-field"
           />
