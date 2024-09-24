@@ -7,7 +7,9 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
   const [loadingCustomers, setLoadingCustomers] = useState(true);
   const [customerError, setCustomerError] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [uniqueColors, setUniqueColors] = useState([]); // State to store unique colors
+  const [uniqueColors, setUniqueColors] = useState([]); // Unique colors from the product table
+  const [filteredSizes, setFilteredSizes] = useState({}); // Store available sizes based on selected color
+  const [products, setProducts] = useState([]); // Store product list
 
   // Fetch customers when the component mounts
   useEffect(() => {
@@ -24,11 +26,13 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
       });
   }, []);
 
-  // Fetch products to get the colors
+  // Fetch products to get colors and sizes
   useEffect(() => {
     axios.get('https://jic2uc8adb.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then(response => {
         const productData = JSON.parse(response.data.body);
+        setProducts(productData);
+
         // Extract unique colors from product data
         const colors = [...new Set(productData.map(product => product.Color))];
         setUniqueColors(colors);
@@ -37,6 +41,14 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
         console.error('Error fetching products:', error);
       });
   }, []);
+
+  // Filter sizes based on selected color
+  const filterSizesByColor = (color) => {
+    const sizesForColor = products
+      .filter((product) => product.Color === color)
+      .map((product) => product.Size);
+    setFilteredSizes({ [color]: [...new Set(sizesForColor)] }); // Set unique sizes for the selected color
+  };
 
   // Initialize with one empty product and default status if the productList is empty
   useEffect(() => {
@@ -78,6 +90,10 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
     const updatedProducts = [...newOrder.productList];
     updatedProducts[index][field] = value;
     setNewOrder({ ...newOrder, productList: updatedProducts });
+
+    if (field === 'color') {
+      filterSizesByColor(value); // Filter sizes when the color changes
+    }
   };
 
   const addProduct = () => {
@@ -182,10 +198,11 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
                     onChange={(e) => handleProductChange(index, 'size', e.target.value)}
                     className="input-field"
                   >
-                    <option value={30}>30</option>
-                    <option value={32}>32</option>
-                    <option value={33}>33</option>
-                    <option value={34}>34</option>
+                    {(filteredSizes[product.color] || []).map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
                   </select>
                 )}
               </div>
