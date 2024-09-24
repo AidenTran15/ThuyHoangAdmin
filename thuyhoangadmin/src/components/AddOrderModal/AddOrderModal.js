@@ -14,7 +14,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
       ...prev,
       productList: [
         ...prev.productList,
-        { color: 'red', size: 30, quantity: 1, isConfirmed: false },
+        { color: 'red', size: 30, quantity: 10, isConfirmed: false }, // Default quantity is now 10
       ],
     }));
   };
@@ -95,39 +95,42 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, setIsAd
                 )}
               </div>
 
-              {/* Quantity Field */}
+              {/* Quantity Field (Changed to Select) */}
               <div className="product-field-group">
                 <label className="input-label">Quantity</label>
                 {product.isConfirmed ? (
                   <span className="locked-field">{product.quantity}</span>
                 ) : (
-                  <input
-                    type="number"
+                  <select
                     value={product.quantity}
                     onChange={(e) => handleProductChange(index, 'quantity', e.target.value)}
                     className="input-field"
-                  />
+                  >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={30}>30</option>
+                    <option value={40}>40</option>
+                    <option value={50}>50</option>
+                  </select>
                 )}
               </div>
 
-              {/* Buttons */}
-              <div className="button-group">
-                {!product.isConfirmed ? (
-                  <button
-                    className="confirm-product-button"
-                    onClick={() => confirmProduct(index)}
-                  >
-                    Add
-                  </button>
-                ) : (
-                  <button
-                    className="remove-product-button"
-                    onClick={() => removeProduct(index)}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
+              {/* Add or Remove Button */}
+              {!product.isConfirmed ? (
+                <button
+                  className="confirm-product-button"
+                  onClick={() => confirmProduct(index)}
+                >
+                  Add
+                </button>
+              ) : (
+                <button
+                  className="remove-product-button"
+                  onClick={() => removeProduct(index)}
+                >
+                  Remove
+                </button>
+              )}
             </div>
           </div>
         ))}
