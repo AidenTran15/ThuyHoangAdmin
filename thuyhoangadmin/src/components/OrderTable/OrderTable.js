@@ -106,10 +106,10 @@ const OrderTable = () => {
         <h2>Manage Orders</h2>
         <div className="button-group">
           <button className="add-order-button" onClick={() => setIsAddingNew(true)}>
-            Add New Order
+            Tạo Đơn
           </button>
           <Link to="/history" className="view-history-button">
-            View History Orders
+            Xem Đơn Cũ
           </Link>
         </div>
       </div>
@@ -122,19 +122,20 @@ const OrderTable = () => {
         <table>
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Products</th>
-              <th>Total</th>
-              <th>Total Quantity</th>
-              <th>Status</th>
-              <th>Order Date</th>
+              <th>Ngày Giờ</th>
+              <th>Đơn Hàng ID</th>
+              <th>Khách Hàng</th>
+              <th>Các Sản Phẩm</th>
+              <th>Tổng SL</th>
+              <th>Tổng Giá</th>
+              <th>Trạng Thái</th>
             </tr>
           </thead>
           <tbody>
             {orders.length > 0 ? (
               orders.map(order => (
                 <tr key={order.orderID}>
+                  <td>{order.OrderDate}</td>
                   <td>{order.orderID}</td>
                   <td>{order.Customer}</td>
                   <td>
@@ -148,18 +149,17 @@ const OrderTable = () => {
                       ) : 'No products'}
                     </ul>
                   </td>
-                  <td>{order.Total}</td>
                   <td>{order.TotalQuantity}</td>
+                  <td>{order.Total}</td>
                   <td>
                     <select
                       value={order.Status}
                       onChange={(e) => handleStatusChange(order.orderID, e.target.value)}
                     >
-                      <option value="Pending">Pending</option>
-                      <option value="Done">Done</option>
+                      <option value="Pending">Đang xử Lý</option>
+                      <option value="Done">Hoàn Thành</option>
                     </select>
                   </td>
-                  <td>{order.OrderDate}</td>
                 </tr>
               ))
             ) : (
