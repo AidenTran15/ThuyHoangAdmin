@@ -137,7 +137,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
     <div className="modal">
       <div className="modal-content">
         <h3 className="modal-title">Add New Order</h3>
-
+  
         <div className="input-group">
           <label className="input-label">Customer Name</label>
           {loadingCustomers ? (
@@ -160,7 +160,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
             </select>
           )}
         </div>
-
+  
         {newOrder.productList.map((product, index) => (
           <div key={index} className="product-card">
             <div className="product-row">
@@ -182,7 +182,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
                   </select>
                 )}
               </div>
-
+  
               <div className="product-field-group">
                 <label className="input-label">Size</label>
                 {product.isConfirmed ? (
@@ -201,7 +201,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
                   </select>
                 )}
               </div>
-
+  
               <div className="product-field-group">
                 <label className="input-label">Quantity (Max: {maxQuantities[`${product.color}-${product.size}`] || 0})</label>
                 {product.isConfirmed ? (
@@ -220,12 +220,15 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
                   </select>
                 )}
               </div>
-
+  
+              {/* Remove or comment out the Product ID section */}
+              {/* 
               <div className="product-field-group">
                 <label className="input-label">Product ID</label>
                 <span>{productIDs[`${product.color}-${product.size}`] || 'N/A'}</span>
               </div>
-
+              */}
+  
               {!product.isConfirmed ? (
                 <button className="add-button" onClick={() => confirmProduct(index)}>
                   Add
@@ -238,13 +241,13 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
             </div>
           </div>
         ))}
-
+  
         {newOrder.productList.some((product) => product.isConfirmed) && (
           <button className="add-product-button" onClick={addProduct}>
             Add More
           </button>
         )}
-
+  
         <div className="input-group">
           <label className="input-label">Total Quantity</label>
           <input
@@ -255,7 +258,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
             className="input-field"
           />
         </div>
-
+  
         <div className="input-group">
           <label className="input-label">Total Amount</label>
           <input
@@ -266,7 +269,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
             className="input-field"
           />
         </div>
-
+  
         <div className="modal-footer">
           <button className="save-button" onClick={handleAddOrderSaveClick}>
             Save
@@ -278,6 +281,7 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
       </div>
     </div>
   );
+  
 };
 
 export default AddOrderModal;
