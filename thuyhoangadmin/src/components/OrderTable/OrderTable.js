@@ -25,7 +25,6 @@ const OrderTable = () => {
   useEffect(() => {
     axios.get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then(response => {
-        console.log(response.data);
         let orderData;
         if (typeof response.data.body === 'string') {
           orderData = JSON.parse(response.data.body);
@@ -44,21 +43,41 @@ const OrderTable = () => {
 
   const handleAddOrderSaveClick = () => {
     const orderWithID = { 
-      ...newOrder, 
       orderID: generateOrderID(), 
+      customer_name: newOrder.customer,  // Adjust field names to match the expected body in Lambda
+      product_list: newOrder.productList.map((product, index) => ({
+        product_id: `P00${index + 1}`,  // Example product_id generation
+        color: product.color,
+        size: product.size,
+        quantity: product.quantity
+      })),
+      total_quantity: newOrder.totalQuantity, 
+      total_amount: newOrder.total, 
+      status: 'Pending',
       orderDate: new Date().toISOString().replace('T', ' ').substring(0, 16)  // Format with only date and time (HH:MM)
     };
-    axios.post('https://your-api-endpoint.com/orders', orderWithID, {
+  
+    // Stringify the order data and wrap it in a "body" field
+    const requestBody = JSON.stringify({
+      body: JSON.stringify(orderWithID)
+    });
+  
+    console.log("Formatted order data being sent:", requestBody); // Log the formatted request body
+  
+    axios.post('https://n73lcvb962.execute-api.ap-southeast-2.amazonaws.com/prod/add', requestBody, {
       headers: { 'Content-Type': 'application/json' }
     })
-      .then(() => {
+      .then(response => {
+        console.log("API Response:", response.data); // Log the API response for debugging
         setIsAddingNew(false);
         setOrders(prevOrders => [...prevOrders, orderWithID]);
       })
       .catch(error => {
-        console.error("Error adding new order!", error);
+        console.error("Error adding new order:", error.response ? error.response.data : error.message);  // Log any error messages from the API
       });
   };
+  
+  
 
   return (
     <div className="order-table">
