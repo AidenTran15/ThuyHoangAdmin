@@ -110,10 +110,13 @@ const OrderTable = () => {
         <td>{order.orderID}</td>
         <td>{order.Customer}</td>
         <td>
-          {order.ProductList
-            ? order.ProductList.map(product => 
-                `${product.color} ${product.size} - ${product.quantity}`).join(', ')
-            : 'No products'}
+          <ul style={{ paddingLeft: '0', margin: '0', listStyleType: 'none' }}>
+            {order.ProductList
+              ? order.ProductList.map((product, index) => (
+                  <li key={index}>{`${product.color} ${product.size} - ${product.quantity}`}</li>
+                ))
+              : 'No products'}
+          </ul>
         </td>
         <td>{order.Total}</td>
         <td>{order.TotalQuantity}</td>
@@ -127,6 +130,8 @@ const OrderTable = () => {
     </tr>
   )}
 </tbody>
+
+
 
         </table>
       )}
