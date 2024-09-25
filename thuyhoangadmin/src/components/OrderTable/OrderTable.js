@@ -46,7 +46,7 @@ const OrderTable = () => {
     const orderWithID = { 
       ...newOrder, 
       orderID: generateOrderID(), 
-      orderDate: new Date().toISOString().replace('T', ' ').substring(0, 19)  // Include both date and time
+      orderDate: new Date().toISOString().replace('T', ' ').substring(0, 16)  // Format with only date and time (HH:MM)
     };
     axios.post('https://your-api-endpoint.com/orders', orderWithID, {
       headers: { 'Content-Type': 'application/json' }
@@ -94,7 +94,7 @@ const OrderTable = () => {
                   <td>{order.Total}</td>
                   <td>{order.TotalQuantity}</td>
                   <td>{order.Status}</td>
-                  <td>{order.OrderDate}</td> {/* Display the Order Date with Time */}
+                  <td>{order.OrderDate}</td> {/* Display the Order Date with HH:MM time */}
                 </tr>
               ))
             ) : (
