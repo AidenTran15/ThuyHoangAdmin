@@ -112,13 +112,21 @@ body {
 }
 
 .add-button {
-    background-color: #28a745;
+    background-color: #28a745 !important; /* Green background with higher priority */
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    align-self: flex-end;
+    height: 42px;
 }
 
 .add-button:hover {
-    background-color: #218838;
+    background-color: #218838 !important; /* Darker green on hover */
 }
-
 .add-button:disabled {
     background-color: #a5d6a7;
     cursor: not-allowed;
