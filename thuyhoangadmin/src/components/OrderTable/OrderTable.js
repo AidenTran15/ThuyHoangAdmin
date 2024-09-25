@@ -86,16 +86,18 @@ const OrderTable = () => {
     axios.put('https://bk77c3sxtk.execute-api.ap-southeast-2.amazonaws.com/prod/updatestatus', requestBody)
       .then(response => {
         setOrders(prevOrders =>
-          prevOrders.map(order => 
-            order.orderID === orderID ? { ...order, Status: newStatus } : order
-          )
+          prevOrders
+            .map(order =>
+              order.orderID === orderID ? { ...order, Status: newStatus } : order
+            )
+            .filter(order => order.Status !== 'Done') // Remove the order if the status is "Done"
         );
       })
       .catch(error => {
         console.error("Error updating order status:", error);
       });
   };
-
+  
   return (
     <div className="order-table">
       <h2>Manage Orders</h2>
