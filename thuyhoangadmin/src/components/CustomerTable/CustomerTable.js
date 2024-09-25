@@ -123,7 +123,6 @@ const CustomerTable = () => {
             <th>Phone Number</th>
             <th>Address</th>
             <th>Pant Price</th>
-            <th>Shirt Price</th>
             <th>Password</th>
             <th>Actions</th>
           </tr>
@@ -172,18 +171,6 @@ const CustomerTable = () => {
                 <td>
                   {editingCustomer === customer['phone_number'] ? (
                     <input
-                      type="number"
-                      name="dress_price"
-                      value={updatedCustomer.dress_price || 0}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    customer.dress_price
-                  )}
-                </td>
-                <td>
-                  {editingCustomer === customer['phone_number'] ? (
-                    <input
                       type="password"
                       name="password"
                       value={updatedCustomer.password || ''}
@@ -212,7 +199,7 @@ const CustomerTable = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="7">No customers found</td>
+              <td colSpan="6">No customers found</td>
             </tr>
           )}
         </tbody>
@@ -227,7 +214,6 @@ const CustomerTable = () => {
             <input type="text" name="phone_number" placeholder="Phone Number" onChange={handleNewCustomerInputChange} />
             <input type="text" name="address" placeholder="Address" onChange={handleNewCustomerInputChange} />
             <input type="number" name="short_price" placeholder="Pant Price" onChange={handleNewCustomerInputChange} />
-            <input type="number" name="dress_price" placeholder="Shirt Price" onChange={handleNewCustomerInputChange} />
             <input type="password" name="password" placeholder="Password" onChange={handleNewCustomerInputChange} />
             <button onClick={handleAddCustomerSaveClick}>Save</button>
             <button onClick={() => setIsAddingNew(false)}>Cancel</button>
