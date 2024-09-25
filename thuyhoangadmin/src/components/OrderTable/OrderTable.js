@@ -104,24 +104,30 @@ const OrderTable = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.length > 0 ? (
-              orders.map(order => (
-                <tr key={order.orderID}>
-                  <td>{order.orderID}</td>
-                  <td>{order.Customer}</td>
-                  <td>{order.ProductList ? order.ProductList.join(', ') : 'No products'}</td>
-                  <td>{order.Total}</td>
-                  <td>{order.TotalQuantity}</td>
-                  <td>{order.Status}</td>
-                  <td>{order.OrderDate}</td> {/* Display the Order Date with HH:MM time */}
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7">No orders found</td>
-              </tr>
-            )}
-          </tbody>
+  {orders.length > 0 ? (
+    orders.map(order => (
+      <tr key={order.orderID}>
+        <td>{order.orderID}</td>
+        <td>{order.Customer}</td>
+        <td>
+          {order.ProductList
+            ? order.ProductList.map(product => 
+                `${product.color} ${product.size} - ${product.quantity}`).join(', ')
+            : 'No products'}
+        </td>
+        <td>{order.Total}</td>
+        <td>{order.TotalQuantity}</td>
+        <td>{order.Status}</td>
+        <td>{order.OrderDate}</td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="7">No orders found</td>
+    </tr>
+  )}
+</tbody>
+
         </table>
       )}
 
