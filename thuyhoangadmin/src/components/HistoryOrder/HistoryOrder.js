@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './OrderTable.css';
-import { Link } from 'react-router-dom';
+import '../OrderTable/OrderTable.css'; // Reuse the same styling for consistency
 
-const OrderTable = () => {
+const HistoryOrder = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,9 +14,9 @@ const OrderTable = () => {
           ? JSON.parse(response.data.body) 
           : response.data.body;
         
-        // Filter the orders to only include those with status "Pending"
-        const pendingOrders = orderData.filter(order => order.Status === 'Pending');
-        setOrders(Array.isArray(pendingOrders) ? pendingOrders : []);
+        // Filter the orders by status "Done"
+        const doneOrders = orderData.filter(order => order.Status === 'Done');
+        setOrders(Array.isArray(doneOrders) ? doneOrders : []);
         setLoading(false);
       })
       .catch(error => {
@@ -27,31 +26,9 @@ const OrderTable = () => {
       });
   }, []);
 
-  const handleStatusChange = (orderID) => {
-    const requestBody = {
-      orderID: orderID
-    };
-  
-    console.log('Request body being sent:', requestBody);  // Log the body for debugging
-  
-    axios.put('https://bk77c3sxtk.execute-api.ap-southeast-2.amazonaws.com/prod/updatestatus', requestBody)
-      .then(response => {
-        setOrders(prevOrders =>
-          prevOrders.map(order => 
-            order.orderID === orderID ? { ...order, Status: 'Done' } : order
-          ).filter(order => order.Status === 'Pending')  // Keep only pending orders in the state
-        );
-      })
-      .catch(error => {
-        console.error("Error updating order status:", error);
-      });
-  };
-
   return (
     <div className="order-table">
-      <h2>Manage Orders</h2>
-      <Link to="/history">View Order History</Link>
-      
+      <h2>Order History (Completed Orders)</h2>
 
       {loading ? (
         <p>Loading orders...</p>
@@ -89,25 +66,13 @@ const OrderTable = () => {
                   </td>
                   <td>{order.Total}</td>
                   <td>{order.TotalQuantity}</td>
-                  <td>
-                    {order.Status === 'Pending' ? (
-                      <select
-                        value={order.Status}
-                        onChange={() => handleStatusChange(order.orderID)}
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Done">Done</option>
-                      </select>
-                    ) : (
-                      order.Status
-                    )}
-                  </td>
+                  <td>{order.Status}</td>
                   <td>{order.OrderDate}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7">No pending orders found</td>
+                <td colSpan="7">No completed orders found</td>
               </tr>
             )}
           </tbody>
@@ -117,4 +82,4 @@ const OrderTable = () => {
   );
 };
 
-export default OrderTable;
+export default HistoryOrder;
