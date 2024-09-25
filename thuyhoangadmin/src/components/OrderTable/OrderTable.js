@@ -22,12 +22,6 @@ const OrderTable = () => {
     return Math.floor(10000 + Math.random() * 90000).toString();
   };
 
-  // Add function to get the current date
-  const getCurrentDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
-  };
-
   useEffect(() => {
     axios.get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then(response => {
@@ -52,7 +46,7 @@ const OrderTable = () => {
     const orderWithID = { 
       ...newOrder, 
       orderID: generateOrderID(), 
-      orderDate: getCurrentDate()  // Add orderDate when saving
+      orderDate: new Date().toISOString().replace('T', ' ').substring(0, 19)  // Include both date and time
     };
     axios.post('https://your-api-endpoint.com/orders', orderWithID, {
       headers: { 'Content-Type': 'application/json' }
@@ -87,7 +81,7 @@ const OrderTable = () => {
               <th>Total</th>
               <th>Total Quantity</th>
               <th>Status</th>
-              <th>Order Date</th> {/* Add Order Date column */}
+              <th>Order Date</th> {/* Add Order Date with Time column */}
             </tr>
           </thead>
           <tbody>
@@ -100,7 +94,7 @@ const OrderTable = () => {
                   <td>{order.Total}</td>
                   <td>{order.TotalQuantity}</td>
                   <td>{order.Status}</td>
-                  <td>{order.OrderDate}</td> {/* Display the Order Date */}
+                  <td>{order.OrderDate}</td> {/* Display the Order Date with Time */}
                 </tr>
               ))
             ) : (
