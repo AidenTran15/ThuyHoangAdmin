@@ -18,23 +18,26 @@ const OrderTable = () => {
     status: ''
   });
 
+  // Fetch orders when the component loads
   useEffect(() => {
-    axios.get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
-      .then(response => {
-        let orderData = typeof response.data.body === 'string' 
-          ? JSON.parse(response.data.body) 
-          : response.data.body;
-        
-        const pendingOrders = orderData.filter(order => order.Status === 'Pending');
-        setOrders(Array.isArray(pendingOrders) ? pendingOrders : []);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error("Error fetching the orders!", error);
-        setError("Error fetching the orders.");
-        setLoading(false);
-      });
-  }, []);
+    if (!isAddingNew) {  // Only fetch when not adding a new order
+      axios.get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
+        .then(response => {
+          let orderData = typeof response.data.body === 'string' 
+            ? JSON.parse(response.data.body) 
+            : response.data.body;
+          
+          const pendingOrders = orderData.filter(order => order.Status === 'Pending');
+          setOrders(Array.isArray(pendingOrders) ? pendingOrders : []);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error("Error fetching the orders!", error);
+          setError("Error fetching the orders.");
+          setLoading(false);
+        });
+    }
+  }, [isAddingNew]);  // Depend on isAddingNew so it doesn't reload when adding a new order
 
   // Helper function to generate order IDs
   const generateOrderID = () => {
@@ -69,8 +72,8 @@ const OrderTable = () => {
     })
       .then(response => {
         console.log("API Response:", response.data);
+        setOrders(prevOrders => [...prevOrders, orderWithID]);  // Add new order to the list
         setIsAddingNew(false); // Close the modal after saving
-        setOrders(prevOrders => [...prevOrders, orderWithID]);
       })
       .catch(error => {
         console.error("Error adding new order:", error.response ? error.response.data : error.message);
@@ -98,7 +101,7 @@ const OrderTable = () => {
         console.error("Error updating order status:", error);
       });
   };
-  
+
   return (
     <div className="order-table">
       {/* Header section */}
