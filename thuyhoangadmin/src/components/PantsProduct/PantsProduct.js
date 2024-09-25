@@ -156,7 +156,7 @@ const PantsProduct = () => {
     <div className="pants-product-table">
       <div className="header-container">
         <h2>Manage Pants Products</h2>
-        <button onClick={() => setIsAddingNew(true)} className="add-new-button">Add New</button>
+        <button onClick={() => setIsAddingNew(true)} className="add-new-button">Thêm</button>
         {/* <button onClick={() => setIsAddingNew(true)} class="plus-icon">+</button> */}
 
       </div>
@@ -164,11 +164,11 @@ const PantsProduct = () => {
       <table>
         <thead>
           <tr>
-            <th>ProductID</th>
-            <th>Color</th>
+            <th>Mã Sản Phẩm</th>
+            <th>Màu Sắc</th>
             <th>Size</th>
-            <th>Quantity</th>
-            <th>Actions</th>
+            <th>Số Lượng</th>
+            <th>Hành Động</th>
           </tr>
         </thead>
         <tbody>
@@ -211,8 +211,8 @@ const PantsProduct = () => {
                     <button onClick={handleSaveClick}>Save</button>
                   ) : (
                     <>
-                      <button onClick={() => handleEditClick(product)}>Edit</button>
-                      <button onClick={() => handleDeleteClick(product.ProductID)} style={{ backgroundColor: 'red', color: 'white', marginLeft: '5px' }}>Delete</button>
+                      <button onClick={() => handleEditClick(product)}>Chỉnh</button>
+                      <button onClick={() => handleDeleteClick(product.ProductID)} style={{ backgroundColor: 'red', color: 'white', marginLeft: '5px' }}>Xóa</button>
                     </>
                   )}
                 </td>
@@ -230,7 +230,7 @@ const PantsProduct = () => {
       {isAddingNew && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Add New Product</h3>
+            <h3>Thêm Sản Phẩm Mới</h3>
             <input 
               type="text" 
               name="ProductID" 
@@ -269,10 +269,10 @@ const PantsProduct = () => {
       {isDeleteModalVisible && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>Are you sure you want to delete product {productToDelete}?</p>
-            <button onClick={confirmDeleteProduct}>Yes, Delete</button>
-            <button onClick={() => setIsDeleteModalVisible(false)}>Cancel</button>
+            <h3>Bạn Chắc Chứ?</h3>
+            <p>Bạn có chắc muốn xóa sản phẩm này không {productToDelete}?</p>
+            <button onClick={confirmDeleteProduct}>Đồng Ý</button>
+            <button onClick={() => setIsDeleteModalVisible(false)}>Hủy</button>
           </div>
         </div>
       )}
