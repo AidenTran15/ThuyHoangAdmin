@@ -13,7 +13,10 @@ const OrderTable = () => {
         let orderData = typeof response.data.body === 'string' 
           ? JSON.parse(response.data.body) 
           : response.data.body;
-        setOrders(Array.isArray(orderData) ? orderData : []);
+        
+        // Filter the orders to only include those with status "Pending"
+        const pendingOrders = orderData.filter(order => order.Status === 'Pending');
+        setOrders(Array.isArray(pendingOrders) ? pendingOrders : []);
         setLoading(false);
       })
       .catch(error => {
@@ -35,14 +38,13 @@ const OrderTable = () => {
         setOrders(prevOrders =>
           prevOrders.map(order => 
             order.orderID === orderID ? { ...order, Status: 'Done' } : order
-          )
+          ).filter(order => order.Status === 'Pending')  // Keep only pending orders in the state
         );
       })
       .catch(error => {
         console.error("Error updating order status:", error);
       });
   };
-  
 
   return (
     <div className="order-table">
@@ -102,7 +104,7 @@ const OrderTable = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="7">No orders found</td>
+                <td colSpan="7">No pending orders found</td>
               </tr>
             )}
           </tbody>
