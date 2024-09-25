@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './OrderTable.css';
-import AddOrderModal from '../AddOrderModal/AddOrderModal'; // Import the modal component
+import AddOrderModal from '../AddOrderModal/AddOrderModal'; 
+import { Link } from 'react-router-dom';
 
 const OrderTable = () => {
   const [orders, setOrders] = useState([]);
@@ -106,6 +107,10 @@ const OrderTable = () => {
       <button className="add-order-button" onClick={() => setIsAddingNew(true)}>
         Add New Order
       </button>
+
+      <Link to="/history" className="view-history-button">
+        View History Orders
+      </Link>
 
       {loading ? (
         <p>Loading orders...</p>
