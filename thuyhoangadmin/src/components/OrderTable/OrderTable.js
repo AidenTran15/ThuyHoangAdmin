@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './OrderTable.css';
-import AddOrderModal from '../AddOrderModal/AddOrderModal'; // Import the new modal component
+import AddOrderModal from '../AddOrderModal/AddOrderModal';
 
 const OrderTable = () => {
   const [orders, setOrders] = useState([]);
@@ -20,6 +20,12 @@ const OrderTable = () => {
 
   const generateOrderID = () => {
     return Math.floor(10000 + Math.random() * 90000).toString();
+  };
+
+  // Add function to get the current date
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
   };
 
   useEffect(() => {
@@ -43,7 +49,11 @@ const OrderTable = () => {
   }, []);
 
   const handleAddOrderSaveClick = () => {
-    const orderWithID = { ...newOrder, orderID: generateOrderID() };
+    const orderWithID = { 
+      ...newOrder, 
+      orderID: generateOrderID(), 
+      orderDate: getCurrentDate()  // Add orderDate when saving
+    };
     axios.post('https://your-api-endpoint.com/orders', orderWithID, {
       headers: { 'Content-Type': 'application/json' }
     })
@@ -77,6 +87,7 @@ const OrderTable = () => {
               <th>Total</th>
               <th>Total Quantity</th>
               <th>Status</th>
+              <th>Order Date</th> {/* Add Order Date column */}
             </tr>
           </thead>
           <tbody>
@@ -89,11 +100,12 @@ const OrderTable = () => {
                   <td>{order.Total}</td>
                   <td>{order.TotalQuantity}</td>
                   <td>{order.Status}</td>
+                  <td>{order.OrderDate}</td> {/* Display the Order Date */}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6">No orders found</td>
+                <td colSpan="7">No orders found</td>
               </tr>
             )}
           </tbody>
