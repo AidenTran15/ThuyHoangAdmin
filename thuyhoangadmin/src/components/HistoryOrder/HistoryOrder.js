@@ -54,7 +54,7 @@ const HistoryOrder = () => {
 
   return (
     <div className="order-table">
-      <h2>Order History (Done Orders)</h2>
+      <h2>Lịch Sử Đơn Hàng  (Đơn Hàng Đã Hoàng Thành)</h2>
 
       {loading ? (
         <p>Loading orders...</p>
@@ -64,20 +64,21 @@ const HistoryOrder = () => {
         <table>
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Products</th>
-              <th>Total</th>
-              <th>Total Quantity</th>
-              <th>Status</th>
-              <th>Order Date</th>
-              <th>Actions</th> {/* New column for delete button */}
+              <th>Ngày Giờ</th> {/* Moved Order Date to first column */}
+              <th>Mã Đơn Hàng</th>
+              <th>Khách Hàng</th>
+              <th>Sản Phẩm</th>
+              <th>Tổng SL</th>
+              <th>Tổng Giá</th>
+              <th>Trạng Thái</th>
+              <th>Hành Động</th> {/* New column for delete button */}
             </tr>
           </thead>
           <tbody>
             {orders.length > 0 ? (
               orders.map(order => (
                 <tr key={order.orderID}>
+                  <td>{order.OrderDate}</td> {/* Moved OrderDate to first column */}
                   <td>{order.orderID}</td>
                   <td>{order.Customer}</td>
                   <td>
@@ -91,12 +92,11 @@ const HistoryOrder = () => {
                       ) : 'No products'}
                     </ul>
                   </td>
-                  <td>{order.Total}</td>
                   <td>{order.TotalQuantity}</td>
+                  <td>{order.Total}</td>
                   <td>{order.Status}</td>
-                  <td>{order.OrderDate}</td>
                   <td>
-                    <button onClick={() => handleDeleteOrder(order.orderID)}>Delete</button> {/* Delete button */}
+                    <button onClick={() => handleDeleteOrder(order.orderID)}>Xóa Đơn</button> {/* Delete button */}
                   </td>
                 </tr>
               ))
