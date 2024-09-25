@@ -91,7 +91,7 @@ const CustomerTable = () => {
 
   // Confirm and delete customer
   const confirmDelete = () => {
-    if (confirmationInput === "Confirm") {
+    if (confirmationInput === "Đồng Ý") {
       const requestBody = { body: JSON.stringify({ phone_number: customerToDelete }) }; // Format the request body
 
       axios.delete('https://htjd8snvtc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
@@ -114,17 +114,17 @@ const CustomerTable = () => {
     <div className="customer-table">
       <div className="header-container">
         <h2>Manage Customers</h2>
-        <button onClick={handleAddNewCustomerClick} className="add-new-button">Add New</button>
+        <button onClick={handleAddNewCustomerClick} className="add-new-button">Tạo Mới</button>
       </div>
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Phone Number</th>
-            <th>Address</th>
-            <th>Pant Price</th>
-            <th>Password</th>
-            <th>Actions</th>
+            <th>Tên</th>
+            <th>Số Điện Thoại</th>
+            <th>Địa Chỉ</th>
+            <th>Giá Bán</th>
+            <th>Mật Khẩu</th>
+            <th>Hành Động</th>
           </tr>
         </thead>
         <tbody>
@@ -185,12 +185,12 @@ const CustomerTable = () => {
                     <button onClick={handleSaveClick}>Save</button>
                   ) : (
                     <>
-                      <button onClick={() => handleEditClick(customer)}>Edit</button>
+                      <button onClick={() => handleEditClick(customer)}>Chỉnh</button>
                       <button
                         onClick={() => handleDeleteClick(customer['phone_number'])}
                         style={{ backgroundColor: 'red', color: 'white', marginLeft: '5px' }}
                       >
-                        Delete
+                        Xóa
                       </button>
                     </>
                   )}
@@ -209,14 +209,14 @@ const CustomerTable = () => {
       {isAddingNew && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Add New Customer</h3>
+            <h3>Thêm Khách Hàng Mới</h3>
             <input type="text" name="name" placeholder="Name" onChange={handleNewCustomerInputChange} />
             <input type="text" name="phone_number" placeholder="Phone Number" onChange={handleNewCustomerInputChange} />
             <input type="text" name="address" placeholder="Address" onChange={handleNewCustomerInputChange} />
             <input type="number" name="short_price" placeholder="Pant Price" onChange={handleNewCustomerInputChange} />
             <input type="password" name="password" placeholder="Password" onChange={handleNewCustomerInputChange} />
-            <button onClick={handleAddCustomerSaveClick}>Save</button>
-            <button onClick={() => setIsAddingNew(false)}>Cancel</button>
+            <button onClick={handleAddCustomerSaveClick}>Lưu</button>
+            <button onClick={() => setIsAddingNew(false)}>Hủy Bỏ</button>
           </div>
         </div>
       )}
@@ -226,13 +226,13 @@ const CustomerTable = () => {
         <div className="modal">
           <div className="modal-content">
             <h3>Confirm Deletion</h3>
-            <p>Type "Confirm" to delete this customer:</p>
+            <p>Nhập "Đồng Ý" để xóa dữ liệu này:</p>
             <input
               type="text"
               onChange={(e) => setConfirmationInput(e.target.value)}
             />
-            <button onClick={confirmDelete}>Delete</button>
-            <button onClick={() => setIsDeleteConfirmation(false)}>Cancel</button>
+            <button onClick={confirmDelete}>Xóa</button>
+            <button onClick={() => setIsDeleteConfirmation(false)}>Hủy Bỏ</button>
           </div>
         </div>
       )}
