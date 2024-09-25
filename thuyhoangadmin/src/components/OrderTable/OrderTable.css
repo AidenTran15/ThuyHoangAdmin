@@ -2,7 +2,6 @@
   margin: 20px auto;
   font-family: Arial, sans-serif;
   width: 80%;
-  border-collapse: collapse;
 }
 
 .header-container {
@@ -19,14 +18,20 @@
 
 .header-container h2 {
   margin: 0;
-  flex-grow: 1;
   font-size: 26px;
+  flex-grow: 1;
 }
 
-.add-new-button {
-  background-color: #4CAF50;
+.button-group {
+  display: flex;
+  gap: 15px;
+}
+
+.add-order-button,
+.view-history-button {
+  background-color: #007bff;
   color: white;
-  padding: 12px 25px;
+  padding: 10px 20px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -34,8 +39,19 @@
   transition: background-color 0.3s ease;
 }
 
-.add-new-button:hover {
-  background-color: #45a049;
+.add-order-button:hover,
+.view-history-button:hover {
+  background-color: #0056b3;
+}
+
+.view-history-button {
+  text-decoration: none;
+  display: inline-block;
+  line-height: 32px;
+}
+
+.view-history-button:hover {
+  background-color: #d9534f;
 }
 
 .order-table table {
@@ -125,74 +141,4 @@
 .modal-content input:focus {
   border: 1px solid #4CAF50;
   outline: none;
-}
-
-.product-item {
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.product-item label {
-  margin-right: 10px;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.product-item select,
-.product-item input[type="number"] {
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  margin-right: 10px;
-  width: 80px;
-}
-
-.add-product-button {
-  background-color: #28a745;
-  color: white;
-  padding: 12px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.add-product-button:hover {
-  background-color: #218838;
-}
-
-.save-button,
-.cancel-button {
-  padding: 12px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 120px;
-}
-
-.save-button {
-  background-color: #28a745;
-  color: white;
-  margin-right: 10px;
-}
-
-.save-button:hover {
-  background-color: #218838;
-}
-
-.cancel-button {
-  background-color: #dc3545;
-  color: white;
-}
-
-.cancel-button:hover {
-  background-color: #c82333;
 }

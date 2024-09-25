@@ -101,16 +101,18 @@ const OrderTable = () => {
   
   return (
     <div className="order-table">
-      <h2>Manage Orders</h2>
-
-      {/* Add Order Button */}
-      <button className="add-order-button" onClick={() => setIsAddingNew(true)}>
-        Add New Order
-      </button>
-
-      <Link to="/history" className="view-history-button">
-        View History Orders
-      </Link>
+      {/* Header section */}
+      <div className="header-container">
+        <h2>Manage Orders</h2>
+        <div className="button-group">
+          <button className="add-order-button" onClick={() => setIsAddingNew(true)}>
+            Add New Order
+          </button>
+          <Link to="/history" className="view-history-button">
+            View History Orders
+          </Link>
+        </div>
+      </div>
 
       {loading ? (
         <p>Loading orders...</p>
