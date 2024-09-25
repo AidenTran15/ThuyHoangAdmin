@@ -7,12 +7,12 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
   const [loadingCustomers, setLoadingCustomers] = useState(true);
   const [customerError, setCustomerError] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [uniqueColors, setUniqueColors] = useState([]); // Unique colors from the product table
-  const [filteredSizes, setFilteredSizes] = useState({}); // Store available sizes based on selected color
-  const [products, setProducts] = useState([]); // Store product list
-  const [maxQuantities, setMaxQuantities] = useState({}); // Store max quantity based on selected color and size
+  const [uniqueColors, setUniqueColors] = useState([]);
+  const [filteredSizes, setFilteredSizes] = useState({});
+  const [products, setProducts] = useState([]);
+  const [maxQuantities, setMaxQuantities] = useState({});
+  const [productIDs, setProductIDs] = useState({});
 
-  // Fetch customers when the component mounts
   useEffect(() => {
     axios.get('https://twnbtj6wuc.execute-api.ap-southeast-2.amazonaws.com/prod/customers')
       .then(response => {
@@ -27,15 +27,11 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
       });
   }, []);
 
-  // Fetch products to get colors, sizes, and quantities
   useEffect(() => {
     axios.get('https://jic2uc8adb.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then(response => {
         const productData = JSON.parse(response.data.body);
         setProducts(productData);
-        console.log('Products array:', productData); // Debugging log to view products array
-
-        // Extract unique colors from product data
         const colors = [...new Set(productData.map(product => product.Color))];
         setUniqueColors(colors);
       })
@@ -44,87 +40,43 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
       });
   }, []);
 
-  // Filter sizes based on selected color
   const filterSizesByColor = (color) => {
     const sizesForColor = products
       .filter((product) => product.Color === color)
       .map((product) => product.Size);
-    setFilteredSizes({ [color]: [...new Set(sizesForColor)] }); // Set unique sizes for the selected color
+    setFilteredSizes({ [color]: [...new Set(sizesForColor)] });
   };
 
-  // Get max quantity based on selected color and size by querying products array
-  const getMaxQuantity = (color, size) => {
-    console.log("Checking for color:", color, "and size:", size); // Debugging log
-
-    // Ensure consistent data types: both color and size should be strings
+  const getMaxQuantityAndProductID = (color, size) => {
     const normalizedColor = color.toString().toLowerCase();
     const normalizedSize = size.toString();
 
-    // Find the product that matches the selected color and size
     const product = products.find((product) => 
       product.Color.toLowerCase() === normalizedColor && product.Size.toString() === normalizedSize
     );
 
     if (product) {
-      console.log("Found product:", product); // Debugging log
-      return product.Quantity; // Return the product's quantity
+      setProductIDs(prev => ({ ...prev, [`${color}-${size}`]: product.ProductID }));
+      return product.Quantity;
     } else {
-      console.log("Product not found"); // Debugging log
-      return 0; // If product not found, return 0
+      return 0;
     }
   };
 
-  // Initialize with one empty product and default status if the productList is empty
-  useEffect(() => {
-    if (newOrder.productList.length === 0) {
-      setNewOrder((prev) => ({
-        ...prev,
-        productList: [
-          { color: 'red', size: 30, quantity: 10, isConfirmed: false },
-        ],
-        status: 'pending', // Set default status to 'pending'
-      }));
-    }
-  }, [newOrder.productList.length, setNewOrder]);
-
-  // Automatically update the total quantity when the product list changes
-  useEffect(() => {
-    const totalQuantity = newOrder.productList.reduce((total, product) => total + parseInt(product.quantity || 0), 0);
-    setNewOrder((prev) => ({
-      ...prev,
-      totalQuantity,
-    }));
-  }, [newOrder.productList, setNewOrder]);
-
-  // Calculate the total amount based on total quantity and selected customer's pants price
-  useEffect(() => {
-    if (selectedCustomer && newOrder.totalQuantity) {
-      const pantsPrice = selectedCustomer.short_price || 0;  // Use the correct field for pants price
-      const totalAmount = newOrder.totalQuantity * pantsPrice;
-
-      setNewOrder((prev) => ({
-        ...prev,
-        total: totalAmount,
-      }));
-    }
-  }, [selectedCustomer, newOrder.totalQuantity, setNewOrder]);
-
-  // Handle product changes
   const handleProductChange = (index, field, value) => {
     const updatedProducts = [...newOrder.productList];
     updatedProducts[index][field] = value;
     setNewOrder({ ...newOrder, productList: updatedProducts });
 
     if (field === 'color') {
-      filterSizesByColor(value); // Filter sizes when the color changes
-      updatedProducts[index].size = ''; // Reset size when the color changes
+      filterSizesByColor(value);
+      updatedProducts[index].size = '';
     }
 
     if (field === 'size') {
       const color = updatedProducts[index].color;
-      const maxQuantity = getMaxQuantity(color, value);
-      console.log(`Max quantity for color: ${color}, size: ${value} is ${maxQuantity}`); // Debugging log
-      setMaxQuantities((prev) => ({ ...prev, [`${color}-${value}`]: maxQuantity }));
+      const maxQuantity = getMaxQuantityAndProductID(color, value);
+      setMaxQuantities(prev => ({ ...prev, [`${color}-${value}`]: maxQuantity }));
     }
   };
 
@@ -157,7 +109,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
     }));
   };
 
-  // Handle customer selection from the dropdown and find selected customer details
   const handleCustomerChange = (e) => {
     const selectedCustomerName = e.target.value;
     const customer = customers.find(c => c.name === selectedCustomerName);
@@ -167,6 +118,20 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
       customer: selectedCustomerName,
     }));
   };
+
+  // Calculate the total quantity and amount whenever productList or selectedCustomer changes
+  useEffect(() => {
+    const totalQuantity = newOrder.productList.reduce((total, product) => total + parseInt(product.quantity || 0), 0);
+    const totalAmount = selectedCustomer 
+      ? totalQuantity * (selectedCustomer.short_price || 0) 
+      : 0;
+
+    setNewOrder((prev) => ({
+      ...prev,
+      totalQuantity,
+      total: totalAmount,
+    }));
+  }, [newOrder.productList, selectedCustomer, setNewOrder]);
 
   return (
     <div className="modal">
@@ -199,7 +164,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
         {newOrder.productList.map((product, index) => (
           <div key={index} className="product-card">
             <div className="product-row">
-              {/* Color Field */}
               <div className="product-field-group">
                 <label className="input-label">Color</label>
                 {product.isConfirmed ? (
@@ -219,7 +183,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
                 )}
               </div>
 
-              {/* Size Field */}
               <div className="product-field-group">
                 <label className="input-label">Size</label>
                 {product.isConfirmed ? (
@@ -239,7 +202,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
                 )}
               </div>
 
-              {/* Quantity Field */}
               <div className="product-field-group">
                 <label className="input-label">Quantity (Max: {maxQuantities[`${product.color}-${product.size}`] || 0})</label>
                 {product.isConfirmed ? (
@@ -259,7 +221,11 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
                 )}
               </div>
 
-              {/* Add or Remove Button */}
+              <div className="product-field-group">
+                <label className="input-label">Product ID</label>
+                <span>{productIDs[`${product.color}-${product.size}`] || 'N/A'}</span>
+              </div>
+
               {!product.isConfirmed ? (
                 <button className="add-button" onClick={() => confirmProduct(index)}>
                   Add
@@ -290,7 +256,6 @@ const AddOrderModal = ({ newOrder, setNewOrder, handleAddOrderSaveClick, handleC
           />
         </div>
 
-        {/* Automatically calculated total amount */}
         <div className="input-group">
           <label className="input-label">Total Amount</label>
           <input
