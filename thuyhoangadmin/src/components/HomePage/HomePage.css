@@ -1,81 +1,57 @@
-/* Centering the content and defining the container styles */
+/* Centering the homepage content */
 .homepage-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
     margin: 50px auto;
-    padding: 20px;
-    max-width: 1200px;
+    max-width: 600px;
 }
 
-.homepage-title {
-    font-size: 36px;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.homepage-description {
-    font-size: 18px;
-    color: #555;
-    margin-bottom: 40px;
-    text-align: center;
-}
-
-.card-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-}
-
-.card {
+/* Styling the button container */
+.button-container {
     display: flex;
     flex-direction: column;
+    /* Set buttons to be in a column */
     align-items: center;
-    justify-content: space-between;
-    background-color: #ffffff;
-    color: #333;
+    /* Center align the buttons */
+    gap: 20px;
+    /* Space between each button */
+    margin-top: 50px;
+}
+
+/* Styling the buttons */
+.page-button {
+    background-color: #28a745;
+    /* Set background to green */
+    color: white;
+    font-size: 18px;
+    padding: 15px 40px;
+    /* Adjust padding */
     width: 250px;
-    height: 300px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
+    /* Set a fixed width for all buttons */
     text-align: center;
+    /* Center the text within the button */
+    border: none;
+    border-radius: 8px;
     text-decoration: none;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+.page-button:hover {
+    background-color: #218838;
+    /* Darker green on hover */
+    transform: translateY(-3px);
+    /* Slight hover effect */
 }
 
-.card-icon {
-    font-size: 48px;
-    color: #007bff;
-    margin-bottom: 20px;
-}
-
-.card-title {
-    font-size: 22px;
-    color: #007bff;
-    margin-bottom: 10px;
-}
-
-.card-description {
-    font-size: 16px;
-    color: #555;
-}
-
-/* Responsive design */
+/* Responsive design for smaller screens */
 @media (max-width: 768px) {
-    .card-container {
-        flex-direction: column;
-        align-items: center;
+    .button-container {
+        width: 100%;
+        padding: 0 20px;
     }
 
-    .card {
-        width: 80%;
+    .page-button {
+        width: 100%;
+        /* Full width for buttons on smaller screens */
     }
 }
