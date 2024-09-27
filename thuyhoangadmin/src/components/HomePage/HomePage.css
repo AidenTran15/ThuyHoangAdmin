@@ -1,0 +1,81 @@
+/* Centering the content and defining the container styles */
+.homepage-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 50px auto;
+    padding: 20px;
+    max-width: 1200px;
+}
+
+.homepage-title {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.homepage-description {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #ffffff;
+    color: #333;
+    width: 250px;
+    height: 300px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-icon {
+    font-size: 48px;
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 22px;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.card-description {
+    font-size: 16px;
+    color: #555;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .card-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        width: 80%;
+    }
+}

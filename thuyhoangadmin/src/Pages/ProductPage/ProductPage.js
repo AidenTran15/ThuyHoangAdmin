@@ -1,6 +1,6 @@
 import React from 'react';
 
-import PantsProduct from '../../../components/PantsProduct/PantsProduct'; 
+import PantsProduct from '../../components/PantsProduct/PantsProduct'; 
 
 
 
