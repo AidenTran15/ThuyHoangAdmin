@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './PantsProduct.css'; // Ensure this file contains the appropriate styling
+import './PantsProduct.css';
 
 const PantsProduct = () => {
   const [products, setProducts] = useState([]);
-  const [editingProduct, setEditingProduct] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null); // State for tracking the product being edited
   const [updatedProduct, setUpdatedProduct] = useState({
     ProductID: '',
     Color: '',
@@ -22,16 +22,17 @@ const PantsProduct = () => {
   const [isAddingNew, setIsAddingNew] = useState(false); // State to manage add product modal visibility
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // State to manage delete confirmation modal visibility
   const [productToDelete, setProductToDelete] = useState(null); // Store the productID of the product to be deleted
+  const [filterColor, setFilterColor] = useState('All'); // State for the selected color filter
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  // Fetch all products from the Lambda function via API Gateway
+  // Fetch all products from the API
   const fetchProducts = () => {
     axios.get('https://jic2uc8adb.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then(response => {
-        const productData = JSON.parse(response.data.body);  // Ensure response is parsed correctly
+        const productData = JSON.parse(response.data.body);
         setProducts(Array.isArray(productData) ? productData : []);
       })
       .catch(error => {
@@ -39,10 +40,15 @@ const PantsProduct = () => {
       });
   };
 
+  // Handle filter change
+  const handleFilterChange = (e) => {
+    setFilterColor(e.target.value);
+  };
+
   // Set the product for editing and copy its data into the updatedProduct state
   const handleEditClick = (product) => {
-    setEditingProduct(product.ProductID);
-    setUpdatedProduct({ ...product }); // Ensure ProductID is included
+    setEditingProduct(product.ProductID); // Set the ID of the product being edited
+    setUpdatedProduct({ ...product }); // Pre-fill the form with the product's existing data
   };
 
   // Update the input fields in the updatedProduct state
@@ -50,37 +56,32 @@ const PantsProduct = () => {
     const { name, value } = e.target;
     setUpdatedProduct(prev => ({
       ...prev,
-      [name]: name === 'Size' || name === 'Quantity' ? Number(value) : value,  // Ensure Size and Quantity are numbers
-      ProductID: prev.ProductID // Ensure ProductID stays intact
+      [name]: name === 'Size' || name === 'Quantity' ? Number(value) : value, // Ensure Size and Quantity are numbers
     }));
   };
 
   // Save the updated product to the API
   const handleSaveClick = () => {
-    console.log("Updating product:", updatedProduct);  // Log the updated product before the request
-  
-    // Ensure ProductID is present
     if (!updatedProduct.ProductID) {
-      console.error("ProductID is missing!");  // Log if ProductID is missing
+      console.error("ProductID is missing!");
       return;
     }
-  
-    // Use axios.put for updating the product
+
     axios.put('https://0wg7yclqgf.execute-api.ap-southeast-2.amazonaws.com/prod/update', 
       { body: JSON.stringify(updatedProduct) }, // Wrap the data under "body"
       {
         headers: {
-          'Content-Type': 'application/json'  // Ensure Content-Type is JSON
+          'Content-Type': 'application/json'
         }
       }
     )
     .then(response => {
-      console.log("Product update response:", response.data);  // Log the response from the server
-      setEditingProduct(null);  // Exit edit mode
-      fetchProducts();  // Re-fetch the product list after the update
+      console.log("Product update response:", response.data);
+      setEditingProduct(null); // Exit edit mode
+      fetchProducts(); // Refresh the product list after the update
     })
     .catch(error => {
-      console.error("Error updating the product:", error.response ? error.response.data : error.message);  // Log detailed error message
+      console.error("Error updating the product:", error);
     });
   };
 
@@ -95,9 +96,6 @@ const PantsProduct = () => {
 
   // Add a new product
   const handleAddProductSaveClick = () => {
-    console.log("Adding new product:", newProduct);
-
-    // Ensure that ProductID is not empty
     if (!newProduct.ProductID) {
       console.error("ProductID is required for adding a product!");
       return;
@@ -118,7 +116,7 @@ const PantsProduct = () => {
       setIsAddingNew(false); // Close modal
     })
     .catch(error => {
-      console.error("Error adding the product:", error.response ? error.response.data : error.message);
+      console.error("Error adding the product:", error);
     });
   };
 
@@ -130,10 +128,7 @@ const PantsProduct = () => {
 
   // Confirm deletion of the product
   const confirmDeleteProduct = () => {
-    const apiUrl = `https://d28pbjftsc.execute-api.ap-southeast-2.amazonaws.com/prod/delete`;
-    console.log(`Attempting to delete product with ID: ${productToDelete}`);
-  
-    axios.delete(apiUrl, {
+    axios.delete('https://d28pbjftsc.execute-api.ap-southeast-2.amazonaws.com/prod/delete', {
       data: JSON.stringify({
         body: JSON.stringify({ ProductID: productToDelete })
       }),
@@ -142,7 +137,7 @@ const PantsProduct = () => {
       }
     })
     .then(response => {
-      console.log(`Product ${productToDelete} deleted successfully! Response:`, response.data);
+      console.log(`Product ${productToDelete} deleted successfully!`);
       fetchProducts();  // Refresh the product list
       setIsDeleteModalVisible(false);  // Close the delete confirmation modal
       setProductToDelete(null);  // Reset the product to delete
@@ -152,13 +147,27 @@ const PantsProduct = () => {
     });
   };
 
+  // Filter products by selected color
+  const filteredProducts = filterColor === 'All' ? products : products.filter(product => product.Color === filterColor);
+
   return (
     <div className="pants-product-table">
       <div className="header-container">
         <h2>Manage Pants Products</h2>
         <button onClick={() => setIsAddingNew(true)} className="add-new-button">Thêm</button>
-        {/* <button onClick={() => setIsAddingNew(true)} class="plus-icon">+</button> */}
 
+        {/* Dropdown Filter by Color */}
+        <div className="filter-container">
+          <label htmlFor="colorFilter">Filter by Color:</label>
+          <select id="colorFilter" value={filterColor} onChange={handleFilterChange} className="filter-dropdown">
+            <option value="All">All</option>
+            {Array.from(new Set(products.map(product => product.Color))).map(color => (
+              <option key={color} value={color}>
+                {color}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
   
       <table>
@@ -172,10 +181,20 @@ const PantsProduct = () => {
           </tr>
         </thead>
         <tbody>
-          {products.length > 0 ? (
-            products.map(product => (
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map(product => (
               <tr key={product.ProductID}>
-                <td>{product.ProductID}</td>
+                <td>{editingProduct === product.ProductID ? (
+                  <input
+                    type="text"
+                    name="ProductID"
+                    value={updatedProduct.ProductID}
+                    onChange={handleInputChange}
+                    readOnly // Prevent ProductID from being edited
+                  />
+                ) : (
+                  product.ProductID
+                )}</td>
                 <td>{editingProduct === product.ProductID ? (
                   <input
                     type="text"
@@ -211,8 +230,8 @@ const PantsProduct = () => {
                     <button onClick={handleSaveClick}>Save</button>
                   ) : (
                     <>
-                      <button onClick={() => handleEditClick(product)}>Chỉnh</button>
-                      <button onClick={() => handleDeleteClick(product.ProductID)} style={{ backgroundColor: 'red', color: 'white', marginLeft: '5px' }}>Xóa</button>
+                      <button onClick={() => handleEditClick(product)} className="edit-button">Chỉnh</button>
+                      <button onClick={() => handleDeleteClick(product.ProductID)} className="delete-button">Xóa</button>
                     </>
                   )}
                 </td>
@@ -225,7 +244,7 @@ const PantsProduct = () => {
           )}
         </tbody>
       </table>
-  
+
       {/* Add New Product Modal */}
       {isAddingNew && (
         <div className="modal">
@@ -264,7 +283,7 @@ const PantsProduct = () => {
           </div>
         </div>
       )}
-  
+
       {/* Delete Confirmation Modal */}
       {isDeleteModalVisible && (
         <div className="modal">
@@ -278,7 +297,6 @@ const PantsProduct = () => {
       )}
     </div>
   );
-  
 };
 
 export default PantsProduct;

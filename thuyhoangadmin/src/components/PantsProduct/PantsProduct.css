@@ -3,18 +3,23 @@
   font-family: Arial, sans-serif;
   width: 80%;
   border-collapse: collapse;
-  font-size: 18px; /* Increase the base font size for the entire table */
+  font-size: 18px;
+  /* Increase the base font size for the entire table */
 }
 
 .header-container {
   display: flex;
-  align-items: center;  /* Vertically aligns items */
-  gap: 10px;  /* Adds a small gap between the heading and the button */
+  align-items: center;
+  /* Vertically aligns items */
+  gap: 10px;
+  /* Adds a small gap between the heading and the button */
 }
 
 .header-container h2 {
-  margin: 0;  /* Removes unnecessary margins around the heading */
-  font-size: 28px;  /* Increase heading font size */
+  margin: 0;
+  /* Removes unnecessary margins around the heading */
+  font-size: 28px;
+  /* Increase heading font size */
   font-weight: bold;
 }
 
@@ -25,8 +30,10 @@
   border: none;
   cursor: pointer;
   border-radius: 5px;
-  margin-left: 20px;  /* Adds some space between heading and button */
-  font-size: 18px;  /* Increase font size of the button */
+  margin-left: 20px;
+  /* Adds some space between heading and button */
+  font-size: 18px;
+  /* Increase font size of the button */
 }
 
 .add-new-button:hover {
@@ -40,11 +47,14 @@
   border: 1px solid #ddd;
 }
 
-.pants-product-table th, .pants-product-table td {
-  padding: 16px;  /* Increase padding for a larger appearance */
+.pants-product-table th,
+.pants-product-table td {
+  padding: 16px;
+  /* Increase padding for a larger appearance */
   text-align: left;
   border: 1px solid #ddd;
-  font-size: 18px;  /* Increase font size of table content */
+  font-size: 18px;
+  /* Increase font size of table content */
 }
 
 .pants-product-table th {
@@ -66,10 +76,12 @@
   background-color: #4CAF50;
   color: white;
   border: none;
-  padding: 10px 15px;  /* Increase padding for larger buttons */
+  padding: 10px 15px;
+  /* Increase padding for larger buttons */
   cursor: pointer;
   border-radius: 4px;
-  font-size: 16px;  /* Increase button text size */
+  font-size: 16px;
+  /* Increase button text size */
 }
 
 .pants-product-table button:hover {
@@ -122,7 +134,8 @@
   width: 500px;
   max-width: 90%;
   text-align: center;
-  font-size: 18px;  /* Increase font size inside modal */
+  font-size: 18px;
+  /* Increase font size inside modal */
 }
 
 .plus-icon {
@@ -131,10 +144,35 @@
   background-color: green;
   border: none;
   cursor: pointer;
-  width: 40px;  /* Define the width of the button */
-  height: 40px;  /* Make sure the height matches the width to create a perfect circle */
-  border-radius: 100%;  /* This creates the circular shape */
+  width: 40px;
+  /* Define the width of the button */
+  height: 40px;
+  /* Make sure the height matches the width to create a perfect circle */
+  border-radius: 100%;
+  /* This creates the circular shape */
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 20px;
+  /* Adds space between button and filter */
+}
+
+.filter-dropdown {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-dropdown:hover {
+  border-color: #007bff;
+  /* Change border color on hover */
 }
