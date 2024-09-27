@@ -9,7 +9,7 @@ const OrderTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false); // Control modal visibility
-  const [sortOrder, setSortOrder] = useState('asc'); // State to track the current sort order
+  const [filterCustomer, setFilterCustomer] = useState('All'); // State for the selected customer filter
 
   const [newOrder, setNewOrder] = useState({
     orderID: '',
@@ -20,7 +20,6 @@ const OrderTable = () => {
     status: ''
   });
 
-  // Fetch orders when the component loads
   useEffect(() => {
     if (!isAddingNew) {  // Only fetch when not adding a new order
       axios.get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
@@ -104,16 +103,16 @@ const OrderTable = () => {
       });
   };
 
-  // Function to sort orders by customer name
-  const sortOrdersByCustomerName = () => {
-    const sortedOrders = [...orders].sort((a, b) => {
-      if (a.Customer < b.Customer) return sortOrder === 'asc' ? -1 : 1;
-      if (a.Customer > b.Customer) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
-    setOrders(sortedOrders);
-    setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
+  // Handle customer filter change
+  const handleFilterCustomerChange = (e) => {
+    setFilterCustomer(e.target.value);
   };
+
+  // Filtered orders based on selected customer name
+  const filteredOrders = filterCustomer === 'All' ? orders : orders.filter(order => order.Customer === filterCustomer);
+
+  // Get unique customer names for the dropdown filter
+  const uniqueCustomers = Array.from(new Set(orders.map(order => order.Customer)));
 
   return (
     <div className="order-table">
@@ -130,70 +129,79 @@ const OrderTable = () => {
         </div>
       </div>
 
+      {/* Filter Dropdown aligned to the right */}
+      <div className="filter-container">
+        <label htmlFor="customerFilter">Filter by Customer:</label>
+        <select
+          id="customerFilter"
+          value={filterCustomer}
+          onChange={handleFilterCustomerChange}
+          className="filter-dropdown"
+        >
+          <option value="All">All</option>
+          {uniqueCustomers.map(customer => (
+            <option key={customer} value={customer}>
+              {customer}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {loading ? (
         <p>Loading orders...</p>
       ) : error ? (
         <p>{error}</p>
       ) : (
-        <>
-          {/* Sort Button */}
-          <div className="sort-container">
-            <button onClick={sortOrdersByCustomerName} className="sort-button">
-              Sort by Customer {sortOrder === 'asc' ? '↑' : '↓'}
-            </button>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>Ngày Giờ</th>
-                <th>Đơn Hàng ID</th>
-                <th>Khách Hàng</th>
-                <th>Các Sản Phẩm</th>
-                <th>Tổng SL</th>
-                <th>Tổng Giá</th>
-                <th>Trạng Thái</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.length > 0 ? (
-                orders.map(order => (
-                  <tr key={order.orderID}>
-                    <td>{order.OrderDate}</td>
-                    <td>{order.orderID}</td>
-                    <td>{order.Customer}</td>
-                    <td>
-                      <ul style={{ paddingLeft: '0', margin: '0', listStyleType: 'none' }}>
-                        {order.ProductList ? (
-                          order.ProductList.map((product, index) => (
-                            <li key={index}>
-                              {`${product.color} ${product.size} - ${product.quantity}`}
-                            </li>
-                          ))
-                        ) : 'No products'}
-                      </ul>
-                    </td>
-                    <td>{order.TotalQuantity}</td>
-                    <td>{order.Total}</td>
-                    <td>
-                      <select
-                        value={order.Status}
-                        onChange={(e) => handleStatusChange(order.orderID, e.target.value)}
-                      >
-                        <option value="Pending">Đang xử Lý</option>
-                        <option value="Done">Hoàn Thành</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7">No pending orders found</td>
+        <table>
+          <thead>
+            <tr>
+              <th>Ngày Giờ</th>
+              <th>Đơn Hàng ID</th>
+              <th>Khách Hàng</th>
+              <th>Các Sản Phẩm</th>
+              <th>Tổng SL</th>
+              <th>Tổng Giá</th>
+              <th>Trạng Thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredOrders.length > 0 ? (
+              filteredOrders.map(order => (
+                <tr key={order.orderID}>
+                  <td>{order.OrderDate}</td>
+                  <td>{order.orderID}</td>
+                  <td>{order.Customer}</td>
+                  <td>
+                    <ul style={{ paddingLeft: '0', margin: '0', listStyleType: 'none' }}>
+                      {order.ProductList ? (
+                        order.ProductList.map((product, index) => (
+                          <li key={index}>
+                            {`${product.color} ${product.size} - ${product.quantity}`}
+                          </li>
+                        ))
+                      ) : 'No products'}
+                    </ul>
+                  </td>
+                  <td>{order.TotalQuantity}</td>
+                  <td>{order.Total}</td>
+                  <td>
+                    <select
+                      value={order.Status}
+                      onChange={(e) => handleStatusChange(order.orderID, e.target.value)}
+                    >
+                      <option value="Pending">Đang xử Lý</option>
+                      <option value="Done">Hoàn Thành</option>
+                    </select>
+                  </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7">No orders found</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       )}
 
       {/* AddOrderModal will be shown conditionally */}

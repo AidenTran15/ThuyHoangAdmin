@@ -162,3 +162,30 @@
 .sort-button:hover {
   background-color: #0056b3;
 }
+
+.filter-container {
+  display: flex;
+  justify-content: flex-end;
+  /* Aligns the filter dropdown to the right */
+  align-items: center;
+  margin: 15px 0;
+  /* Adds some space above the filter dropdown */
+}
+
+.filter-container label {
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.filter-dropdown {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-dropdown:hover {
+  border-color: #007bff;
+}
