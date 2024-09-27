@@ -155,21 +155,21 @@ const PantsProduct = () => {
       <div className="header-container">
         <h2>Manage Pants Products</h2>
         <button onClick={() => setIsAddingNew(true)} className="add-new-button">Thêm</button>
-
-        {/* Dropdown Filter by Color */}
-        <div className="filter-container">
-          <label htmlFor="colorFilter">Filter by Color:</label>
-          <select id="colorFilter" value={filterColor} onChange={handleFilterChange} className="filter-dropdown">
-            <option value="All">All</option>
-            {Array.from(new Set(products.map(product => product.Color))).map(color => (
-              <option key={color} value={color}>
-                {color}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
   
+      {/* Move the Dropdown Filter by Color below the header */}
+      <div className="filter-container">
+        <label htmlFor="colorFilter">Filter by Color:</label>
+        <select id="colorFilter" value={filterColor} onChange={handleFilterChange} className="filter-dropdown">
+          <option value="All">All</option>
+          {Array.from(new Set(products.map(product => product.Color))).map(color => (
+            <option key={color} value={color}>
+              {color}
+            </option>
+          ))}
+        </select>
+      </div>
+    
       <table>
         <thead>
           <tr>
@@ -244,6 +244,7 @@ const PantsProduct = () => {
           )}
         </tbody>
       </table>
+  
 
       {/* Add New Product Modal */}
       {isAddingNew && (

@@ -155,12 +155,26 @@
   align-items: center;
 }
 
+.action-container {
+  display: flex;
+  justify-content: flex-end;
+  /* Align the filter and button to the right */
+  align-items: center;
+  gap: 15px;
+  /* Adds space between the button and filter */
+  width: 100%;
+  /* Ensure the container takes full width */
+}
+
 .filter-container {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-left: 20px;
-  /* Adds space between button and filter */
+  margin: 0;
+}
+
+.filter-container label {
+  margin-right: 10px;
+  font-size: 16px;
 }
 
 .filter-dropdown {
