@@ -210,11 +210,11 @@ const CustomerTable = () => {
         <div className="modal">
           <div className="modal-content">
             <h3>Thêm Khách Hàng Mới</h3>
-            <input type="text" name="name" placeholder="Name" onChange={handleNewCustomerInputChange} />
-            <input type="text" name="phone_number" placeholder="Phone Number" onChange={handleNewCustomerInputChange} />
-            <input type="text" name="address" placeholder="Address" onChange={handleNewCustomerInputChange} />
-            <input type="number" name="short_price" placeholder="Pant Price" onChange={handleNewCustomerInputChange} />
-            <input type="password" name="password" placeholder="Password" onChange={handleNewCustomerInputChange} />
+            <input type="text" name="name" placeholder="Tên Khách Hàng" onChange={handleNewCustomerInputChange} />
+            <input type="text" name="phone_number" placeholder="Số Điện Thoại" onChange={handleNewCustomerInputChange} />
+            <input type="text" name="address" placeholder="Địa Chỉ" onChange={handleNewCustomerInputChange} />
+            <input type="number" name="short_price" placeholder="Giá Bán" onChange={handleNewCustomerInputChange} />
+            <input type="password" name="password" placeholder="Mật Khẩu" onChange={handleNewCustomerInputChange} />
             <button onClick={handleAddCustomerSaveClick}>Lưu</button>
             <button onClick={() => setIsAddingNew(false)}>Hủy Bỏ</button>
           </div>

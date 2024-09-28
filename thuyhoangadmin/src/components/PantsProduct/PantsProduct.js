@@ -254,14 +254,14 @@ const PantsProduct = () => {
             <input 
               type="text" 
               name="ProductID" 
-              placeholder="Product ID" 
+              placeholder="Mã Sản Phẩm" 
               value={newProduct.ProductID} 
               onChange={handleNewProductChange} 
             />
             <input 
               type="text" 
               name="Color" 
-              placeholder="Color" 
+              placeholder="Màu Sắc" 
               value={newProduct.Color} 
               onChange={handleNewProductChange} 
             />
@@ -275,7 +275,7 @@ const PantsProduct = () => {
             <input 
               type="number" 
               name="Quantity" 
-              placeholder="Quantity" 
+              placeholder="Số Lượng" 
               value={newProduct.Quantity} 
               onChange={handleNewProductChange} 
             />
