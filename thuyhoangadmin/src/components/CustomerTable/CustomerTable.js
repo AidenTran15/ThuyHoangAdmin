@@ -113,7 +113,7 @@ const CustomerTable = () => {
   return (
     <div className="customer-table">
       <div className="header-container">
-        <h2>Manage Customers</h2>
+        <h2>Quản Lý Khách Hàng</h2>
         <button onClick={handleAddNewCustomerClick} className="add-new-button">Tạo Mới</button>
       </div>
       <table>

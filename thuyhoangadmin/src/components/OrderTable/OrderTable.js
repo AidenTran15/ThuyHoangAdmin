@@ -118,7 +118,7 @@ const OrderTable = () => {
     <div className="order-table">
       {/* Header section */}
       <div className="header-container">
-        <h2>Manage Orders</h2>
+        <h2>Quản Lý Đơn Hàng</h2>
         <div className="button-group">
           <button className="add-order-button" onClick={() => setIsAddingNew(true)}>
             Tạo Đơn
@@ -131,14 +131,14 @@ const OrderTable = () => {
 
       {/* Filter Dropdown aligned to the right */}
       <div className="filter-container">
-        <label htmlFor="customerFilter">Filter by Customer:</label>
+        <label htmlFor="customerFilter">Lọc Đơn Hàng:</label>
         <select
           id="customerFilter"
           value={filterCustomer}
           onChange={handleFilterCustomerChange}
           className="filter-dropdown"
         >
-          <option value="All">All</option>
+          <option value="All">Tất cả</option>
           {uniqueCustomers.map(customer => (
             <option key={customer} value={customer}>
               {customer}
@@ -148,7 +148,7 @@ const OrderTable = () => {
       </div>
 
       {loading ? (
-        <p>Loading orders...</p>
+        <p>Đang tải đơn hàng...</p>
       ) : error ? (
         <p>{error}</p>
       ) : (
@@ -197,7 +197,7 @@ const OrderTable = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="7">No orders found</td>
+                <td colSpan="7">Không tìm thấy đơn hàng</td>
               </tr>
             )}
           </tbody>

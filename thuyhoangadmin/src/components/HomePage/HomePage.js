@@ -5,19 +5,19 @@ import './HomePage.css'; // Import CSS file for styling
 const HomePage = () => {
   return (
     <div className="homepage-container">
-      <h1>Welcome to the Admin Dashboard</h1>
+      <h1>Chào Mừng Đến Với Trang Quản Trị</h1>
       <div className="button-container">
         <Link to="/customer" className="page-button">
-          Customer Management
+          Quản Lý Khách Hàng
         </Link>
         <Link to="/product" className="page-button">
-          Product Management
+          Quản Lý Sản Phẩm
         </Link>
         <Link to="/orders" className="page-button">
-          Order Management
+          Quản Lý Đơn Hàng
         </Link>
         <Link to="/history" className="page-button">
-          Order History
+          Lịch Sử Đơn Hàng
         </Link>
       </div>
     </div>

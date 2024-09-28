@@ -153,15 +153,15 @@ const PantsProduct = () => {
   return (
     <div className="pants-product-table">
       <div className="header-container">
-        <h2>Manage Pants Products</h2>
+        <h2>Quản Lý Sản Phẩm</h2>
         <button onClick={() => setIsAddingNew(true)} className="add-new-button">Thêm</button>
       </div>
   
       {/* Move the Dropdown Filter by Color below the header */}
       <div className="filter-container">
-        <label htmlFor="colorFilter">Filter by Color:</label>
+        <label htmlFor="colorFilter">Lọc Sản Phẩm:</label>
         <select id="colorFilter" value={filterColor} onChange={handleFilterChange} className="filter-dropdown">
-          <option value="All">All</option>
+          <option value="All">Tất cả</option>
           {Array.from(new Set(products.map(product => product.Color))).map(color => (
             <option key={color} value={color}>
               {color}
@@ -227,7 +227,7 @@ const PantsProduct = () => {
                 )}</td>
                 <td>
                   {editingProduct === product.ProductID ? (
-                    <button onClick={handleSaveClick}>Save</button>
+                    <button onClick={handleSaveClick}>Lưu</button>
                   ) : (
                     <>
                       <button onClick={() => handleEditClick(product)} className="edit-button">Chỉnh</button>
@@ -239,7 +239,7 @@ const PantsProduct = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5">No products found</td>
+              <td colSpan="5">Không tìm thấy sản phẩm</td>
             </tr>
           )}
         </tbody>
@@ -279,8 +279,8 @@ const PantsProduct = () => {
               value={newProduct.Quantity} 
               onChange={handleNewProductChange} 
             />
-            <button onClick={handleAddProductSaveClick}>Save</button>
-            <button onClick={() => setIsAddingNew(false)}>Cancel</button>
+            <button onClick={handleAddProductSaveClick}>Lưu</button>
+            <button onClick={() => setIsAddingNew(false)}>Huỷ</button>
           </div>
         </div>
       )}
