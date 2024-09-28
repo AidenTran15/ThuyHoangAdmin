@@ -225,8 +225,8 @@ const CustomerTable = () => {
       {isDeleteConfirmation && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p>Nhập "Đồng Ý" để xóa dữ liệu này:</p>
+            <h3>Xác Nhận Xóa Đơn Hàng</h3>
+            <p>Vui lòng nhập "Đồng Ý" để xóa đơn hàng này:</p>
             <input
               type="text"
               onChange={(e) => setConfirmationInput(e.target.value)}
