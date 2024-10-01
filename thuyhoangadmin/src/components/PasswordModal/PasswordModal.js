@@ -1,19 +1,21 @@
 // src/components/PasswordModal/PasswordModal.js
 import React, { useState } from 'react';
-import './PasswordModal.css'; // Create a CSS file for styling if needed
+import './PasswordModal.css';
 
 const PasswordModal = ({ onPasswordCorrect }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const storedPassword = process.env.REACT_APP_PASSWORD; // Read the password from the environment variable
+
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-    setError(''); // Reset error on input change
+    setError('');
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (password === '123') {
+    if (password === storedPassword) {
       onPasswordCorrect();
     } else {
       setError('Incorrect password. Please try again.');
