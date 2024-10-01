@@ -6,7 +6,7 @@ const PasswordModal = ({ onPasswordCorrect }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const storedPassword = process.env.REACT_APP_PASSWORD; // Read the password from the environment variable
+  const storedPassword = process.env.REACT_APP_PASSWORD; // Đọc mật khẩu từ biến môi trường
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -18,22 +18,22 @@ const PasswordModal = ({ onPasswordCorrect }) => {
     if (password === storedPassword) {
       onPasswordCorrect();
     } else {
-      setError('Incorrect password. Please try again.');
+      setError('Sai mật khẩu. Vui lòng thử lại.');
     }
   };
 
   return (
     <div className="modal-container">
       <div className="modal-content">
-        <h2>Please Enter Password</h2>
+        <h2>Vui Lòng Nhập Mật Khẩu</h2>
         <form onSubmit={handleSubmit}>
           <input
             type="password"
             value={password}
             onChange={handlePasswordChange}
-            placeholder="Enter password"
+            placeholder="Nhập mật khẩu"
           />
-          <button type="submit">Submit</button>
+          <button type="submit">Xác Nhận</button>
         </form>
         {error && <p className="error-message">{error}</p>}
       </div>
