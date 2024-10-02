@@ -19,6 +19,8 @@ const PantsProduct = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // State to manage delete confirmation modal visibility
   const [productToDelete, setProductToDelete] = useState(null); // Store the productID of the product to be deleted
   const [filterColor, setFilterColor] = useState('All'); // State for the selected color filter
+  const [currentPage, setCurrentPage] = useState(1); // State to track the current page
+  const productsPerPage = 15; // Max products per page
 
   useEffect(() => {
     fetchProducts();
@@ -36,18 +38,13 @@ const PantsProduct = () => {
       });
   };
 
-  // Handle filter change
+  // Handle filter change for selecting color
   const handleFilterChange = (e) => {
     setFilterColor(e.target.value);
+    setCurrentPage(1); // Reset to the first page when filter changes
   };
 
-  // Set the product for editing and copy its data into the updatedProduct state
-  const handleEditClick = (product) => {
-    setEditingProduct(product.ProductID); // Set the ID of the product being edited
-    setUpdatedProduct({ ...product }); // Pre-fill the form with the product's existing data
-  };
-
-  // Update the input fields in the updatedProduct state
+  // Handle input change for editing a product
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setUpdatedProduct(prev => ({
@@ -56,7 +53,13 @@ const PantsProduct = () => {
     }));
   };
 
-  // Save the updated product to the API
+  // Handle editing a product
+  const handleEditClick = (product) => {
+    setEditingProduct(product.ProductID); // Set the ID of the product being edited
+    setUpdatedProduct({ ...product }); // Pre-fill the form with the product's existing data
+  };
+
+  // Handle saving the edited product
   const handleSaveClick = () => {
     if (!updatedProduct.ProductID) {
       console.error("ProductID is missing!");
@@ -90,7 +93,7 @@ const PantsProduct = () => {
     }));
   };
 
-  // Add a new product
+  // Handle adding a new product
   const handleAddProductSaveClick = () => {
     if (!newProduct.ProductID) {
       console.error("ProductID is required for adding a product!");
@@ -143,8 +146,25 @@ const PantsProduct = () => {
     });
   };
 
-  // Filter products by selected color
+  // Handle page navigation
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Calculate total pages and get products for current page
   const filteredProducts = filterColor === 'All' ? products : products.filter(product => product.Color === filterColor);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
   return (
     <div className="pants-product-table">
@@ -153,7 +173,7 @@ const PantsProduct = () => {
         <button onClick={() => setIsAddingNew(true)} className="add-new-button">Thêm</button>
       </div>
   
-      {/* Move the Dropdown Filter by Color below the header */}
+      {/* Filter by Color Dropdown */}
       <div className="filter-container">
         <label htmlFor="colorFilter">Lọc Sản Phẩm:</label>
         <select id="colorFilter" value={filterColor} onChange={handleFilterChange} className="filter-dropdown">
@@ -166,6 +186,7 @@ const PantsProduct = () => {
         </select>
       </div>
     
+      {/* Product Table */}
       <table>
         <thead>
           <tr>
@@ -175,8 +196,8 @@ const PantsProduct = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map(product => (
+          {currentProducts.length > 0 ? (
+            currentProducts.map(product => (
               <tr key={product.ProductID}>
                 <td>{editingProduct === product.ProductID ? (
                   <input
@@ -218,6 +239,17 @@ const PantsProduct = () => {
           )}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div className="pagination-controls" style={{ marginTop: '20px' }}>
+        <button onClick={goToPreviousPage} disabled={currentPage === 1} style={{ marginRight: '10px' }}>
+          Trang trước
+        </button>
+        <span>Trang {currentPage} trong {totalPages}</span>
+        <button onClick={goToNextPage} disabled={currentPage === totalPages} style={{ marginLeft: '10px' }}>
+          Trang sau
+        </button>
+      </div>
   
       {/* Add New Product Modal */}
       {isAddingNew && (
