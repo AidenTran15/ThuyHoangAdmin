@@ -10,6 +10,11 @@ const HistoryOrder = () => {
   const [orderToDelete, setOrderToDelete] = useState('');
   const [confirmationInput, setConfirmationInput] = useState('');
 
+  // Function to format currency in VND
+  const formatCurrencyVND = (amount) => {
+    return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+  };
+
   // Function to handle the deletion of an order by orderID
   const handleDeleteOrder = (orderID) => {
     setOrderToDelete(orderID);
@@ -81,7 +86,7 @@ const HistoryOrder = () => {
               <th>Sản Phẩm</th>
               <th>Tổng SL</th>
               <th>Tổng Giá</th>
-              <th>Ghi Chú</th> {/* New Note Column */}
+              <th>Ghi Chú</th>
               <th>Trạng Thái</th>
               <th>Hành Động</th>
             </tr>
@@ -105,8 +110,8 @@ const HistoryOrder = () => {
                     </ul>
                   </td>
                   <td>{order.TotalQuantity}</td>
-                  <td>{order.Total}</td>
-                  <td>{order.Note || 'No Note'}</td> {/* Display the Note value */}
+                  <td>{formatCurrencyVND(order.Total)}</td> {/* Format Tổng Giá to VND */}
+                  <td>{order.Note || 'No Note'}</td>
                   <td>{order.Status}</td>
                   <td>
                     <button onClick={() => handleDeleteOrder(order.orderID)} style={{ backgroundColor: 'red', color: 'white' }}>Xóa Đơn</button>
@@ -115,7 +120,7 @@ const HistoryOrder = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="9">No completed orders found</td> {/* Updated colspan to 9 to match the new column */}
+                <td colSpan="9">No completed orders found</td>
               </tr>
             )}
           </tbody>
