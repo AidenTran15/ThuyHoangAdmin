@@ -81,6 +81,7 @@ const HistoryOrder = () => {
               <th>Sản Phẩm</th>
               <th>Tổng SL</th>
               <th>Tổng Giá</th>
+              <th>Ghi Chú</th> {/* New Note Column */}
               <th>Trạng Thái</th>
               <th>Hành Động</th>
             </tr>
@@ -105,6 +106,7 @@ const HistoryOrder = () => {
                   </td>
                   <td>{order.TotalQuantity}</td>
                   <td>{order.Total}</td>
+                  <td>{order.Note || 'No Note'}</td> {/* Display the Note value */}
                   <td>{order.Status}</td>
                   <td>
                     <button onClick={() => handleDeleteOrder(order.orderID)} style={{ backgroundColor: 'red', color: 'white' }}>Xóa Đơn</button>
@@ -113,7 +115,7 @@ const HistoryOrder = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="8">No completed orders found</td>
+                <td colSpan="9">No completed orders found</td> {/* Updated colspan to 9 to match the new column */}
               </tr>
             )}
           </tbody>
