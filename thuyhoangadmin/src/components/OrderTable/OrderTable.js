@@ -11,7 +11,7 @@ const OrderTable = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [filterCustomer, setFilterCustomer] = useState('All');
   const [currentPage, setCurrentPage] = useState(1); // New state for current page
-  const ordersPerPage = 2; // Set the number of orders displayed per page
+  const ordersPerPage = 10; // Set the number of orders displayed per page
 
   const [newOrder, setNewOrder] = useState({
     orderID: '',
@@ -43,6 +43,11 @@ const OrderTable = () => {
 
   const generateOrderID = () => {
     return Math.floor(10000 + Math.random() * 90000).toString();
+  };
+
+  // Function to format currency in VND format
+  const formatCurrencyVND = (amount) => {
+    return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
   };
 
   const handleAddOrderSaveClick = () => {
@@ -161,9 +166,9 @@ const OrderTable = () => {
             <thead>
               <tr>
                 <th>Ngày Giờ</th>
-                <th>Đơn Hàng ID</th>
+                <th>ID</th>
                 <th>Khách Hàng</th>
-                <th>Các Sản Phẩm</th>
+                <th>Các Sản Phẩm Đơn Hàng</th>
                 <th>Tổng SL</th>
                 <th>Tổng Giá</th>
                 <th>Ghi Chú</th> {/* Add new column for Note */}
@@ -189,7 +194,7 @@ const OrderTable = () => {
                       </ul>
                     </td>
                     <td>{order.TotalQuantity}</td>
-                    <td>{order.Total}</td>
+                    <td>{formatCurrencyVND(order.Total)}</td> {/* Format Tổng Giá to VND */}
                     <td>{order.Note || 'Không có ghi chú'}</td> {/* Display note value */}
                     <td>
                       <select value={order.Status} onChange={(e) => handleStatusChange(order.orderID, e.target.value)}>
