@@ -98,7 +98,7 @@ const HistoryOrder = () => {
       <h2>Lịch Sử Đơn Hàng (Đơn Hàng Đã Hoàn Thành)</h2>
 
       {loading ? (
-        <p>Loading orders...</p>
+        <p>Đang tải đơn hàng...</p>
       ) : error ? (
         <p>{error}</p>
       ) : (
@@ -137,8 +137,8 @@ const HistoryOrder = () => {
                     </td>
                     <td>{order.TotalQuantity}</td>
                     <td>{formatCurrencyVND(order.Total)}</td>
-                    <td>{order.Note || 'No Note'}</td>
-                    <td>{order.Status}</td>
+                    <td>{order.Note || 'Không có ghi chú'}</td>
+                    <td>{order.Status === 'Done' ? 'Hoàn Thành' : order.Status}</td> {/* Update Status text */}
                     <td>
                       <button onClick={() => handleDeleteOrder(order.orderID)} style={{ backgroundColor: 'red', color: 'white' }}>Xóa Đơn</button>
                     </td>
@@ -146,7 +146,7 @@ const HistoryOrder = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9">Không tìm thấy đơn hàng hoàn thành nào</td>
+                  <td colSpan="9">Không tìm thấy đơn hàng đã hoàn thành</td>
                 </tr>
               )}
             </tbody>
@@ -159,15 +159,15 @@ const HistoryOrder = () => {
               disabled={currentPage === 1}
               style={{ marginRight: '10px' }}
             >
-              Trang Trước
+              Trang trước
             </button>
-            <span>Trang {currentPage} trên {totalPages}</span>
+            <span>Trang {currentPage} trong {totalPages}</span>
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
               style={{ marginLeft: '10px' }}
             >
-              Trang Sau
+              Trang sau
             </button>
           </div>
         </>
