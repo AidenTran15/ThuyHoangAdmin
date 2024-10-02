@@ -10,6 +10,10 @@ const HistoryOrder = () => {
   const [orderToDelete, setOrderToDelete] = useState('');
   const [confirmationInput, setConfirmationInput] = useState('');
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 15;
+
   // Function to format currency in VND
   const formatCurrencyVND = (amount) => {
     return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
@@ -68,6 +72,27 @@ const HistoryOrder = () => {
       });
   }, []);
 
+  // Calculate total pages
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+
+  // Get the current orders to be displayed
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+
+  // Handle pagination navigation
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div className="order-table">
       <h2>Lịch Sử Đơn Hàng (Đơn Hàng Đã Hoàn Thành)</h2>
@@ -77,54 +102,75 @@ const HistoryOrder = () => {
       ) : error ? (
         <p>{error}</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Ngày Giờ</th>
-              <th>Mã Đơn Hàng</th>
-              <th>Khách Hàng</th>
-              <th>Sản Phẩm</th>
-              <th>Tổng SL</th>
-              <th>Tổng Giá</th>
-              <th>Ghi Chú</th>
-              <th>Trạng Thái</th>
-              <th>Hành Động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length > 0 ? (
-              orders.map(order => (
-                <tr key={order.orderID}>
-                  <td>{order.OrderDate}</td>
-                  <td>{order.orderID}</td>
-                  <td>{order.Customer}</td>
-                  <td>
-                    <ul style={{ paddingLeft: '0', margin: '0', listStyleType: 'none' }}>
-                      {order.ProductList ? (
-                        order.ProductList.map((product, index) => (
-                          <li key={index}>
-                            {`${product.color} ${product.size} - ${product.quantity}`}
-                          </li>
-                        ))
-                      ) : 'No products'}
-                    </ul>
-                  </td>
-                  <td>{order.TotalQuantity}</td>
-                  <td>{formatCurrencyVND(order.Total)}</td> {/* Format Tổng Giá to VND */}
-                  <td>{order.Note || 'No Note'}</td>
-                  <td>{order.Status}</td>
-                  <td>
-                    <button onClick={() => handleDeleteOrder(order.orderID)} style={{ backgroundColor: 'red', color: 'white' }}>Xóa Đơn</button>
-                  </td>
-                </tr>
-              ))
-            ) : (
+        <>
+          <table>
+            <thead>
               <tr>
-                <td colSpan="9">No completed orders found</td>
+                <th>Ngày Giờ</th>
+                <th>Mã Đơn Hàng</th>
+                <th>Khách Hàng</th>
+                <th>Sản Phẩm</th>
+                <th>Tổng SL</th>
+                <th>Tổng Giá</th>
+                <th>Ghi Chú</th>
+                <th>Trạng Thái</th>
+                <th>Hành Động</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentOrders.length > 0 ? (
+                currentOrders.map(order => (
+                  <tr key={order.orderID}>
+                    <td>{order.OrderDate}</td>
+                    <td>{order.orderID}</td>
+                    <td>{order.Customer}</td>
+                    <td>
+                      <ul style={{ paddingLeft: '0', margin: '0', listStyleType: 'none' }}>
+                        {order.ProductList ? (
+                          order.ProductList.map((product, index) => (
+                            <li key={index}>
+                              {`${product.color} ${product.size} - ${product.quantity}`}
+                            </li>
+                          ))
+                        ) : 'No products'}
+                      </ul>
+                    </td>
+                    <td>{order.TotalQuantity}</td>
+                    <td>{formatCurrencyVND(order.Total)}</td>
+                    <td>{order.Note || 'No Note'}</td>
+                    <td>{order.Status}</td>
+                    <td>
+                      <button onClick={() => handleDeleteOrder(order.orderID)} style={{ backgroundColor: 'red', color: 'white' }}>Xóa Đơn</button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9">Không tìm thấy đơn hàng hoàn thành nào</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          {/* Pagination Controls */}
+          <div className="pagination-controls" style={{ marginTop: '20px' }}>
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              style={{ marginRight: '10px' }}
+            >
+              Trang Trước
+            </button>
+            <span>Trang {currentPage} trên {totalPages}</span>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              style={{ marginLeft: '10px' }}
+            >
+              Trang Sau
+            </button>
+          </div>
+        </>
       )}
 
       {/* Delete Confirmation Modal */}
