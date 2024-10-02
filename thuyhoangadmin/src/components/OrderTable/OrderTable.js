@@ -10,6 +10,8 @@ const OrderTable = () => {
   const [error, setError] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [filterCustomer, setFilterCustomer] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1); // New state for current page
+  const ordersPerPage = 2; // Set the number of orders displayed per page
 
   const [newOrder, setNewOrder] = useState({
     orderID: '',
@@ -102,7 +104,26 @@ const OrderTable = () => {
 
   const filteredOrders = filterCustomer === 'All' ? orders : orders.filter((order) => order.Customer === filterCustomer);
 
+  // Calculate total pages and get orders for current page
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+
   const uniqueCustomers = Array.from(new Set(orders.map((order) => order.Customer)));
+
+  // Handle page navigation
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
     <div className="order-table">
@@ -135,55 +156,68 @@ const OrderTable = () => {
       ) : error ? (
         <p>{error}</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Ngày Giờ</th>
-              <th>Đơn Hàng ID</th>
-              <th>Khách Hàng</th>
-              <th>Các Sản Phẩm</th>
-              <th>Tổng SL</th>
-              <th>Tổng Giá</th>
-              <th>Ghi Chú</th> {/* Add new column for Note */}
-              <th>Trạng Thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
-                <tr key={order.orderID}>
-                  <td>{order.OrderDate}</td>
-                  <td>{order.orderID}</td>
-                  <td>{order.Customer}</td>
-                  <td>
-                    <ul style={{ paddingLeft: '0', margin: '0', listStyleType: 'none' }}>
-                      {order.ProductList ? (
-                        order.ProductList.map((product, index) => (
-                          <li key={index}>{`${product.color} ${product.size} - ${product.quantity}`}</li>
-                        ))
-                      ) : (
-                        'No products'
-                      )}
-                    </ul>
-                  </td>
-                  <td>{order.TotalQuantity}</td>
-                  <td>{order.Total}</td>
-                  <td>{order.Note || 'Không có ghi chú'}</td> {/* Display note value */}
-                  <td>
-                    <select value={order.Status} onChange={(e) => handleStatusChange(order.orderID, e.target.value)}>
-                      <option value="Pending">Đang xử Lý</option>
-                      <option value="Done">Hoàn Thành</option>
-                    </select>
-                  </td>
-                </tr>
-              ))
-            ) : (
+        <>
+          <table>
+            <thead>
               <tr>
-                <td colSpan="8">Không tìm thấy đơn hàng</td>
+                <th>Ngày Giờ</th>
+                <th>Đơn Hàng ID</th>
+                <th>Khách Hàng</th>
+                <th>Các Sản Phẩm</th>
+                <th>Tổng SL</th>
+                <th>Tổng Giá</th>
+                <th>Ghi Chú</th> {/* Add new column for Note */}
+                <th>Trạng Thái</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentOrders.length > 0 ? (
+                currentOrders.map((order) => (
+                  <tr key={order.orderID}>
+                    <td>{order.OrderDate}</td>
+                    <td>{order.orderID}</td>
+                    <td>{order.Customer}</td>
+                    <td>
+                      <ul style={{ paddingLeft: '0', margin: '0', listStyleType: 'none' }}>
+                        {order.ProductList ? (
+                          order.ProductList.map((product, index) => (
+                            <li key={index}>{`${product.color} ${product.size} - ${product.quantity}`}</li>
+                          ))
+                        ) : (
+                          'No products'
+                        )}
+                      </ul>
+                    </td>
+                    <td>{order.TotalQuantity}</td>
+                    <td>{order.Total}</td>
+                    <td>{order.Note || 'Không có ghi chú'}</td> {/* Display note value */}
+                    <td>
+                      <select value={order.Status} onChange={(e) => handleStatusChange(order.orderID, e.target.value)}>
+                        <option value="Pending">Đang xử Lý</option>
+                        <option value="Done">Hoàn Thành</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8">Không tìm thấy đơn hàng</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          {/* Pagination Controls */}
+          <div className="pagination-controls" style={{ marginTop: '20px' }}>
+            <button onClick={goToPreviousPage} disabled={currentPage === 1} style={{ marginRight: '10px' }}>
+              Trang trước
+            </button>
+            <span>Trang {currentPage} trong {totalPages}</span>
+            <button onClick={goToNextPage} disabled={currentPage === totalPages} style={{ marginLeft: '10px' }}>
+              Trang sau
+            </button>
+          </div>
+        </>
       )}
 
       {isAddingNew && (
