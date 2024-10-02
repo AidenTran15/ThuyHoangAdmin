@@ -8,15 +8,11 @@ const PantsProduct = () => {
   const [updatedProduct, setUpdatedProduct] = useState({
     ProductID: '',
     Color: '',
-    Size: 0,
-    Quantity: 0,
   });
 
   const [newProduct, setNewProduct] = useState({
     ProductID: '',
-    Color: '',
-    Size: 0,
-    Quantity: 0
+    Color: ''
   });
 
   const [isAddingNew, setIsAddingNew] = useState(false); // State to manage add product modal visibility
@@ -56,7 +52,7 @@ const PantsProduct = () => {
     const { name, value } = e.target;
     setUpdatedProduct(prev => ({
       ...prev,
-      [name]: name === 'Size' || name === 'Quantity' ? Number(value) : value, // Ensure Size and Quantity are numbers
+      [name]: value, // Only handle 'ProductID' and 'Color'
     }));
   };
 
@@ -90,7 +86,7 @@ const PantsProduct = () => {
     const { name, value } = e.target;
     setNewProduct(prev => ({
       ...prev,
-      [name]: name === 'Size' || name === 'Quantity' ? Number(value) : value  // Ensure Size and Quantity are numbers
+      [name]: value  // Only handle 'ProductID' and 'Color'
     }));
   };
 
@@ -112,7 +108,7 @@ const PantsProduct = () => {
     .then(response => {
       console.log("Product added successfully:", response.data);
       fetchProducts();  // Refresh the product list
-      setNewProduct({ ProductID: '', Color: '', Size: 0, Quantity: 0 }); // Reset form
+      setNewProduct({ ProductID: '', Color: '' }); // Reset form
       setIsAddingNew(false); // Close modal
     })
     .catch(error => {
@@ -175,8 +171,6 @@ const PantsProduct = () => {
           <tr>
             <th>Mã Sản Phẩm</th>
             <th>Màu Sắc</th>
-            <th>Size</th>
-            <th>Số Lượng</th>
             <th>Hành Động</th>
           </tr>
         </thead>
@@ -205,26 +199,6 @@ const PantsProduct = () => {
                 ) : (
                   product.Color
                 )}</td>
-                <td>{editingProduct === product.ProductID ? (
-                  <input
-                    type="number"
-                    name="Size"
-                    value={updatedProduct.Size || 0}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  product.Size
-                )}</td>
-                <td>{editingProduct === product.ProductID ? (
-                  <input
-                    type="number"
-                    name="Quantity"
-                    value={updatedProduct.Quantity || 0}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  product.Quantity
-                )}</td>
                 <td>
                   {editingProduct === product.ProductID ? (
                     <button onClick={handleSaveClick}>Lưu</button>
@@ -239,13 +213,12 @@ const PantsProduct = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5">Không tìm thấy sản phẩm</td>
+              <td colSpan="3">Không tìm thấy sản phẩm</td>
             </tr>
           )}
         </tbody>
       </table>
   
-
       {/* Add New Product Modal */}
       {isAddingNew && (
         <div className="modal">
@@ -263,20 +236,6 @@ const PantsProduct = () => {
               name="Color" 
               placeholder="Màu Sắc" 
               value={newProduct.Color} 
-              onChange={handleNewProductChange} 
-            />
-            <input 
-              type="number" 
-              name="Size" 
-              placeholder="Size" 
-              value={newProduct.Size} 
-              onChange={handleNewProductChange} 
-            />
-            <input 
-              type="number" 
-              name="Quantity" 
-              placeholder="Số Lượng" 
-              value={newProduct.Quantity} 
               onChange={handleNewProductChange} 
             />
             <button onClick={handleAddProductSaveClick}>Lưu</button>
