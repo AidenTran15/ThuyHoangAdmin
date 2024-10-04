@@ -34,10 +34,23 @@ const VaiInventoryPage = () => {
   // Handle input changes for adding a new product
   const handleNewProductChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+
+    // If the input is for ProductDetail, calculate TotalMeter based on the list of values
+    if (name === 'ProductDetail') {
+      const detailList = value.split(',').map((item) => parseFloat(item.trim())); // Convert string to array of numbers
+      const totalMeter = detailList.reduce((sum, num) => sum + (isNaN(num) ? 0 : num), 0); // Calculate total meter
+
+      setNewProduct((prev) => ({
+        ...prev,
+        ProductDetail: value, // Store the raw string input
+        TotalMeter: `${totalMeter} meters` // Update TotalMeter automatically
+      }));
+    } else {
+      setNewProduct((prev) => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   // Handle adding a new product
@@ -58,7 +71,7 @@ const VaiInventoryPage = () => {
 
     axios
       .post(
-        'https://YOUR_API_GATEWAY_URL/prod/add', // Replace with your API Gateway URL
+        'https://goq3m8d3ve.execute-api.ap-southeast-2.amazonaws.com/prod/add', // Replace with your API Gateway URL
         { body: JSON.stringify(productData) },
         {
           headers: {
@@ -182,12 +195,13 @@ const VaiInventoryPage = () => {
               value={newProduct.ProductDetail}
               onChange={handleNewProductChange}
             />
+            {/* Display TotalMeter as read-only input field */}
             <input
               type="text"
               name="TotalMeter"
               placeholder="Tổng Mét"
               value={newProduct.TotalMeter}
-              onChange={handleNewProductChange}
+              readOnly
             />
             <div className="modal-buttons">
               <button onClick={handleAddProductSaveClick}>Lưu</button>
