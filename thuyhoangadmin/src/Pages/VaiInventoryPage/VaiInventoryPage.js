@@ -1,3 +1,4 @@
+// src/Pages/VaiInventoryPage/VaiInventoryPage.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './VaiInventoryPage.css'; // Import CSS for styling
@@ -11,9 +12,9 @@ const VaiInventoryPage = () => {
     axios.get('https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your Lambda URL
       .then(response => {
         // Assuming the response body is a JSON array of products
-        const productData = JSON.parse(response.data.body); // Parse the JSON string if it's in a string format
+        const productData = JSON.parse(response.data.body);
         console.log("Fetched Products: ", productData);
-        setProducts(Array.isArray(productData) ? productData : []); // Ensure it's an array before setting state
+        setProducts(Array.isArray(productData) ? productData : []);
         setIsLoading(false);
       })
       .catch(error => {
@@ -22,13 +23,21 @@ const VaiInventoryPage = () => {
       });
   }, []);
 
+  // Placeholder function for handling adding new products
+  const handleAddNewProductClick = () => {
+    alert("Add new product functionality is not implemented yet.");
+  };
+
   return (
-    <div className="vai-inventory-table">
-      <h2>Vai Inventory Management</h2>
+    <div className="vai-inventory-page">
+      <div className="header-container">
+        <h2>Quản Lý Tồn Kho</h2>
+        <button onClick={handleAddNewProductClick} className="add-new-button">Tạo Mới</button>
+      </div>
       {isLoading ? (
         <p>Loading...</p>
       ) : (
-        <table>
+        <table className="vai-inventory-table">
           <thead>
             <tr>
               <th>Product ID</th>
