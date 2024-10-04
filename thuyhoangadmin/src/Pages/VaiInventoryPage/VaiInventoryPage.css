@@ -84,12 +84,12 @@
   }
   
   .edit-button {
-    background-color: #333;
+    background-color: #28a745; /* Green color for Edit button */
     color: white;
   }
   
   .edit-button:hover {
-    background-color: #555;
+    background-color: #218838; /* Darker green on hover */
   }
   
   .delete-button {
@@ -236,7 +236,7 @@
   
   /* Modal Buttons */
   .modal-buttons button {
-    background-color: #333;
+    background-color: #28a745; /* Green color for Save button */
     color: white;
     width: 100px;
     padding: 10px 15px;
@@ -249,7 +249,7 @@
   }
   
   .modal-buttons button:hover {
-    background-color: #555;
+    background-color: #218838; /* Darker green on hover */
   }
   
   .modal-buttons button:last-child {
