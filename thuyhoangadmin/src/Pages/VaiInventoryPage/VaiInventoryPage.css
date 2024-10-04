@@ -1,3 +1,4 @@
+/* General Styles */
 .vai-inventory-page {
     margin: 20px auto;
     width: 80%;
@@ -20,8 +21,9 @@
     color: #333;
   }
   
+  /* Add New Button */
   .add-new-button {
-    background-color: #333;
+    background-color: #28a745; /* Green color */
     color: white;
     padding: 8px 16px;
     border: none;
@@ -32,9 +34,10 @@
   }
   
   .add-new-button:hover {
-    background-color: #555;
+    background-color: #218838; /* Darker green on hover */
   }
   
+  /* Inventory Table */
   .vai-inventory-table {
     width: 100%;
     border-collapse: collapse;
@@ -145,6 +148,7 @@
     outline: none;
   }
   
+  /* Product Detail Section */
   .product-detail-section {
     display: flex;
     align-items: center;
@@ -152,8 +156,8 @@
   }
   
   .add-detail-button {
-    background-color: #333;
-    color: white;
+    background-color: #28a745 !important; /* Force Green color for Plus button */
+    color: white !important;
     padding: 8px 14px;
     border: none;
     border-radius: 4px;
@@ -163,7 +167,7 @@
   }
   
   .add-detail-button:hover {
-    background-color: #555;
+    background-color: #218838 !important; /* Darker green on hover */
   }
   
   .product-detail-list {
