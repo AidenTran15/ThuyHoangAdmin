@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './VaiInventoryPage.css'; // Import CSS for styling
+import ImportProductModal from './ImportProductModal'; // Import the new modal component
 
 const VaiInventoryPage = () => {
   const [products, setProducts] = useState([]);
   const [newProduct, setNewProduct] = useState({
     ProductID: '',
     Color: '',
-    totalProduct: '', // Total number of items in ProductDetail list
-    ProductDetail: [], // Store ProductDetail as an array to add individual items
+    totalProduct: '',
+    ProductDetail: [],
     TotalMeter: ''
   });
-  const [isAddingNew, setIsAddingNew] = useState(false); // State to manage add product modal visibility
-  const [isEditing, setIsEditing] = useState(false); // State to check if we are editing an existing product
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentDetail, setCurrentDetail] = useState(''); // State to track the current detail input
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // State to manage delete confirmation modal
-  const [productToDelete, setProductToDelete] = useState(null); // Track product to delete
+  const [currentDetail, setCurrentDetail] = useState('');
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [isImportModalVisible, setIsImportModalVisible] = useState(false); // State for Import modal visibility
 
   useEffect(() => {
     axios
@@ -35,11 +37,7 @@ const VaiInventoryPage = () => {
   // Handle input changes for adding or editing a product
   const handleNewProductChange = (e) => {
     const { name, value } = e.target;
-
-    setNewProduct((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+    setNewProduct((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle adding a new detail to ProductDetail array
@@ -49,7 +47,6 @@ const VaiInventoryPage = () => {
         const updatedProductDetail = [...prev.ProductDetail, parseFloat(currentDetail)];
         const totalMeter = updatedProductDetail.reduce((sum, num) => sum + num, 0); // Calculate total meter
         const totalProductCount = updatedProductDetail.length; // Calculate total number of items
-
         return {
           ...prev,
           ProductDetail: updatedProductDetail,
@@ -92,7 +89,7 @@ const VaiInventoryPage = () => {
       { body: JSON.stringify(newProduct) },
       { headers: { 'Content-Type': 'application/json' } }
     )
-      .then((response) => {
+      .then(() => {
         setProducts((prev) => (isEditing ? prev.map((p) => (p.ProductID === newProduct.ProductID ? newProduct : p)) : [...prev, newProduct]));
         setNewProduct({ ProductID: '', Color: '', totalProduct: '', ProductDetail: [], TotalMeter: '' });
         setIsAddingNew(false);
@@ -136,6 +133,7 @@ const VaiInventoryPage = () => {
       <div className="header-container">
         <h2>Quản Lý Tồn Kho</h2>
         <button onClick={() => { setIsAddingNew(true); setIsEditing(false); }} className="add-new-button">Tạo Mới</button>
+        <button onClick={() => setIsImportModalVisible(true)} className="import-button">Import</button> {/* Import Button */}
       </div>
       {isLoading ? <p>Loading...</p> : (
         <table className="vai-inventory-table">
@@ -180,8 +178,6 @@ const VaiInventoryPage = () => {
               value={newProduct.Color}
               onChange={handleNewProductChange}
             />
-
-            {/* Product Detail Section */}
             <div className="product-detail-section">
               <input
                 type="number"
@@ -193,7 +189,6 @@ const VaiInventoryPage = () => {
                 +
               </button>
             </div>
-
             <ul className="product-detail-list">
               {newProduct.ProductDetail.map((detail, index) => (
                 <li key={index}>
@@ -209,7 +204,6 @@ const VaiInventoryPage = () => {
               ))}
             </ul>
 
-            {/* Display Total Product and Total Meter */}
             <div className="total-fields">
               <div>
                 <label>Tổng Sản Phẩm:</label>
@@ -243,6 +237,15 @@ const VaiInventoryPage = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Import Product Modal */}
+      {isImportModalVisible && (
+        <ImportProductModal
+          isVisible={isImportModalVisible}
+          handleClose={() => setIsImportModalVisible(false)}
+          setProducts={setProducts}
+        />
       )}
     </div>
   );
