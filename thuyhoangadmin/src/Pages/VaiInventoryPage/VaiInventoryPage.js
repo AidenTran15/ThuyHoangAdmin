@@ -1,27 +1,78 @@
-// src/Pages/VaiInventoryPage/VaiInventoryPage.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './VaiInventoryPage.css'; // Import CSS for styling
 
 const VaiInventoryPage = () => {
   const [products, setProducts] = useState([]);
+  const [newProduct, setNewProduct] = useState({
+    ProductID: '',
+    Color: '',
+    totalProduct: '',
+    ProductDetail: '',
+    TotalMeter: ''
+  });
+  const [isAddingNew, setIsAddingNew] = useState(false); // State to manage add product modal visibility
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch all products from the Lambda API on component mount
   useEffect(() => {
-    axios.get('https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your Lambda URL
-      .then(response => {
+    axios
+      .get('https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your Lambda URL
+      .then((response) => {
         // Assuming the response body is a JSON array of products
         const productData = JSON.parse(response.data.body);
-        console.log("Fetched Products: ", productData);
+        console.log('Fetched Products: ', productData);
         setProducts(Array.isArray(productData) ? productData : []);
         setIsLoading(false);
       })
-      .catch(error => {
-        console.error("Error fetching the products!", error);
+      .catch((error) => {
+        console.error('Error fetching the products!', error);
         setIsLoading(false);
       });
   }, []);
+
+  // Handle input changes for adding a new product
+  const handleNewProductChange = (e) => {
+    const { name, value } = e.target;
+    setNewProduct((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Handle adding a new product
+  const handleAddProductSaveClick = () => {
+    if (!newProduct.ProductID) {
+      alert('ProductID is required for adding a product!');
+      return;
+    }
+
+    axios
+      .post(
+        'https://goq3m8d3ve.execute-api.ap-southeast-2.amazonaws.com/prod/add', // Replace with your API Gateway URL
+        { body: JSON.stringify(newProduct) },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      .then((response) => {
+        console.log('Product added successfully:', response.data);
+        setProducts((prev) => [...prev, newProduct]); // Add new product to the table
+        setNewProduct({
+          ProductID: '',
+          Color: '',
+          totalProduct: '',
+          ProductDetail: '',
+          TotalMeter: ''
+        }); // Reset form
+        setIsAddingNew(false); // Close modal
+      })
+      .catch((error) => {
+        console.error('Error adding the product:', error);
+      });
+  };
 
   // Placeholder functions for edit and delete actions
   const handleEditClick = (productId) => {
@@ -32,15 +83,13 @@ const VaiInventoryPage = () => {
     alert(`Delete functionality for Product ID: ${productId} not implemented yet.`);
   };
 
-  const handleAddNewProductClick = () => {
-    alert("Add new product functionality is not implemented yet.");
-  };
-
   return (
     <div className="vai-inventory-page">
       <div className="header-container">
         <h2>Quản Lý Tồn Kho</h2>
-        <button onClick={handleAddNewProductClick} className="add-new-button">Tạo Mới</button>
+        <button onClick={() => setIsAddingNew(true)} className="add-new-button">
+          Tạo Mới
+        </button>
       </div>
       {isLoading ? (
         <p>Loading...</p>
@@ -88,6 +137,54 @@ const VaiInventoryPage = () => {
             )}
           </tbody>
         </table>
+      )}
+
+      {/* Add New Product Modal */}
+      {isAddingNew && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Thêm Sản Phẩm Mới</h3>
+            <input
+              type="text"
+              name="ProductID"
+              placeholder="Mã Sản Phẩm"
+              value={newProduct.ProductID}
+              onChange={handleNewProductChange}
+            />
+            <input
+              type="text"
+              name="Color"
+              placeholder="Màu Sắc"
+              value={newProduct.Color}
+              onChange={handleNewProductChange}
+            />
+            <input
+              type="number"
+              name="totalProduct"
+              placeholder="Tổng Sản Phẩm"
+              value={newProduct.totalProduct}
+              onChange={handleNewProductChange}
+            />
+            <input
+              type="number"
+              name="ProductDetail"
+              placeholder="Chi Tiết Sản Phẩm"
+              value={newProduct.ProductDetail}
+              onChange={handleNewProductChange}
+            />
+            <input
+              type="text"
+              name="TotalMeter"
+              placeholder="Tổng Mét"
+              value={newProduct.TotalMeter}
+              onChange={handleNewProductChange}
+            />
+            <div className="modal-buttons">
+              <button onClick={handleAddProductSaveClick}>Lưu</button>
+              <button onClick={() => setIsAddingNew(false)}>Huỷ</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
