@@ -8,7 +8,7 @@ const VaiInventoryPage = () => {
     ProductID: '',
     Color: '',
     totalProduct: '',
-    ProductDetail: '',
+    ProductDetail: '', // Use a string to temporarily store the comma-separated values
     TotalMeter: ''
   });
   const [isAddingNew, setIsAddingNew] = useState(false); // State to manage add product modal visibility
@@ -47,10 +47,19 @@ const VaiInventoryPage = () => {
       return;
     }
 
+    // Convert ProductDetail to an array of numbers
+    const productDetailArray = newProduct.ProductDetail.split(',').map((item) => parseFloat(item.trim()));
+
+    // Prepare the product data to send to the backend
+    const productData = {
+      ...newProduct,
+      ProductDetail: productDetailArray // Replace ProductDetail string with array of numbers
+    };
+
     axios
       .post(
-        'https://goq3m8d3ve.execute-api.ap-southeast-2.amazonaws.com/prod/add', // Replace with your API Gateway URL
-        { body: JSON.stringify(newProduct) },
+        'https://YOUR_API_GATEWAY_URL/prod/add', // Replace with your API Gateway URL
+        { body: JSON.stringify(productData) },
         {
           headers: {
             'Content-Type': 'application/json'
@@ -59,7 +68,7 @@ const VaiInventoryPage = () => {
       )
       .then((response) => {
         console.log('Product added successfully:', response.data);
-        setProducts((prev) => [...prev, newProduct]); // Add new product to the table
+        setProducts((prev) => [...prev, productData]); // Add new product to the table
         setNewProduct({
           ProductID: '',
           Color: '',
@@ -112,7 +121,8 @@ const VaiInventoryPage = () => {
                   <td>{product.ProductID}</td>
                   <td>{product.Color}</td>
                   <td>{product.totalProduct}</td>
-                  <td>{product.ProductDetail}</td>
+                  {/* Check if ProductDetail is an array before using join */}
+                  <td>{Array.isArray(product.ProductDetail) ? product.ProductDetail.join(', ') : product.ProductDetail}</td>
                   <td>{product.TotalMeter}</td>
                   <td>
                     <button
@@ -166,9 +176,9 @@ const VaiInventoryPage = () => {
               onChange={handleNewProductChange}
             />
             <input
-              type="number"
+              type="text"
               name="ProductDetail"
-              placeholder="Chi Tiết Sản Phẩm"
+              placeholder="Chi Tiết Sản Phẩm (e.g., 50, 55.5, 51)"
               value={newProduct.ProductDetail}
               onChange={handleNewProductChange}
             />
