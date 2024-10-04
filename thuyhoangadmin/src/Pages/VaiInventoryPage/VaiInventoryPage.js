@@ -183,6 +183,14 @@ const VaiInventoryPage = () => {
               value={newProduct.Color}
               onChange={handleNewProductChange}
             />
+            {/* Move ProductDetail above totalProduct */}
+            <input
+              type="text"
+              name="ProductDetail"
+              placeholder="Chi Tiết Sản Phẩm (e.g., 50, 55.5, 51)"
+              value={newProduct.ProductDetail}
+              onChange={handleNewProductChange}
+            />
             {/* totalProduct is now read-only and calculated automatically */}
             <input
               type="number"
@@ -190,13 +198,6 @@ const VaiInventoryPage = () => {
               placeholder="Tổng Sản Phẩm"
               value={newProduct.totalProduct}
               readOnly
-            />
-            <input
-              type="text"
-              name="ProductDetail"
-              placeholder="Chi Tiết Sản Phẩm (e.g., 50, 55.5, 51)"
-              value={newProduct.ProductDetail}
-              onChange={handleNewProductChange}
             />
             {/* Display TotalMeter as read-only input field */}
             <input
