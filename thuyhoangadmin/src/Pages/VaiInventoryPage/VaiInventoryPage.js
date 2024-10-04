@@ -23,7 +23,15 @@ const VaiInventoryPage = () => {
       });
   }, []);
 
-  // Placeholder function for handling adding new products
+  // Placeholder functions for edit and delete actions
+  const handleEditClick = (productId) => {
+    alert(`Edit functionality for Product ID: ${productId} not implemented yet.`);
+  };
+
+  const handleDeleteClick = (productId) => {
+    alert(`Delete functionality for Product ID: ${productId} not implemented yet.`);
+  };
+
   const handleAddNewProductClick = () => {
     alert("Add new product functionality is not implemented yet.");
   };
@@ -45,6 +53,7 @@ const VaiInventoryPage = () => {
               <th>Total Product</th>
               <th>Product Detail</th>
               <th>Total Meter</th>
+              <th>Action</th> {/* New Action column */}
             </tr>
           </thead>
           <tbody>
@@ -56,11 +65,25 @@ const VaiInventoryPage = () => {
                   <td>{product.totalProduct}</td>
                   <td>{product.ProductDetail}</td>
                   <td>{product.TotalMeter}</td>
+                  <td>
+                    <button
+                      className="action-button edit-button"
+                      onClick={() => handleEditClick(product.ProductID)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="action-button delete-button"
+                      onClick={() => handleDeleteClick(product.ProductID)}
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5">No products found</td>
+                <td colSpan="6">No products found</td>
               </tr>
             )}
           </tbody>
