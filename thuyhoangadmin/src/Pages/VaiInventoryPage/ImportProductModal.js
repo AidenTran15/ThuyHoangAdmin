@@ -1,9 +1,7 @@
-// ImportProductModal.js
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ImportProductModal.css'; // Import styles for the modal
 
-const ImportProductModal = ({ isVisible, handleClose, onSave }) => {
+const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   const [importData, setImportData] = useState({
     Customer: '',
     Color: '',
@@ -29,6 +27,20 @@ const ImportProductModal = ({ isVisible, handleClose, onSave }) => {
     handleClose(); // Close the modal after saving
   };
 
+  useEffect(() => {
+    // Reset the import data when modal is opened or closed
+    if (!isVisible) {
+      setImportData({
+        Customer: '',
+        Color: '',
+        TotalAmount: '',
+        ProductDetail: [],
+        totalProduct: '',
+        TotalMeter: ''
+      });
+    }
+  }, [isVisible]);
+
   return (
     isVisible && (
       <div className="import-modal">
@@ -41,16 +53,20 @@ const ImportProductModal = ({ isVisible, handleClose, onSave }) => {
             value={importData.Customer}
             onChange={handleInputChange}
           />
+          {/* Color Dropdown populated with colors from parent component */}
           <select
             name="Color"
             value={importData.Color}
             onChange={handleInputChange}
           >
             <option value="">Select Color</option>
-            <option value="Red">Red</option>
-            <option value="Blue">Blue</option>
-            <option value="Green">Green</option>
-            {/* Add more colors as per your requirements */}
+            {colors && colors.length > 0 ? (
+              colors.map((color, index) => (
+                <option key={index} value={color}>{color}</option>
+              ))
+            ) : (
+              <option value="">No colors available</option>
+            )}
           </select>
           <input
             type="number"

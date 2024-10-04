@@ -1,5 +1,4 @@
 // VaiInventoryPage.js
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './VaiInventoryPage.css'; // Import CSS for styling
@@ -21,13 +20,17 @@ const VaiInventoryPage = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [isImportModalVisible, setIsImportModalVisible] = useState(false); // State for Import modal visibility
+  const [colors, setColors] = useState([]); // State to store unique colors
 
   useEffect(() => {
+    // Fetch products from the API and extract unique colors
     axios
       .get('https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your Lambda URL
       .then((response) => {
         const productData = JSON.parse(response.data.body);
         setProducts(Array.isArray(productData) ? productData : []);
+        const uniqueColors = [...new Set(productData.map((product) => product.Color))]; // Extract unique colors
+        setColors(uniqueColors); // Set colors state
         setIsLoading(false);
       })
       .catch((error) => {
@@ -252,7 +255,8 @@ const VaiInventoryPage = () => {
         <ImportProductModal
           isVisible={isImportModalVisible}
           handleClose={() => setIsImportModalVisible(false)}
-          onSave={handleImportSave}
+          onSave={handleImportSave} // Define this function to handle imported data saving
+          colors={colors} // Pass colors state from VaiInventoryPage
         />
       )}
     </div>
