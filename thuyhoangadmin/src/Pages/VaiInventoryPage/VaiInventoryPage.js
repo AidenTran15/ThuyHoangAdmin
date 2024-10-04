@@ -1,3 +1,5 @@
+// VaiInventoryPage.js
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './VaiInventoryPage.css'; // Import CSS for styling
@@ -128,6 +130,11 @@ const VaiInventoryPage = () => {
     }
   };
 
+  const handleImportSave = (importData) => {
+    // Add the new import data to the product list
+    setProducts((prev) => [...prev, importData]);
+  };
+
   return (
     <div className="vai-inventory-page">
       <div className="header-container">
@@ -135,6 +142,7 @@ const VaiInventoryPage = () => {
         <button onClick={() => { setIsAddingNew(true); setIsEditing(false); }} className="add-new-button">Tạo Mới</button>
         <button onClick={() => setIsImportModalVisible(true)} className="import-button">Import</button> {/* Import Button */}
       </div>
+
       {isLoading ? <p>Loading...</p> : (
         <table className="vai-inventory-table">
           <thead>
@@ -244,7 +252,7 @@ const VaiInventoryPage = () => {
         <ImportProductModal
           isVisible={isImportModalVisible}
           handleClose={() => setIsImportModalVisible(false)}
-          setProducts={setProducts}
+          onSave={handleImportSave}
         />
       )}
     </div>
