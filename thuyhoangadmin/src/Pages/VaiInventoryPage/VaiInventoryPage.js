@@ -159,7 +159,7 @@ const VaiInventoryPage = () => {
           </tbody>
         </table>
       )}
-      
+
       {/* Add/Edit Product Modal */}
       {isAddingNew && (
         <div className="modal">

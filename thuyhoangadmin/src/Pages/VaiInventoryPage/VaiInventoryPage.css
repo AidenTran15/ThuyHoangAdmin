@@ -170,6 +170,7 @@
     background-color: #218838 !important; /* Darker green on hover */
   }
   
+  /* Product Detail List */
   .product-detail-list {
     list-style-type: none;
     padding: 0;
@@ -185,7 +186,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center; /* Vertically center items */
-    padding: 15px; /* Increase padding for more space */
+    padding: 10px; /* Adjust padding for more space */
     border-bottom: 1px solid #eee;
     transition: background-color 0.3s ease;
   }
@@ -198,15 +199,26 @@
     background-color: #f1f1f1;
   }
   
+  .product-detail-list li span {
+    flex-grow: 1; /* Allow text container to grow */
+  }
+  
   /* Remove Detail Button */
   .remove-detail-button {
     background-color: #e74c3c;
     color: white;
-    padding: 2px 5px; /* Smaller size for button */
+    padding: 0; /* Remove padding for smaller size */
+    width: 20px; /* Set a fixed width */
+    height: 20px; /* Set a fixed height */
     border: none;
-    border-radius: 4px; /* Smaller rounded corners */
-    font-size: 8px; /* Smaller font size */
+    border-radius: 50%; /* Circular button */
+    font-size: 10px; /* Smaller font size */
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1; /* Center align text vertically */
+    text-align: center; /* Center align text horizontally */
     transition: background-color 0.3s ease;
   }
   
