@@ -7,7 +7,7 @@ const VaiInventoryPage = () => {
   const [newProduct, setNewProduct] = useState({
     ProductID: '',
     Color: '',
-    totalProduct: '',
+    totalProduct: '', // Total number of items in ProductDetail list
     ProductDetail: '', // Use a string to temporarily store the comma-separated values
     TotalMeter: ''
   });
@@ -35,15 +35,17 @@ const VaiInventoryPage = () => {
   const handleNewProductChange = (e) => {
     const { name, value } = e.target;
 
-    // If the input is for ProductDetail, calculate TotalMeter based on the list of values
+    // If the input is for ProductDetail, calculate TotalMeter and totalProduct based on the list of values
     if (name === 'ProductDetail') {
-      const detailList = value.split(',').map((item) => parseFloat(item.trim())); // Convert string to array of numbers
-      const totalMeter = detailList.reduce((sum, num) => sum + (isNaN(num) ? 0 : num), 0); // Calculate total meter
+      const detailList = value.split(',').map((item) => parseFloat(item.trim())).filter(item => !isNaN(item)); // Convert string to array of numbers and filter out NaN values
+      const totalMeter = detailList.reduce((sum, num) => sum + num, 0); // Calculate total meter
+      const totalProductCount = detailList.length; // Calculate total number of items in the list
 
       setNewProduct((prev) => ({
         ...prev,
         ProductDetail: value, // Store the raw string input
-        TotalMeter: `${totalMeter} meters` // Update TotalMeter automatically
+        TotalMeter: `${totalMeter} meters`, // Update TotalMeter automatically
+        totalProduct: totalProductCount // Update totalProduct automatically
       }));
     } else {
       setNewProduct((prev) => ({
@@ -71,7 +73,7 @@ const VaiInventoryPage = () => {
 
     axios
       .post(
-        'https://goq3m8d3ve.execute-api.ap-southeast-2.amazonaws.com/prod/add', // Replace with your API Gateway URL
+        'https://YOUR_API_GATEWAY_URL/prod/add', // Replace with your API Gateway URL
         { body: JSON.stringify(productData) },
         {
           headers: {
@@ -181,12 +183,13 @@ const VaiInventoryPage = () => {
               value={newProduct.Color}
               onChange={handleNewProductChange}
             />
+            {/* totalProduct is now read-only and calculated automatically */}
             <input
               type="number"
               name="totalProduct"
               placeholder="Tổng Sản Phẩm"
               value={newProduct.totalProduct}
-              onChange={handleNewProductChange}
+              readOnly
             />
             <input
               type="text"
