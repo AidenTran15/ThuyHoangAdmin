@@ -20,7 +20,7 @@ const PantsProduct = () => {
   const [productToDelete, setProductToDelete] = useState(null); // Store the productID of the product to be deleted
   const [filterColor, setFilterColor] = useState('All'); // State for the selected color filter
   const [currentPage, setCurrentPage] = useState(1); // State to track the current page
-  const productsPerPage = 15; // Max products per page
+  const productsPerPage = 20; // Max products per page
 
   useEffect(() => {
     fetchProducts();
@@ -31,7 +31,12 @@ const PantsProduct = () => {
     axios.get('https://jic2uc8adb.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then(response => {
         const productData = JSON.parse(response.data.body);
-        setProducts(Array.isArray(productData) ? productData : []);
+        const sortedProducts = productData.sort((a, b) => {
+          const numA = parseInt(a.ProductID.replace(/\D/g, ''), 10); // Extract number from "Màu XX"
+          const numB = parseInt(b.ProductID.replace(/\D/g, ''), 10);
+          return numA - numB; // Compare numbers
+        });
+        setProducts(Array.isArray(sortedProducts) ? sortedProducts : []);
       })
       .catch(error => {
         console.error("Error fetching the pants products!", error);
