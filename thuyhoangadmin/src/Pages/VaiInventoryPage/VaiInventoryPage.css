@@ -123,16 +123,19 @@
     border-radius: 6px;
     width: 420px;
     max-width: 90%;
-    text-align: left;
+    text-align: center; /* Center text inside the modal */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   
+  /* Center the Title Text */
   .modal-content h3 {
     margin-bottom: 16px;
     font-size: 18px;
     color: #333;
+    text-align: center; /* Center the title text */
   }
   
+  /* Center Input Fields */
   .modal-content input {
     width: 95%;
     padding: 10px;
@@ -238,7 +241,13 @@
     color: #333;
   }
   
-  /* Modal Buttons */
+  /* Centered Modal Buttons */
+  .modal-buttons {
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    gap: 10px; /* Add space between buttons */
+  }
+  
   .modal-buttons button {
     background-color: #28a745; /* Green color for Save button */
     color: white;
