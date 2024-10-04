@@ -8,22 +8,21 @@ const VaiInventoryPage = () => {
     ProductID: '',
     Color: '',
     totalProduct: '', // Total number of items in ProductDetail list
-    ProductDetail: '', // Use a string to temporarily store the comma-separated values
+    ProductDetail: [], // Store ProductDetail as an array to add individual items
     TotalMeter: ''
   });
   const [isAddingNew, setIsAddingNew] = useState(false); // State to manage add product modal visibility
   const [isEditing, setIsEditing] = useState(false); // State to check if we are editing an existing product
   const [isLoading, setIsLoading] = useState(true);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // State to manage delete confirmation modal visibility
-  const [productToDelete, setProductToDelete] = useState(null); // Store the productID of the product to be deleted
+  const [currentDetail, setCurrentDetail] = useState(''); // State to track the current detail input
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // State to manage delete confirmation modal
+  const [productToDelete, setProductToDelete] = useState(null); // Track product to delete
 
-  // Fetch all products from the Lambda API on component mount
   useEffect(() => {
     axios
       .get('https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your Lambda URL
       .then((response) => {
         const productData = JSON.parse(response.data.body);
-        console.log('Fetched Products: ', productData);
         setProducts(Array.isArray(productData) ? productData : []);
         setIsLoading(false);
       })
@@ -37,103 +36,94 @@ const VaiInventoryPage = () => {
   const handleNewProductChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === 'ProductDetail') {
-      const detailList = value.split(',').map((item) => parseFloat(item.trim())).filter(item => !isNaN(item)); // Convert string to array of numbers and filter out NaN values
-      const totalMeter = detailList.reduce((sum, num) => sum + num, 0); // Calculate total meter
-      const totalProductCount = detailList.length; // Calculate total number of items in the list
+    setNewProduct((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-      setNewProduct((prev) => ({
-        ...prev,
-        ProductDetail: value, // Store the raw string input
-        TotalMeter: `${totalMeter} meters`, // Update TotalMeter automatically
-        totalProduct: totalProductCount // Update totalProduct automatically
-      }));
-    } else {
-      setNewProduct((prev) => ({
-        ...prev,
-        [name]: value
-      }));
+  // Handle adding a new detail to ProductDetail array
+  const handleAddProductDetail = () => {
+    if (currentDetail && !isNaN(currentDetail)) {
+      setNewProduct((prev) => {
+        const updatedProductDetail = [...prev.ProductDetail, parseFloat(currentDetail)];
+        const totalMeter = updatedProductDetail.reduce((sum, num) => sum + num, 0); // Calculate total meter
+        const totalProductCount = updatedProductDetail.length; // Calculate total number of items
+
+        return {
+          ...prev,
+          ProductDetail: updatedProductDetail,
+          TotalMeter: `${totalMeter} meters`, // Update TotalMeter automatically
+          totalProduct: totalProductCount // Update totalProduct automatically
+        };
+      });
+      setCurrentDetail(''); // Clear the input field after adding
     }
   };
 
-  // Handle saving a new product or updating an existing product
+  // Handle removing a product detail from ProductDetail array
+  const handleRemoveDetail = (index) => {
+    setNewProduct((prev) => {
+      const updatedProductDetail = prev.ProductDetail.filter((_, i) => i !== index);
+      const totalMeter = updatedProductDetail.reduce((sum, num) => sum + num, 0);
+      return {
+        ...prev,
+        ProductDetail: updatedProductDetail,
+        TotalMeter: `${totalMeter} meters`,
+        totalProduct: updatedProductDetail.length
+      };
+    });
+  };
+
   const handleSaveProduct = () => {
     if (!newProduct.ProductID) {
       alert('ProductID is required!');
       return;
     }
 
-    // Convert ProductDetail to an array of numbers
-    const productDetailArray = newProduct.ProductDetail.split(',').map((item) => parseFloat(item.trim()));
-
-    // Prepare the product data to send to the backend
-    const productData = {
-      ...newProduct,
-      ProductDetail: productDetailArray // Replace ProductDetail string with array of numbers
-    };
-
     const apiUrl = isEditing
-      ? `https://2t6r0vxhzf.execute-api.ap-southeast-2.amazonaws.com/prod/update` // Use this URL for updating with PUT method
-      : `https://goq3m8d3ve.execute-api.ap-southeast-2.amazonaws.com/prod/add`; // Use this URL for adding with POST method
+      ? `https://2t6r0vxhzf.execute-api.ap-southeast-2.amazonaws.com/prod/update`
+      : `https://goq3m8d3ve.execute-api.ap-southeast-2.amazonaws.com/prod/add`;
 
     const requestMethod = isEditing ? axios.put : axios.post; // Use PUT for editing, POST for adding
 
     requestMethod(
       apiUrl,
-      { body: JSON.stringify(productData) },
+      { body: JSON.stringify(newProduct) },
       { headers: { 'Content-Type': 'application/json' } }
     )
       .then((response) => {
-        console.log(`Product ${isEditing ? 'updated' : 'added'} successfully:`, response.data);
-
-        // Update the product list
-        setProducts((prev) => (isEditing ? prev.map((p) => (p.ProductID === newProduct.ProductID ? productData : p)) : [...prev, productData]));
-
-        // Reset form and close modal
-        setNewProduct({ ProductID: '', Color: '', totalProduct: '', ProductDetail: '', TotalMeter: '' });
+        setProducts((prev) => (isEditing ? prev.map((p) => (p.ProductID === newProduct.ProductID ? newProduct : p)) : [...prev, newProduct]));
+        setNewProduct({ ProductID: '', Color: '', totalProduct: '', ProductDetail: [], TotalMeter: '' });
         setIsAddingNew(false);
         setIsEditing(false);
       })
-      .catch((error) => {
-        console.error(`Error ${isEditing ? 'updating' : 'adding'} the product:`, error);
-      });
+      .catch((error) => console.error(`Error ${isEditing ? 'updating' : 'adding'} the product:`, error));
   };
 
-  // Show delete confirmation modal
-  const showDeleteModal = (productId) => {
-    setProductToDelete(productId);
-    setIsDeleteModalVisible(true);
-  };
-
-  // Handle deleting a product
-  const confirmDeleteProduct = () => {
+  const handleDeleteProduct = () => {
     axios({
       method: 'delete',
-      url: 'https://27emf55jka.execute-api.ap-southeast-2.amazonaws.com/prod/delete', // Replace with your API Gateway URL for deleting
-      data: { body: JSON.stringify({ ProductID: productToDelete }) }, // Wrap ProductID inside the "body" field
+      url: 'https://27emf55jka.execute-api.ap-southeast-2.amazonaws.com/prod/delete',
+      data: { body: JSON.stringify({ ProductID: productToDelete }) },
       headers: { 'Content-Type': 'application/json' }
     })
-      .then((response) => {
-        console.log(`Product ${productToDelete} deleted successfully:`, response.data);
-        setProducts((prev) => prev.filter((product) => product.ProductID !== productToDelete)); // Remove deleted product from state
+      .then(() => {
+        setProducts((prev) => prev.filter((product) => product.ProductID !== productToDelete));
         setIsDeleteModalVisible(false);
         setProductToDelete(null);
       })
-      .catch((error) => {
-        console.error(`Error deleting product ${productToDelete}:`, error);
-      });
+      .catch((error) => console.error(`Error deleting product ${productToDelete}:`, error));
   };
 
-  // Handle editing an existing product
   const handleEditClick = (productId) => {
     const productToEdit = products.find((product) => product.ProductID === productId);
-
     if (productToEdit) {
       setNewProduct({
         ProductID: productToEdit.ProductID,
         Color: productToEdit.Color,
         totalProduct: productToEdit.totalProduct,
-        ProductDetail: productToEdit.ProductDetail.join(', '), // Convert array back to string
+        ProductDetail: productToEdit.ProductDetail,
         TotalMeter: productToEdit.TotalMeter
       });
       setIsAddingNew(true);
@@ -153,7 +143,7 @@ const VaiInventoryPage = () => {
             <tr><th>Product ID</th><th>Color</th><th>Total Product</th><th>Product Detail</th><th>Total Meter</th><th>Action</th></tr>
           </thead>
           <tbody>
-            {products.length > 0 ? products.map((product) => (
+            {products.map((product) => (
               <tr key={product.ProductID}>
                 <td>{product.ProductID}</td>
                 <td>{product.Color}</td>
@@ -162,22 +152,37 @@ const VaiInventoryPage = () => {
                 <td>{product.TotalMeter}</td>
                 <td>
                   <button className="action-button edit-button" onClick={() => handleEditClick(product.ProductID)}>Edit</button>
-                  <button className="action-button delete-button" onClick={() => showDeleteModal(product.ProductID)}>Delete</button>
+                  <button className="action-button delete-button" onClick={() => { setProductToDelete(product.ProductID); setIsDeleteModalVisible(true); }}>Delete</button>
                 </td>
               </tr>
-            )) : (
-              <tr><td colSpan="6">No products found</td></tr>
-            )}
+            ))}
           </tbody>
         </table>
       )}
+      
+      {/* Add/Edit Product Modal */}
       {isAddingNew && (
         <div className="modal">
           <div className="modal-content">
             <h3>{isEditing ? 'Chỉnh Sửa Sản Phẩm' : 'Thêm Sản Phẩm Mới'}</h3>
             <input type="text" name="ProductID" placeholder="Mã Sản Phẩm" value={newProduct.ProductID} onChange={handleNewProductChange} readOnly={isEditing} />
             <input type="text" name="Color" placeholder="Màu Sắc" value={newProduct.Color} onChange={handleNewProductChange} />
-            <input type="text" name="ProductDetail" placeholder="Chi Tiết Sản Phẩm (e.g., 50, 55.5, 51)" value={newProduct.ProductDetail} onChange={handleNewProductChange} />
+            <div className="product-detail-section">
+              <input
+                type="number"
+                placeholder="Nhập Chi Tiết Sản Phẩm (e.g., 50)"
+                value={currentDetail}
+                onChange={(e) => setCurrentDetail(e.target.value)}
+              />
+              <button className="add-detail-button" onClick={handleAddProductDetail}>Thêm Chi Tiết</button>
+            </div>
+            <ul className="product-detail-list">
+              {newProduct.ProductDetail.map((detail, index) => (
+                <li key={index}>
+                  {detail} <button className="remove-detail-button" onClick={() => handleRemoveDetail(index)}>Xóa</button>
+                </li>
+              ))}
+            </ul>
             <input type="number" name="totalProduct" placeholder="Tổng Sản Phẩm" value={newProduct.totalProduct} readOnly />
             <input type="text" name="TotalMeter" placeholder="Tổng Mét" value={newProduct.TotalMeter} readOnly />
             <div className="modal-buttons">
@@ -188,15 +193,15 @@ const VaiInventoryPage = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Confirm Delete Modal */}
       {isDeleteModalVisible && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Xác Nhận Xóa</h3>
-            <p>Bạn có chắc chắn muốn xóa sản phẩm này không?</p>
+            <h3>Bạn có chắc muốn xóa sản phẩm này?</h3>
+            <p>Sản phẩm sẽ bị xóa vĩnh viễn khỏi hệ thống.</p>
             <div className="modal-buttons">
-              <button onClick={confirmDeleteProduct}>Xóa</button>
-              <button onClick={() => { setIsDeleteModalVisible(false); setProductToDelete(null); }}>Huỷ</button>
+              <button onClick={handleDeleteProduct}>Xóa</button>
+              <button onClick={() => setIsDeleteModalVisible(false)}>Hủy</button>
             </div>
           </div>
         </div>
