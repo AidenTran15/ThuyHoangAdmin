@@ -12,6 +12,7 @@ const VaiInventoryPage = () => {
     TotalMeter: ''
   });
   const [isAddingNew, setIsAddingNew] = useState(false); // State to manage add product modal visibility
+  const [isEditing, setIsEditing] = useState(false); // State to check if we are editing an existing product
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch all products from the Lambda API on component mount
@@ -31,7 +32,7 @@ const VaiInventoryPage = () => {
       });
   }, []);
 
-  // Handle input changes for adding a new product
+  // Handle input changes for adding or editing a product
   const handleNewProductChange = (e) => {
     const { name, value } = e.target;
 
@@ -55,10 +56,10 @@ const VaiInventoryPage = () => {
     }
   };
 
-  // Handle adding a new product
-  const handleAddProductSaveClick = () => {
+  // Handle saving a new product or updating an existing product
+  const handleSaveProduct = () => {
     if (!newProduct.ProductID) {
-      alert('ProductID is required for adding a product!');
+      alert('ProductID is required!');
       return;
     }
 
@@ -71,38 +72,84 @@ const VaiInventoryPage = () => {
       ProductDetail: productDetailArray // Replace ProductDetail string with array of numbers
     };
 
-    axios
-      .post(
-        'https://YOUR_API_GATEWAY_URL/prod/add', // Replace with your API Gateway URL
-        { body: JSON.stringify(productData) },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
+    // Determine the API URL and method based on whether we are editing or adding a new product
+    const apiUrl = isEditing
+      ? `https://2t6r0vxhzf.execute-api.ap-southeast-2.amazonaws.com/prod/update` // Use this URL for updating with PUT method
+      : `https://goq3m8d3ve.execute-api.ap-southeast-2.amazonaws.com/prod/add`; // Use this URL for adding with POST method
+
+    const requestMethod = isEditing ? axios.put : axios.post; // Use PUT for editing, POST for adding
+
+    requestMethod(
+      apiUrl,
+      { body: JSON.stringify(productData) },
+      {
+        headers: {
+          'Content-Type': 'application/json'
         }
-      )
+      }
+    )
       .then((response) => {
-        console.log('Product added successfully:', response.data);
-        setProducts((prev) => [...prev, productData]); // Add new product to the table
+        console.log(`Product ${isEditing ? 'updated' : 'added'} successfully:`, response.data);
+
+        // Update the product list
+        setProducts((prev) => {
+          if (isEditing) {
+            // Replace the edited product in the list
+            return prev.map((product) =>
+              product.ProductID === newProduct.ProductID ? productData : product
+            );
+          } else {
+            // Add new product to the list
+            return [...prev, productData];
+          }
+        });
+
+        // Reset form and close modal
         setNewProduct({
           ProductID: '',
           Color: '',
           totalProduct: '',
           ProductDetail: '',
           TotalMeter: ''
-        }); // Reset form
-        setIsAddingNew(false); // Close modal
+        });
+        setIsAddingNew(false);
+        setIsEditing(false);
       })
       .catch((error) => {
-        console.error('Error adding the product:', error);
+        console.error(`Error ${isEditing ? 'updating' : 'adding'} the product:`, error);
+
+        // Log additional error information for debugging
+        if (error.response) {
+          console.error('Error Response Data:', error.response.data);
+          console.error('Error Response Status:', error.response.status);
+          console.error('Error Response Headers:', error.response.headers);
+        } else if (error.request) {
+          console.error('Error Request:', error.request);
+        } else {
+          console.error('Error Message:', error.message);
+        }
       });
   };
 
-  // Placeholder functions for edit and delete actions
+  // Handle editing an existing product
   const handleEditClick = (productId) => {
-    alert(`Edit functionality for Product ID: ${productId} not implemented yet.`);
+    const productToEdit = products.find((product) => product.ProductID === productId);
+
+    if (productToEdit) {
+      // Populate the modal with the selected product's data
+      setNewProduct({
+        ProductID: productToEdit.ProductID,
+        Color: productToEdit.Color,
+        totalProduct: productToEdit.totalProduct,
+        ProductDetail: productToEdit.ProductDetail.join(', '), // Convert array back to string
+        TotalMeter: productToEdit.TotalMeter
+      });
+      setIsAddingNew(true);
+      setIsEditing(true);
+    }
   };
 
+  // Handle deleting a product (Placeholder)
   const handleDeleteClick = (productId) => {
     alert(`Delete functionality for Product ID: ${productId} not implemented yet.`);
   };
@@ -111,7 +158,7 @@ const VaiInventoryPage = () => {
     <div className="vai-inventory-page">
       <div className="header-container">
         <h2>Quản Lý Tồn Kho</h2>
-        <button onClick={() => setIsAddingNew(true)} className="add-new-button">
+        <button onClick={() => { setIsAddingNew(true); setIsEditing(false); }} className="add-new-button">
           Tạo Mới
         </button>
       </div>
@@ -164,17 +211,18 @@ const VaiInventoryPage = () => {
         </table>
       )}
 
-      {/* Add New Product Modal */}
+      {/* Add/Edit Product Modal */}
       {isAddingNew && (
         <div className="modal">
           <div className="modal-content">
-            <h3>Thêm Sản Phẩm Mới</h3>
+            <h3>{isEditing ? 'Chỉnh Sửa Sản Phẩm' : 'Thêm Sản Phẩm Mới'}</h3>
             <input
               type="text"
               name="ProductID"
               placeholder="Mã Sản Phẩm"
               value={newProduct.ProductID}
               onChange={handleNewProductChange}
+              readOnly={isEditing} // ProductID is read-only in edit mode
             />
             <input
               type="text"
@@ -208,8 +256,8 @@ const VaiInventoryPage = () => {
               readOnly
             />
             <div className="modal-buttons">
-              <button onClick={handleAddProductSaveClick}>Lưu</button>
-              <button onClick={() => setIsAddingNew(false)}>Huỷ</button>
+              <button onClick={handleSaveProduct}>{isEditing ? 'Cập Nhật' : 'Lưu'}</button>
+              <button onClick={() => { setIsAddingNew(false); setIsEditing(false); }}>Huỷ</button>
             </div>
           </div>
         </div>
