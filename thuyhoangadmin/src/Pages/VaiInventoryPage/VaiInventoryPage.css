@@ -203,28 +203,32 @@
     flex-grow: 1; /* Allow text container to grow */
   }
   
-  /* Remove Detail Button */
-  .remove-detail-button {
+/* Remove Detail Button */
+
+.remove-detail-button {
     background-color: #e74c3c;
     color: white;
-    padding: 0; /* Remove padding for smaller size */
-    width: 20px; /* Set a fixed width */
-    height: 20px; /* Set a fixed height */
+    width: 15px; /* Set a slightly larger fixed width */
+    height: 35px; /* Set fixed height */
+    min-width: 15px; /* Prevent the button from shrinking */
+    min-height: 15px; /* Prevent the button from shrinking */
+    padding: 0; /* Remove all padding */
     border: none;
     border-radius: 50%; /* Circular button */
     font-size: 10px; /* Smaller font size */
+    line-height: 1; /* Line height for centering text */
+    display: flex; /* Flexbox for centering */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1; /* Center align text vertically */
-    text-align: center; /* Center align text horizontally */
+    text-align: center;
     transition: background-color 0.3s ease;
   }
   
   .remove-detail-button:hover {
     background-color: #c0392b;
   }
+  
   
   /* Total Fields Section */
   .total-fields {
