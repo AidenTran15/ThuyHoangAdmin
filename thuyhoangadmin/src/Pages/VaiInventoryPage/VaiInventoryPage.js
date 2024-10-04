@@ -165,29 +165,67 @@ const VaiInventoryPage = () => {
         <div className="modal">
           <div className="modal-content">
             <h3>{isEditing ? 'Chỉnh Sửa Sản Phẩm' : 'Thêm Sản Phẩm Mới'}</h3>
-            <input type="text" name="ProductID" placeholder="Mã Sản Phẩm" value={newProduct.ProductID} onChange={handleNewProductChange} readOnly={isEditing} />
-            <input type="text" name="Color" placeholder="Màu Sắc" value={newProduct.Color} onChange={handleNewProductChange} />
+            <input
+              type="text"
+              name="ProductID"
+              placeholder="Mã Sản Phẩm"
+              value={newProduct.ProductID}
+              onChange={handleNewProductChange}
+              readOnly={isEditing}
+            />
+            <input
+              type="text"
+              name="Color"
+              placeholder="Màu Sắc"
+              value={newProduct.Color}
+              onChange={handleNewProductChange}
+            />
+
+            {/* Product Detail Section */}
             <div className="product-detail-section">
               <input
                 type="number"
-                placeholder="Nhập Chi Tiết Sản Phẩm (e.g., 50)"
+                placeholder="Nhập Chi Tiết Sản Phẩm"
                 value={currentDetail}
                 onChange={(e) => setCurrentDetail(e.target.value)}
               />
-              <button className="add-detail-button" onClick={handleAddProductDetail}>Thêm Chi Tiết</button>
+              <button className="add-detail-button" onClick={handleAddProductDetail}>
+                +
+              </button>
             </div>
+
             <ul className="product-detail-list">
               {newProduct.ProductDetail.map((detail, index) => (
                 <li key={index}>
-                  {detail} <button className="remove-detail-button" onClick={() => handleRemoveDetail(index)}>Xóa</button>
+                  {detail} meters
+                  <button
+                    className="remove-detail-button"
+                    onClick={() => handleRemoveDetail(index)}
+                    title="Remove Detail"
+                  >
+                    &times;
+                  </button>
                 </li>
               ))}
             </ul>
-            <input type="number" name="totalProduct" placeholder="Tổng Sản Phẩm" value={newProduct.totalProduct} readOnly />
-            <input type="text" name="TotalMeter" placeholder="Tổng Mét" value={newProduct.TotalMeter} readOnly />
+
+            {/* Display Total Product and Total Meter */}
+            <div className="total-fields">
+              <div>
+                <label>Tổng Sản Phẩm:</label>
+                <input type="text" name="totalProduct" value={newProduct.totalProduct} readOnly />
+              </div>
+              <div>
+                <label>Tổng Mét:</label>
+                <input type="text" name="TotalMeter" value={newProduct.TotalMeter} readOnly />
+              </div>
+            </div>
+
             <div className="modal-buttons">
               <button onClick={handleSaveProduct}>{isEditing ? 'Cập Nhật' : 'Lưu'}</button>
-              <button onClick={() => { setIsAddingNew(false); setIsEditing(false); }}>Huỷ</button>
+              <button onClick={() => { setIsAddingNew(false); setIsEditing(false); }}>
+                Huỷ
+              </button>
             </div>
           </div>
         </div>
