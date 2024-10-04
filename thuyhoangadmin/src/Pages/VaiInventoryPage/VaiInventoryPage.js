@@ -14,6 +14,8 @@ const VaiInventoryPage = () => {
   const [isAddingNew, setIsAddingNew] = useState(false); // State to manage add product modal visibility
   const [isEditing, setIsEditing] = useState(false); // State to check if we are editing an existing product
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false); // State to manage delete confirmation modal visibility
+  const [productToDelete, setProductToDelete] = useState(null); // Store the productID of the product to be deleted
 
   // Fetch all products from the Lambda API on component mount
   useEffect(() => {
@@ -97,22 +99,30 @@ const VaiInventoryPage = () => {
       });
   };
 
-  const handleDeleteProduct = (productId) => {
+  // Show delete confirmation modal
+  const showDeleteModal = (productId) => {
+    setProductToDelete(productId);
+    setIsDeleteModalVisible(true);
+  };
+
+  // Handle deleting a product
+  const confirmDeleteProduct = () => {
     axios({
       method: 'delete',
       url: 'https://27emf55jka.execute-api.ap-southeast-2.amazonaws.com/prod/delete', // Replace with your API Gateway URL for deleting
-      data: { body: JSON.stringify({ ProductID: productId }) }, // Wrap ProductID inside the "body" field
+      data: { body: JSON.stringify({ ProductID: productToDelete }) }, // Wrap ProductID inside the "body" field
       headers: { 'Content-Type': 'application/json' }
     })
       .then((response) => {
-        console.log(`Product ${productId} deleted successfully:`, response.data);
-        setProducts((prev) => prev.filter((product) => product.ProductID !== productId)); // Remove deleted product from state
+        console.log(`Product ${productToDelete} deleted successfully:`, response.data);
+        setProducts((prev) => prev.filter((product) => product.ProductID !== productToDelete)); // Remove deleted product from state
+        setIsDeleteModalVisible(false);
+        setProductToDelete(null);
       })
       .catch((error) => {
-        console.error(`Error deleting product ${productId}:`, error);
+        console.error(`Error deleting product ${productToDelete}:`, error);
       });
   };
-  
 
   // Handle editing an existing product
   const handleEditClick = (productId) => {
@@ -152,7 +162,7 @@ const VaiInventoryPage = () => {
                 <td>{product.TotalMeter}</td>
                 <td>
                   <button className="action-button edit-button" onClick={() => handleEditClick(product.ProductID)}>Edit</button>
-                  <button className="action-button delete-button" onClick={() => handleDeleteProduct(product.ProductID)}>Delete</button>
+                  <button className="action-button delete-button" onClick={() => showDeleteModal(product.ProductID)}>Delete</button>
                 </td>
               </tr>
             )) : (
@@ -173,6 +183,20 @@ const VaiInventoryPage = () => {
             <div className="modal-buttons">
               <button onClick={handleSaveProduct}>{isEditing ? 'Cập Nhật' : 'Lưu'}</button>
               <button onClick={() => { setIsAddingNew(false); setIsEditing(false); }}>Huỷ</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalVisible && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Xác Nhận Xóa</h3>
+            <p>Bạn có chắc chắn muốn xóa sản phẩm này không?</p>
+            <div className="modal-buttons">
+              <button onClick={confirmDeleteProduct}>Xóa</button>
+              <button onClick={() => { setIsDeleteModalVisible(false); setProductToDelete(null); }}>Huỷ</button>
             </div>
           </div>
         </div>
