@@ -8,6 +8,7 @@ import HistoryOrder from './components/HistoryOrder/HistoryOrder';
 import CustomerPage from './Pages/CustomerPage/CustomerPage';
 import ProductPage from './Pages/ProductPage/ProductPage';
 import PasswordModal from './components/PasswordModal/PasswordModal'; // Import PasswordModal
+import VaiInventoryTable from './Pages/VaiInventoryPage/VaiInventoryPage'; //'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,6 +30,7 @@ function App() {
               <Route path="/history" element={<HistoryOrder />} />
               <Route path="/customer" element={<CustomerPage />} />
               <Route path="/product" element={<ProductPage />} />
+              <Route path="/inventory" element={<VaiInventoryTable />} /> {/* New route for inventory */}
             </Routes>
           </>
         )}

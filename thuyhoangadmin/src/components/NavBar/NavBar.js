@@ -1,3 +1,4 @@
+// src/components/NavBar/NavBar.js
 import React from 'react';
 import { Link } from 'react-router-dom'; // Import Link for navigation
 import './NavBar.css'; // Import CSS for styling
@@ -14,6 +15,7 @@ const NavBar = () => {
         <li><Link to="/history">Lịch Sử</Link></li>
         <li><Link to="/customer">Khách Hàng</Link></li>
         <li><Link to="/product">Sản Phẩm</Link></li>
+        <li><Link to="/inventory">Inventory</Link></li> {/* New link for inventory */}
       </ul>
     </nav>
   );

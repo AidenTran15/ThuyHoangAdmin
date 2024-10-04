@@ -1,0 +1,49 @@
+/* src/Pages/VaiInventoryPage/VaiInventoryTable.css */
+.vai-inventory-table {
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    width: 80%;
+    border-collapse: collapse;
+    font-size: 18px;
+    text-align: center;
+  }
+  
+  .vai-inventory-table h2 {
+    text-align: center;
+    color: #333;
+    font-size: 28px;
+  }
+  
+  .vai-inventory-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    font-size: 18px;
+  }
+  
+  .vai-inventory-table th,
+  .vai-inventory-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+  }
+  
+  .vai-inventory-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    text-align: center;
+    font-size: 20px;
+  }
+  
+  .vai-inventory-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .vai-inventory-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .vai-inventory-table td {
+    text-align: center;
+  }
+  
