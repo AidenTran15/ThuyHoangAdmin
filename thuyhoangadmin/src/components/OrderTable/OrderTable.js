@@ -10,8 +10,11 @@ const OrderTable = () => {
   const [error, setError] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [filterCustomer, setFilterCustomer] = useState('All');
-  const [currentPage, setCurrentPage] = useState(1); // New state for current page
-  const ordersPerPage = 10; // Set the number of orders displayed per page
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isNoteModalVisible, setIsNoteModalVisible] = useState(false);
+  const [currentNote, setCurrentNote] = useState('');
+
+  const ordersPerPage = 10;
 
   const [newOrder, setNewOrder] = useState({
     orderID: '',
@@ -20,7 +23,7 @@ const OrderTable = () => {
     total: 0,
     totalQuantity: 0,
     status: '',
-    note: '' // Include note in the state
+    note: ''
   });
 
   useEffect(() => {
@@ -45,7 +48,6 @@ const OrderTable = () => {
     return Math.floor(10000 + Math.random() * 90000).toString();
   };
 
-  // Function to format currency in VND format
   const formatCurrencyVND = (amount) => {
     return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
   };
@@ -64,7 +66,7 @@ const OrderTable = () => {
       total_amount: newOrder.total,
       status: 'Pending',
       orderDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      note: newOrder.note // Include the note field
+      note: newOrder.note
     };
 
     const requestBody = JSON.stringify({
@@ -107,9 +109,14 @@ const OrderTable = () => {
     setFilterCustomer(e.target.value);
   };
 
+  const handleViewNote = (note) => {
+    console.log('View Detail clicked', note); // Debug statement
+    setCurrentNote(note);
+    setIsNoteModalVisible(true);
+  };
+
   const filteredOrders = filterCustomer === 'All' ? orders : orders.filter((order) => order.Customer === filterCustomer);
 
-  // Calculate total pages and get orders for current page
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
@@ -117,7 +124,6 @@ const OrderTable = () => {
 
   const uniqueCustomers = Array.from(new Set(orders.map((order) => order.Customer)));
 
-  // Handle page navigation
   const goToNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
@@ -135,12 +141,8 @@ const OrderTable = () => {
       <div className="header-container">
         <h2>Quản Lý Đơn Hàng</h2>
         <div className="button-group">
-          <button className="add-order-button" onClick={() => setIsAddingNew(true)}>
-            Tạo Đơn
-          </button>
-          <Link to="/history" className="view-history-button">
-            Xem Đơn Cũ
-          </Link>
+          <button className="add-order-button" onClick={() => setIsAddingNew(true)}>Tạo Đơn</button>
+          <Link to="/history" className="view-history-button">Xem Đơn Cũ</Link>
         </div>
       </div>
 
@@ -149,9 +151,7 @@ const OrderTable = () => {
         <select id="customerFilter" value={filterCustomer} onChange={handleFilterCustomerChange} className="filter-dropdown">
           <option value="All">Tất cả</option>
           {uniqueCustomers.map((customer) => (
-            <option key={customer} value={customer}>
-              {customer}
-            </option>
+            <option key={customer} value={customer}>{customer}</option>
           ))}
         </select>
       </div>
@@ -171,7 +171,7 @@ const OrderTable = () => {
                 <th>Các Sản Phẩm Đơn Hàng</th>
                 <th>Tổng SL</th>
                 <th>Tổng Giá</th>
-                <th>Ghi Chú</th> {/* Add new column for Note */}
+                <th>Ghi Chú</th>
                 <th>Trạng Thái</th>
               </tr>
             </thead>
@@ -194,8 +194,10 @@ const OrderTable = () => {
                       </ul>
                     </td>
                     <td>{order.TotalQuantity}</td>
-                    <td>{formatCurrencyVND(order.Total)}</td> {/* Format Tổng Giá to VND */}
-                    <td>{order.Note || 'Không có ghi chú'}</td> {/* Display note value */}
+                    <td>{formatCurrencyVND(order.Total)}</td>
+                    <td>
+                      <button className="view-detail-button" onClick={() => handleViewNote(order.Note)}>View Detail</button>
+                    </td>
                     <td>
                       <select value={order.Status} onChange={(e) => handleStatusChange(order.orderID, e.target.value)}>
                         <option value="Pending">Đang xử Lý</option>
@@ -212,22 +214,39 @@ const OrderTable = () => {
             </tbody>
           </table>
 
-          {/* Pagination Controls */}
           <div className="pagination-controls" style={{ marginTop: '20px' }}>
-            <button onClick={goToPreviousPage} disabled={currentPage === 1} style={{ marginRight: '10px' }}>
-              Trang trước
-            </button>
+            <button onClick={goToPreviousPage} disabled={currentPage === 1} style={{ marginRight: '10px' }}>Trang trước</button>
             <span>Trang {currentPage} trong {totalPages}</span>
-            <button onClick={goToNextPage} disabled={currentPage === totalPages} style={{ marginLeft: '10px' }}>
-              Trang sau
-            </button>
+            <button onClick={goToNextPage} disabled={currentPage === totalPages} style={{ marginLeft: '10px' }}>Trang sau</button>
           </div>
         </>
       )}
 
       {isAddingNew && (
-        <AddOrderModal newOrder={newOrder} setNewOrder={setNewOrder} handleAddOrderSaveClick={handleAddOrderSaveClick} handleClose={() => setIsAddingNew(false)} />
+        <AddOrderModal
+          newOrder={newOrder}
+          setNewOrder={setNewOrder}
+          handleAddOrderSaveClick={handleAddOrderSaveClick}
+          handleClose={() => setIsAddingNew(false)}
+        />
       )}
+
+      {isNoteModalVisible && (
+        <NoteModal note={currentNote} onClose={() => setIsNoteModalVisible(false)} />
+      )}
+    </div>
+  );
+};
+
+// Note Modal Component
+const NoteModal = ({ note, onClose }) => {
+  return (
+    <div className="note-modal">
+      <div className="note-modal-content">
+        <h3>Note Detail</h3>
+        <p>{note || 'No details available'}</p>
+        <button onClick={onClose}>Close</button>
+      </div>
     </div>
   );
 };
