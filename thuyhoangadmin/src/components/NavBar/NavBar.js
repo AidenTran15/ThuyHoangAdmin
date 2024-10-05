@@ -7,7 +7,7 @@ const NavBar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <h1>Admin Dashboard</h1>
+        <h1>Thuỷ Hoàng</h1>
       </div>
       <ul className="navbar-links">
         <li><Link to="/">Trang Chủ</Link></li>
