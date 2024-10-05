@@ -209,4 +209,39 @@
   border-radius: 8px;
   width: 400px;
   max-width: 90%;
+  text-align: center;
+  /* Center text inside the modal */
+  display: flex;
+  flex-direction: column;
+  /* Align elements vertically */
+  justify-content: center;
+  /* Center content vertically */
+  align-items: center;
+  /* Center content horizontally */
+}
+
+.note-modal-content h3 {
+  margin-bottom: 15px;
+  /* Add space below the header */
+  font-size: 24px;
+  /* Adjust font size */
+}
+
+.note-modal-content p {
+  margin-bottom: 20px;
+  /* Space between paragraph and button */
+}
+
+.note-modal-content button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.note-modal-content button:hover {
+  background-color: #0056b3;
 }

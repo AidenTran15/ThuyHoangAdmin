@@ -196,7 +196,7 @@ const OrderTable = () => {
                     <td>{order.TotalQuantity}</td>
                     <td>{formatCurrencyVND(order.Total)}</td>
                     <td>
-                      <button className="view-detail-button" onClick={() => handleViewNote(order.Note)}>View Detail</button>
+                      <button className="view-detail-button" onClick={() => handleViewNote(order.Note)}>Ghi Chú</button>
                     </td>
                     <td>
                       <select value={order.Status} onChange={(e) => handleStatusChange(order.orderID, e.target.value)}>
@@ -243,9 +243,9 @@ const NoteModal = ({ note, onClose }) => {
   return (
     <div className="note-modal">
       <div className="note-modal-content">
-        <h3>Note Detail</h3>
-        <p>{note || 'No details available'}</p>
-        <button onClick={onClose}>Close</button>
+        <h3>Ghi Chú</h3>
+        <p>{note || 'Không có ghi chú'}</p>
+        <button onClick={onClose}>Đóng</button>
       </div>
     </div>
   );
