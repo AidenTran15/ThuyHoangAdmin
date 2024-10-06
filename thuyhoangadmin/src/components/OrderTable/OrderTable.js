@@ -200,7 +200,8 @@ const OrderTable = () => {
                     </td>
                     <td>
                       <select value={order.Status} onChange={(e) => handleStatusChange(order.orderID, e.target.value)}>
-                        <option value="Pending">Đang xử Lý</option>
+                        <option value="Pending">Chưa xử Lý</option>
+                        <option value="Preparing">Đang chuẩn bị</option>
                         <option value="Done">Hoàn Thành</option>
                       </select>
                     </td>
