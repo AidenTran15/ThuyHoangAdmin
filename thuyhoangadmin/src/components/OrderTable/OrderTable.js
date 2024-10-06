@@ -10,6 +10,7 @@ const OrderTable = () => {
   const [error, setError] = useState(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [filterCustomer, setFilterCustomer] = useState('All');
+  const [filterStatus, setFilterStatus] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const [isNoteModalVisible, setIsNoteModalVisible] = useState(false);
   const [currentNote, setCurrentNote] = useState('');
@@ -31,9 +32,10 @@ const OrderTable = () => {
       axios
         .get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
         .then((response) => {
+          // Parse and log the response for debugging
           let orderData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data.body;
-          const pendingOrders = orderData.filter((order) => order.Status === 'Pending');
-          setOrders(Array.isArray(pendingOrders) ? pendingOrders : []);
+          console.log('API Response on Page Load:', orderData); // Log the API response to check the order statuses
+          setOrders(Array.isArray(orderData) ? orderData : []);
           setLoading(false);
         })
         .catch((error) => {
@@ -96,8 +98,11 @@ const OrderTable = () => {
     axios
       .put('https://bk77c3sxtk.execute-api.ap-southeast-2.amazonaws.com/prod/updatestatus', requestBody)
       .then((response) => {
+        console.log('Status Update Response:', response.data); // Log the response after updating the status
         setOrders((prevOrders) =>
-          prevOrders.map((order) => (order.orderID === orderID ? { ...order, Status: newStatus } : order)).filter((order) => order.Status !== 'Done')
+          prevOrders.map((order) => 
+            order.orderID === orderID ? { ...order, Status: newStatus } : order
+          )
         );
       })
       .catch((error) => {
@@ -109,13 +114,20 @@ const OrderTable = () => {
     setFilterCustomer(e.target.value);
   };
 
+  const handleFilterStatusChange = (e) => {
+    setFilterStatus(e.target.value);
+  };
+
   const handleViewNote = (note) => {
     console.log('View Detail clicked', note); // Debug statement
     setCurrentNote(note);
     setIsNoteModalVisible(true);
   };
 
-  const filteredOrders = filterCustomer === 'All' ? orders : orders.filter((order) => order.Customer === filterCustomer);
+  // Apply the filtering logic based on the filter dropdowns for customer and status
+  const filteredOrders = orders
+    .filter((order) => (filterCustomer === 'All' ? true : order.Customer === filterCustomer))
+    .filter((order) => (filterStatus === 'All' ? (order.Status === 'Pending' || order.Status === 'Preparing') : order.Status === filterStatus));
 
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
   const indexOfLastOrder = currentPage * ordersPerPage;
@@ -153,6 +165,15 @@ const OrderTable = () => {
           {uniqueCustomers.map((customer) => (
             <option key={customer} value={customer}>{customer}</option>
           ))}
+        </select>
+
+        {/* New Status Filter Dropdown */}
+        <label htmlFor="statusFilter" style={{ marginLeft: '20px' }}>Trạng Thái:</label>
+        <select id="statusFilter" value={filterStatus} onChange={handleFilterStatusChange} className="filter-dropdown">
+          <option value="All">Tất cả</option>
+          <option value="Pending">Chưa xử Lý</option>
+          <option value="Preparing">Đang chuẩn bị</option>
+          <option value="Done">Hoàn Thành</option>
         </select>
       </div>
 
