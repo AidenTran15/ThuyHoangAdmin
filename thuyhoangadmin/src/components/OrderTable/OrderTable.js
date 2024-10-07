@@ -202,7 +202,7 @@ Ghi Chú: ${order.Note || 'Không có ghi chú'}
                 <th>Các Sản Phẩm Đơn Hàng</th>
                 <th>Tổng SL</th>
                 <th>Tổng Giá</th>
-                <th>Ghi Chú</th>
+                <th>Note</th>
                 <th>Copy</th> {/* Moved Copy column before Status */}
                 <th>Trạng Thái</th>
               </tr>
@@ -228,7 +228,7 @@ Ghi Chú: ${order.Note || 'Không có ghi chú'}
                     <td>{order.TotalQuantity}</td>
                     <td>{formatCurrencyVND(order.Total)}</td>
                     <td>
-                      <button className="view-detail-button" onClick={() => handleViewNote(order.Note)}>Ghi Chú</button>
+                      <button className="view-detail-button" onClick={() => handleViewNote(order.Note)}>Note</button>
                     </td>
                     <td>
                       <button className="copy-button" onClick={() => handleCopyOrder(order)}>Copy</button> {/* Moved copy button */}
