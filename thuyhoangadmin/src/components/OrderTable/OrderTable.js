@@ -216,12 +216,17 @@ const OrderTable = () => {
                       <button className="view-detail-button" onClick={() => handleViewNote(order.Note)}>Ghi Chú</button>
                     </td>
                     <td>
-                      <select value={order.Status} onChange={(e) => handleStatusChange(order.orderID, e.target.value)}>
-                        <option value="Pending">Chưa xử Lý</option>
-                        <option value="Preparing">Đang chuẩn bị</option>
-                        <option value="Done">Hoàn Thành</option>
-                      </select>
-                    </td>
+  <select
+    className="status-dropdown"
+    value={order.Status}
+    onChange={(e) => handleStatusChange(order.orderID, e.target.value)}
+  >
+    <option value="Pending">Chưa xử Lý</option>
+    <option value="Preparing">Đang chuẩn bị</option>
+    <option value="Done">Hoàn Thành</option>
+  </select>
+</td>
+
                   </tr>
                 ))
               ) : (

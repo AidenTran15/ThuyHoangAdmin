@@ -96,7 +96,7 @@
 }
 
 .preparing-status {
-  background-color: yellow;
+  background-color: #fff3cd;
   /* Light yellow for Preparing */
   color: blue;
 }
@@ -113,6 +113,55 @@
 
 .order-table button:hover {
   background-color: #45a049;
+}
+
+/* Custom Dropdown Styles */
+.status-dropdown {
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 150px;
+  /* Set the desired width here */
+  font-size: 16px;
+  transition: all 0.3s ease;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-dropdown:hover,
+.status-dropdown:focus {
+  border-color: #007bff;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.status-dropdown option {
+  padding: 10px;
+}
+
+.status-dropdown:active {
+  border-color: #0056b3;
+}
+
+/* Status-specific Option Styles */
+.status-dropdown option[value="Pending"] {
+  background-color: #f8d7da;
+  /* Light red for Pending */
+  color: #721c24;
+}
+
+.status-dropdown option[value="Preparing"] {
+  background-color: #fff3cd;
+  /* Light yellow for Preparing */
+  color: #856404;
+}
+
+.status-dropdown option[value="Done"] {
+  background-color: #d4edda;
+  /* Light green for Done */
+  color: #155724;
 }
 
 /* Modal Styles */
