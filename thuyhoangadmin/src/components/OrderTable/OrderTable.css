@@ -1,3 +1,4 @@
+/* General Styles */
 .order-table {
   margin: 20px auto;
   font-family: Arial, sans-serif;
@@ -54,6 +55,7 @@
   background-color: #d9534f;
 }
 
+/* Table Styles */
 .order-table table {
   width: 100%;
   border-collapse: collapse;
@@ -86,6 +88,19 @@
   background-color: #f9f9f9;
 }
 
+/* Row Status Styles */
+.pending-status {
+  background-color: #f8d7da;
+  /* Light red for Pending */
+  color: black;
+}
+
+.preparing-status {
+  background-color: yellow;
+  /* Light yellow for Preparing */
+  color: blue;
+}
+
 .order-table button {
   background-color: #4CAF50;
   color: white;
@@ -100,6 +115,7 @@
   background-color: #45a049;
 }
 
+/* Modal Styles */
 .modal {
   position: fixed;
   top: 0;
@@ -143,6 +159,7 @@
   outline: none;
 }
 
+/* Sorting and Filtering Styles */
 .sort-container {
   margin: 20px 0;
   text-align: right;
@@ -166,10 +183,8 @@
 .filter-container {
   display: flex;
   justify-content: flex-end;
-  /* Aligns the filter dropdown to the right */
   align-items: center;
   margin: 15px 0;
-  /* Adds some space above the filter dropdown */
 }
 
 .filter-container label {
@@ -190,6 +205,7 @@
   border-color: #007bff;
 }
 
+/* Note Modal Styles */
 .note-modal {
   position: fixed;
   top: 0;
@@ -210,26 +226,19 @@
   width: 400px;
   max-width: 90%;
   text-align: center;
-  /* Center text inside the modal */
   display: flex;
   flex-direction: column;
-  /* Align elements vertically */
   justify-content: center;
-  /* Center content vertically */
   align-items: center;
-  /* Center content horizontally */
 }
 
 .note-modal-content h3 {
   margin-bottom: 15px;
-  /* Add space below the header */
   font-size: 24px;
-  /* Adjust font size */
 }
 
 .note-modal-content p {
   margin-bottom: 20px;
-  /* Space between paragraph and button */
 }
 
 .note-modal-content button {

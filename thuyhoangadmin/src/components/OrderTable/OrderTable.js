@@ -32,9 +32,8 @@ const OrderTable = () => {
       axios
         .get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
         .then((response) => {
-          // Parse and log the response for debugging
           let orderData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data.body;
-          console.log('API Response on Page Load:', orderData); // Log the API response to check the order statuses
+          console.log('API Response on Page Load:', orderData);
           setOrders(Array.isArray(orderData) ? orderData : []);
           setLoading(false);
         })
@@ -81,8 +80,8 @@ const OrderTable = () => {
       })
       .then((response) => {
         console.log('API Response:', response.data);
-        setOrders((prevOrders) => [...prevOrders, orderWithID]); // Add new order to the list
-        setIsAddingNew(false); // Close the modal after saving
+        setOrders((prevOrders) => [...prevOrders, orderWithID]);
+        setIsAddingNew(false);
       })
       .catch((error) => {
         console.error('Error adding new order:', error.response ? error.response.data : error.message);
@@ -98,7 +97,7 @@ const OrderTable = () => {
     axios
       .put('https://bk77c3sxtk.execute-api.ap-southeast-2.amazonaws.com/prod/updatestatus', requestBody)
       .then((response) => {
-        console.log('Status Update Response:', response.data); // Log the response after updating the status
+        console.log('Status Update Response:', response.data);
         setOrders((prevOrders) =>
           prevOrders.map((order) => 
             order.orderID === orderID ? { ...order, Status: newStatus } : order
@@ -119,12 +118,10 @@ const OrderTable = () => {
   };
 
   const handleViewNote = (note) => {
-    console.log('View Detail clicked', note); // Debug statement
     setCurrentNote(note);
     setIsNoteModalVisible(true);
   };
 
-  // Apply the filtering logic based on the filter dropdowns for customer and status
   const filteredOrders = orders
     .filter((order) => (filterCustomer === 'All' ? true : order.Customer === filterCustomer))
     .filter((order) => (filterStatus === 'All' ? (order.Status === 'Pending' || order.Status === 'Preparing') : order.Status === filterStatus));
@@ -167,7 +164,6 @@ const OrderTable = () => {
           ))}
         </select>
 
-        {/* New Status Filter Dropdown */}
         <label htmlFor="statusFilter" style={{ marginLeft: '20px' }}>Trạng Thái:</label>
         <select id="statusFilter" value={filterStatus} onChange={handleFilterStatusChange} className="filter-dropdown">
           <option value="All">Tất cả</option>
@@ -199,7 +195,7 @@ const OrderTable = () => {
             <tbody>
               {currentOrders.length > 0 ? (
                 currentOrders.map((order) => (
-                  <tr key={order.orderID}>
+                  <tr key={order.orderID} className={order.Status === 'Pending' ? 'pending-status' : order.Status === 'Preparing' ? 'preparing-status' : ''}>
                     <td>{order.OrderDate}</td>
                     <td>{order.orderID}</td>
                     <td>{order.Customer}</td>
