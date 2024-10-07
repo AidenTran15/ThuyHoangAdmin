@@ -32,7 +32,6 @@ const OrderTable = () => {
       axios
         .get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
         .then((response) => {
-          // Parse and log the response for debugging
           let orderData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data.body;
           console.log('API Response on Page Load:', orderData); // Log the API response to check the order statuses
           setOrders(Array.isArray(orderData) ? orderData : []);
@@ -124,7 +123,6 @@ const OrderTable = () => {
     setIsNoteModalVisible(true);
   };
 
-  // Apply the filtering logic based on the filter dropdowns for customer and status
   const filteredOrders = orders
     .filter((order) => (filterCustomer === 'All' ? true : order.Customer === filterCustomer))
     .filter((order) => (filterStatus === 'All' ? (order.Status === 'Pending' || order.Status === 'Preparing') : order.Status === filterStatus));
@@ -167,13 +165,13 @@ const OrderTable = () => {
           ))}
         </select>
 
-        {/* New Status Filter Dropdown */}
+        {/* Modified Status Filter Dropdown */}
         <label htmlFor="statusFilter" style={{ marginLeft: '20px' }}>Trạng Thái:</label>
         <select id="statusFilter" value={filterStatus} onChange={handleFilterStatusChange} className="filter-dropdown">
           <option value="All">Tất cả</option>
           <option value="Pending">Chưa xử Lý</option>
           <option value="Preparing">Đang chuẩn bị</option>
-          <option value="Done">Hoàn Thành</option>
+          {/* Removed <option value="Done">Hoàn Thành</option> */}
         </select>
       </div>
 
