@@ -122,7 +122,7 @@ const OrderTable = () => {
   // Function to handle copying the order details in Vietnamese format
   const handleCopyOrder = (order) => {
     const orderDetails = `
-Mã Đơn Hàng: ${order.orderID}
+// Mã Đơn Hàng: ${order.orderID}
 Khách Hàng: ${order.Customer}
 Sản Phẩm:
 ${order.ProductList.map(product => `- Màu: ${product.color}, Kích cỡ: ${product.size}, Số Lượng: ${product.quantity}`).join('\n')}
@@ -203,8 +203,8 @@ Ghi Chú: ${order.Note || 'Không có ghi chú'}
                 <th>Tổng SL</th>
                 <th>Tổng Giá</th>
                 <th>Ghi Chú</th>
+                <th>Copy</th> {/* Moved Copy column before Status */}
                 <th>Trạng Thái</th>
-                <th>Sao Chép</th> {/* New column for copy button */}
               </tr>
             </thead>
             <tbody>
@@ -231,6 +231,9 @@ Ghi Chú: ${order.Note || 'Không có ghi chú'}
                       <button className="view-detail-button" onClick={() => handleViewNote(order.Note)}>Ghi Chú</button>
                     </td>
                     <td>
+                      <button className="copy-button" onClick={() => handleCopyOrder(order)}>Copy</button> {/* Moved copy button */}
+                    </td>
+                    <td>
                       <select
                         className="status-dropdown"
                         value={order.Status}
@@ -240,9 +243,6 @@ Ghi Chú: ${order.Note || 'Không có ghi chú'}
                         <option value="Preparing">Đang chuẩn bị</option>
                         <option value="Done">Hoàn Thành</option>
                       </select>
-                    </td>
-                    <td>
-                      <button className="copy-button" onClick={() => handleCopyOrder(order)}>Sao Chép</button> {/* New copy button */}
                     </td>
                   </tr>
                 ))
