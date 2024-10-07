@@ -122,19 +122,40 @@ const OrderTable = () => {
   // Function to handle copying the order details in Vietnamese format
   const handleCopyOrder = (order) => {
     const orderDetails = `
-// Mã Đơn Hàng: ${order.orderID}
-Khách Hàng: ${order.Customer}
-Sản Phẩm:
-${order.ProductList.map(product => `- Màu: ${product.color}, Kích cỡ: ${product.size}, Số Lượng: ${product.quantity}`).join('\n')}
-Tổng Số Lượng: ${order.TotalQuantity}
-Ghi Chú: ${order.Note || 'Không có ghi chú'}
+  Khách Hàng: ${order.Customer}
+  Sản Phẩm:
+  ${order.ProductList.map(product => `- Màu: ${product.color}, Kích cỡ: ${product.size}, Số Lượng: ${product.quantity}`).join('\n')}
+  Tổng Số Lượng: ${order.TotalQuantity}
+  Ghi Chú: ${order.Note || 'Không có ghi chú'}
     `;
-    navigator.clipboard.writeText(orderDetails)
-      .then(() => {
+  
+    // Check if Clipboard API is supported
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(orderDetails)
+        .then(() => {
+          alert('Thông tin đơn hàng đã được sao chép!');
+        })
+        .catch((error) => {
+          console.error('Lỗi khi sao chép thông tin đơn hàng:', error);
+          alert('Lỗi khi sao chép thông tin đơn hàng, vui lòng thử lại.');
+        });
+    } else {
+      // Fallback option for browsers that do not support Clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = orderDetails;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
         alert('Thông tin đơn hàng đã được sao chép!');
-      })
-      .catch((error) => console.error('Lỗi khi sao chép thông tin đơn hàng:', error));
+      } catch (err) {
+        console.error('Lỗi khi sao chép thông tin đơn hàng:', err);
+        alert('Lỗi khi sao chép thông tin đơn hàng, vui lòng thử lại.');
+      }
+      document.body.removeChild(textArea);
+    }
   };
+  
 
   const filteredOrders = orders
     .filter((order) => (filterCustomer === 'All' ? true : order.Customer === filterCustomer))
