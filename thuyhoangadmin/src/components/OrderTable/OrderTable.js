@@ -33,7 +33,6 @@ const OrderTable = () => {
         .get('https://fme5f3bdqi.execute-api.ap-southeast-2.amazonaws.com/prod/get')
         .then((response) => {
           let orderData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data.body;
-          console.log('API Response on Page Load:', orderData);
           setOrders(Array.isArray(orderData) ? orderData : []);
           setLoading(false);
         })
@@ -79,7 +78,6 @@ const OrderTable = () => {
         headers: { 'Content-Type': 'application/json' }
       })
       .then((response) => {
-        console.log('API Response:', response.data);
         setOrders((prevOrders) => [...prevOrders, orderWithID]);
         setIsAddingNew(false);
       })
@@ -97,9 +95,8 @@ const OrderTable = () => {
     axios
       .put('https://bk77c3sxtk.execute-api.ap-southeast-2.amazonaws.com/prod/updatestatus', requestBody)
       .then((response) => {
-        console.log('Status Update Response:', response.data);
         setOrders((prevOrders) =>
-          prevOrders.map((order) => 
+          prevOrders.map((order) =>
             order.orderID === orderID ? { ...order, Status: newStatus } : order
           )
         );
@@ -120,6 +117,23 @@ const OrderTable = () => {
   const handleViewNote = (note) => {
     setCurrentNote(note);
     setIsNoteModalVisible(true);
+  };
+
+  // Function to handle copying the order details in Vietnamese format
+  const handleCopyOrder = (order) => {
+    const orderDetails = `
+Mã Đơn Hàng: ${order.orderID}
+Khách Hàng: ${order.Customer}
+Sản Phẩm:
+${order.ProductList.map(product => `- Màu: ${product.color}, Kích cỡ: ${product.size}, Số Lượng: ${product.quantity}`).join('\n')}
+Tổng Số Lượng: ${order.TotalQuantity}
+Ghi Chú: ${order.Note || 'Không có ghi chú'}
+    `;
+    navigator.clipboard.writeText(orderDetails)
+      .then(() => {
+        alert('Thông tin đơn hàng đã được sao chép!');
+      })
+      .catch((error) => console.error('Lỗi khi sao chép thông tin đơn hàng:', error));
   };
 
   const filteredOrders = orders
@@ -190,6 +204,7 @@ const OrderTable = () => {
                 <th>Tổng Giá</th>
                 <th>Ghi Chú</th>
                 <th>Trạng Thái</th>
+                <th>Sao Chép</th> {/* New column for copy button */}
               </tr>
             </thead>
             <tbody>
@@ -216,22 +231,24 @@ const OrderTable = () => {
                       <button className="view-detail-button" onClick={() => handleViewNote(order.Note)}>Ghi Chú</button>
                     </td>
                     <td>
-  <select
-    className="status-dropdown"
-    value={order.Status}
-    onChange={(e) => handleStatusChange(order.orderID, e.target.value)}
-  >
-    <option value="Pending">Chưa xử Lý</option>
-    <option value="Preparing">Đang chuẩn bị</option>
-    <option value="Done">Hoàn Thành</option>
-  </select>
-</td>
-
+                      <select
+                        className="status-dropdown"
+                        value={order.Status}
+                        onChange={(e) => handleStatusChange(order.orderID, e.target.value)}
+                      >
+                        <option value="Pending">Chưa xử Lý</option>
+                        <option value="Preparing">Đang chuẩn bị</option>
+                        <option value="Done">Hoàn Thành</option>
+                      </select>
+                    </td>
+                    <td>
+                      <button className="copy-button" onClick={() => handleCopyOrder(order)}>Sao Chép</button> {/* New copy button */}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8">Không tìm thấy đơn hàng</td>
+                  <td colSpan="9">Không tìm thấy đơn hàng</td>
                 </tr>
               )}
             </tbody>
