@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './VaiInventoryPage.css'; // Import CSS for styling
-import ImportProductModal from './ImportProductModal'; // Import the import modal component
-import ExportProductModal from './ExportProductModal'; // Import the export modal component
+import ImportProductModal from './ImportProductModal'; // Import the Import modal component
+import ExportProductModal from './ExportProductModal'; // Import the Export modal component
 
 const VaiInventoryPage = () => {
   const [products, setProducts] = useState([]);
@@ -140,7 +140,7 @@ const VaiInventoryPage = () => {
   };
 
   const handleExportSave = (exportData) => {
-    // Add the new export data to the product list or handle export-specific logic here
+    // Update the product list with the new export data
     setProducts((prev) => [...prev, exportData]);
   };
 
@@ -150,7 +150,7 @@ const VaiInventoryPage = () => {
         <h2>Quản Lý Tồn Kho</h2>
         <button onClick={() => { setIsAddingNew(true); setIsEditing(false); }} className="add-new-button">Tạo Mới</button>
         <button onClick={() => setIsImportModalVisible(true)} className="import-button">Import</button> {/* Import Button */}
-        <button onClick={() => setIsExportModalVisible(true)} className="export-button">Export</button> {/* New Export Button */}
+        <button onClick={() => setIsExportModalVisible(true)} className="export-button">Export</button> {/* Export Button */}
       </div>
 
       {isLoading ? <p>Loading...</p> : (

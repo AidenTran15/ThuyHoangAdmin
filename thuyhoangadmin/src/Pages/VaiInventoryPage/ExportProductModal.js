@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import './ImportProductModal.css'; // Use the same styling for both modals
+import './ExportProductModal.css'; // Import styles for the modal
 
 const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   const [exportData, setExportData] = useState({
     Customer: '',
     TotalAmount: '',
-    ProductDetail: '',  // Temporary field for product details as string
     Color: '',
-    ProductList: {},
+    ProductDetail: [],
+    SelectedProductDetails: [], // Store selected product details
     totalProduct: 0,
     TotalMeter: 0,
-    Status: 'Export',  // Default status as 'Export'
-    Note: ''           // New field for user note
+    Status: 'Export', // Set default status to 'Export'
+    Note: ''          // New field for user note
   });
-
+  const [availableProductDetails, setAvailableProductDetails] = useState([]); // Store available product details for selected color
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Handle input changes for export data
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setExportData((prev) => ({
@@ -24,72 +25,68 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     }));
   };
 
-  const calculateTotals = (productList) => {
-    let totalProduct = 0;
-    let totalMeter = 0;
+  // Handle the selection of a color to fetch existing product details
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      if (exportData.Color) {
+        try {
+          const response = await fetch(`https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get?color=${encodeURIComponent(exportData.Color)}`);
+          if (response.ok) {
+            const data = await response.json();
+            const parsedData = typeof data.body === 'string' ? JSON.parse(data.body) : data;
+            const matchingItem = parsedData.find(item => item.Color === exportData.Color);
+            if (matchingItem) {
+              setAvailableProductDetails(matchingItem.ProductDetail || []);
+            }
+          } else {
+            setAvailableProductDetails([]);
+            console.error(`Failed to fetch details for color ${exportData.Color}. Status: ${response.status}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching details for color ${exportData.Color}:`, error);
+          setAvailableProductDetails([]);
+        }
+      }
+    };
 
-    for (const color in productList) {
-      const productValues = productList[color];
-      const numericValues = productValues.filter(value => !isNaN(value) && value > 0);
-      totalProduct += numericValues.length;
-      totalMeter += numericValues.reduce((acc, value) => acc + value, 0);
-    }
+    fetchProductDetails();
+  }, [exportData.Color]);
 
-    return { totalProduct, totalMeter };
-  };
+  // Handle the selection of product details from availableProductDetails
+  const handleSelectProductDetail = (selectedDetail) => {
+    setExportData((prev) => {
+      const alreadySelected = prev.SelectedProductDetails.includes(selectedDetail);
+      const updatedSelection = alreadySelected
+        ? prev.SelectedProductDetails.filter(detail => detail !== selectedDetail)
+        : [...prev.SelectedProductDetails, selectedDetail];
 
-  const calculateColorTotals = (productValues) => {
-    const numericValues = productValues.filter(value => !isNaN(value) && value > 0);
-    const colorTotalProduct = numericValues.length;
-    const colorTotalMeter = numericValues.reduce((acc, value) => acc + value, 0);
-    return { colorTotalProduct, colorTotalMeter };
-  };
-
-  const handleAddProduct = () => {
-    if (exportData.Color && exportData.ProductDetail) {
-      const productValues = exportData.ProductDetail.split(',').map((item) => parseFloat(item.trim()) || 0);
-
-      const updatedProductList = {
-        ...exportData.ProductList,
-        [exportData.Color]: productValues
-      };
-
-      const { totalProduct, totalMeter } = calculateTotals(updatedProductList);
-
-      setExportData((prev) => ({
+      return {
         ...prev,
-        ProductList: updatedProductList,
-        totalProduct,
-        TotalMeter: totalMeter,
-        Color: '',
-        ProductDetail: ''
-      }));
-    }
-  };
-
-  const handleSave = async () => {
-    setErrorMessage('');
-    const detail = {};
-    Object.keys(exportData.ProductList).forEach((color) => {
-      const { colorTotalProduct, colorTotalMeter } = calculateColorTotals(exportData.ProductList[color]);
-      detail[color] = {
-        TotalProduct: colorTotalProduct,
-        TotalMeter: `${colorTotalMeter} meters`
+        SelectedProductDetails: updatedSelection,
+        totalProduct: updatedSelection.length,
+        TotalMeter: updatedSelection.reduce((acc, value) => acc + value, 0)
       };
     });
+  };
 
+  // Save the export data
+  const handleSave = async () => {
+    setErrorMessage(''); // Reset error message before saving
+
+    // Prepare the request body to match the DynamoDB table structure
     const requestBody = {
       Customer: exportData.Customer,
       TotalAmount: Number(exportData.TotalAmount),
-      ProductList: exportData.ProductList,
+      ProductList: { [exportData.Color]: exportData.SelectedProductDetails }, // Include selected product details
       TotalProduct: exportData.totalProduct,
       TotalMeter: `${exportData.TotalMeter} meters`,
       Status: exportData.Status,
       Note: exportData.Note || '',
-      Detail: detail
+      Detail: { [exportData.Color]: { TotalProduct: exportData.totalProduct, TotalMeter: `${exportData.TotalMeter} meters` } }
     };
 
     try {
+      // Make a POST request to add the data to TrackingInventory
       const trackingResponse = await fetch('https://towbaoz4e2.execute-api.ap-southeast-2.amazonaws.com/prod/add-tranking-invent', {
         method: 'POST',
         headers: {
@@ -103,42 +100,43 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       }
 
       console.log('Data added successfully to TrackingInventory.');
+      onSave(exportData); // Pass the data back to parent component if needed
+      handleClose(); // Close the modal after successful save
 
-      // Additional update logic for VaiInventory can go here, if needed...
-
-      console.log('Data added successfully to both TrackingInventory and VaiInventory.');
-      onSave(exportData);
-      handleClose();
     } catch (error) {
-      console.error('Error while adding or updating data:', error);
+      console.error('Error while adding data:', error);
       setErrorMessage(`Error: ${error.message}`);
     }
   };
 
   useEffect(() => {
+    // Reset the export data and available product details when modal is opened or closed
     if (!isVisible) {
       setExportData({
         Customer: '',
         Color: '',
         TotalAmount: '',
-        ProductDetail: '',
-        ProductList: {},
+        ProductDetail: [],
+        SelectedProductDetails: [],
         totalProduct: 0,
         TotalMeter: 0,
         Status: 'Export',
         Note: ''
       });
+      setAvailableProductDetails([]);
     }
   }, [isVisible]);
 
   return (
     isVisible && (
-      <div className="import-modal">
+      <div className="export-modal">
         <div className="modal-content">
           <h3>Export Product</h3>
 
+          {/* Display error message, if any */}
           {errorMessage && <p className="error-message">{errorMessage}</p>}
 
+          {/* Input for Customer Name */}
           <input
             type="text"
             name="Customer"
@@ -147,6 +145,7 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
+          {/* Dropdown for Color selection populated with colors from parent component */}
           <select
             name="Color"
             value={exportData.Color}
@@ -162,39 +161,43 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             )}
           </select>
 
-          <input
-            type="text"
-            name="ProductDetail"
-            placeholder="Product Detail (comma-separated numbers)"
-            value={exportData.ProductDetail}
-            onChange={handleInputChange}
-          />
+          {/* Display available product details for the selected color */}
+          {availableProductDetails.length > 0 && (
+            <div className="available-products">
+              <h4>Available Product Details for {exportData.Color}:</h4>
+              <div className="product-detail-list">
+                {availableProductDetails.map((detail, index) => (
+                  <div
+                    key={index}
+                    className={`product-detail-item ${exportData.SelectedProductDetails.includes(detail) ? 'selected' : ''}`}
+                    onClick={() => handleSelectProductDetail(detail)}
+                  >
+                    {detail} meters
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-          <button onClick={handleAddProduct} disabled={!exportData.Color || !exportData.ProductDetail}>
-            Add Product
-          </button>
+          {/* Display selected product details */}
+          {exportData.SelectedProductDetails.length > 0 && (
+            <div className="selected-products">
+              <h4>Selected Product Details:</h4>
+              <ul>
+                {exportData.SelectedProductDetails.map((detail, index) => (
+                  <li key={`${detail}-${index}`}>{detail} meters</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          <div className="product-list">
-            <h4>Added Products</h4>
-            <ul>
-              {Object.keys(exportData.ProductList).map((color, index) => {
-                const { colorTotalProduct, colorTotalMeter } = calculateColorTotals(exportData.ProductList[color]);
-                return (
-                  <li key={`${color}-${index}`}>
-                    <strong>{color}</strong>: {exportData.ProductList[color].join(', ')}
-                    <p> - Total Product: {colorTotalProduct}</p>
-                    <p> - Total Meter: {colorTotalMeter} meters</p>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
+          {/* Display calculated overall total product and total meter */}
           <div className="totals">
             <p><strong>Overall Total Product:</strong> {exportData.totalProduct}</p>
             <p><strong>Overall Total Meter:</strong> {exportData.TotalMeter} meters</p>
           </div>
 
+          {/* Input for Total Amount */}
           <input
             type="number"
             name="TotalAmount"
@@ -203,6 +206,7 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
+          {/* Input for Note */}
           <textarea
             name="Note"
             placeholder="Additional Note"
@@ -211,8 +215,7 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             rows="3"
           />
 
-          <input type="hidden" name="Status" value={exportData.Status} />
-
+          {/* Modal buttons for save and cancel */}
           <div className="modal-buttons">
             <button onClick={handleSave}>Save</button>
             <button onClick={handleClose}>Cancel</button>
