@@ -10,7 +10,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     ProductList: {},    // Dictionary to store color as key and product details as value (list of numbers)
     totalProduct: 0,    // Total count of all products across colors
     TotalMeter: 0,      // Total sum of all product meters
-    Status: 'Import'    // Set default status as 'Import'
+    Status: 'Import',   // Set default status as 'Import'
+    Note: ''            // New field for user note
   });
 
   // Handle input changes for import data
@@ -129,7 +130,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
         ProductList: {},
         totalProduct: 0,
         TotalMeter: 0,
-        Status: 'Import' // Reset status to 'Import'
+        Status: 'Import', // Reset status to 'Import'
+        Note: ''          // Reset note field
       });
     }
   }, [isVisible]);
@@ -139,6 +141,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       <div className="import-modal">
         <div className="modal-content">
           <h3>Import Product</h3>
+
+          {/* Input for Customer Name */}
           <input
             type="text"
             name="Customer"
@@ -147,6 +151,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
+          {/* Dropdown for Color selection populated with colors from parent component */}
           <select
             name="Color"
             value={importData.Color}
@@ -162,6 +167,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             )}
           </select>
 
+          {/* Input for Product Detail */}
           <input
             type="text"
             name="ProductDetail"
@@ -170,10 +176,12 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
+          {/* Add Product Button */}
           <button onClick={handleAddProduct} disabled={!importData.Color || !importData.ProductDetail}>
             Add Product
           </button>
 
+          {/* Display list of added colors and product details */}
           <div className="product-list">
             <h4>Added Products</h4>
             <ul>
@@ -190,11 +198,13 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             </ul>
           </div>
 
+          {/* Display calculated overall total product and total meter */}
           <div className="totals">
             <p><strong>Overall Total Product:</strong> {importData.totalProduct}</p>
             <p><strong>Overall Total Meter:</strong> {importData.TotalMeter} meters</p>
           </div>
 
+          {/* Input for Total Amount */}
           <input
             type="number"
             name="TotalAmount"
@@ -203,8 +213,19 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
+          {/* Input for Note */}
+          <textarea
+            name="Note"
+            placeholder="Additional Note"
+            value={importData.Note}
+            onChange={handleInputChange}
+            rows="3"
+          />
+
+          {/* Hidden Input for Status - Hardcoded as 'Import' */}
           <input type="hidden" name="Status" value={importData.Status} />
 
+          {/* Modal buttons for save and cancel */}
           <div className="modal-buttons">
             <button onClick={handleSave}>Save</button>
             <button onClick={handleClose}>Cancel</button>
