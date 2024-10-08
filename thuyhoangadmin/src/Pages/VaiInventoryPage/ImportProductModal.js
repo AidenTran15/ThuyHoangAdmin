@@ -30,7 +30,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     // Iterate through each color's product list
     for (const color in productList) {
       const productValues = productList[color];
-      
+
       // Ensure all values in productValues are valid numbers
       const numericValues = productValues.filter(value => !isNaN(value) && value > 0);
 
@@ -40,6 +40,17 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     }
 
     return { totalProduct, totalMeter };
+  };
+
+  // Calculate total product and meters for a specific color
+  const calculateColorTotals = (productValues) => {
+    // Ensure all values in productValues are valid numbers
+    const numericValues = productValues.filter(value => !isNaN(value) && value > 0);
+
+    const colorTotalProduct = numericValues.length;
+    const colorTotalMeter = numericValues.reduce((acc, value) => acc + value, 0);
+
+    return { colorTotalProduct, colorTotalMeter };
   };
 
   // Add selected color and product detail to the ProductList
@@ -168,18 +179,23 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
           <div className="product-list">
             <h4>Added Products</h4>
             <ul>
-              {Object.keys(importData.ProductList).map((color, index) => (
-                <li key={index}>
-                  <strong>{color}</strong>: {importData.ProductList[color].join(', ')}
-                </li>
-              ))}
+              {Object.keys(importData.ProductList).map((color, index) => {
+                const { colorTotalProduct, colorTotalMeter } = calculateColorTotals(importData.ProductList[color]);
+                return (
+                  <li key={index}>
+                    <strong>{color}</strong>: {importData.ProductList[color].join(', ')}
+                    <p> - Total Product: {colorTotalProduct}</p>
+                    <p> - Total Meter: {colorTotalMeter} meters</p>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
-          {/* Display calculated total product and total meter */}
+          {/* Display calculated overall total product and total meter */}
           <div className="totals">
-            <p><strong>Total Product:</strong> {importData.totalProduct}</p>
-            <p><strong>Total Meter:</strong> {importData.TotalMeter} meters</p>
+            <p><strong>Overall Total Product:</strong> {importData.totalProduct}</p>
+            <p><strong>Overall Total Meter:</strong> {importData.TotalMeter} meters</p>
           </div>
 
           {/* Input for Total Amount */}
