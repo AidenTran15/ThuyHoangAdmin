@@ -6,7 +6,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     Customer: '',
     Color: '',
     TotalAmount: '',
-    ProductDetail: '',  // Updated to handle input as a single string
+    ProductDetail: '',  // ProductDetail will be a string input
     totalProduct: '',
     TotalMeter: '',
     Status: 'Import'    // Set default status as 'Import'
@@ -23,12 +23,18 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 
   // Save the import data to DynamoDB using the provided REST API
   const handleSave = async () => {
+    // Convert Color and ProductDetail into ProductList format
+    const productList = {};
+    if (importData.Color && importData.ProductDetail) {
+      productList[importData.Color] = importData.ProductDetail;
+    }
+
     // Prepare the request body to match the DynamoDB table structure
     const requestBody = {
       Customer: importData.Customer,
       Color: importData.Color,
       TotalAmount: Number(importData.TotalAmount), // Convert to number
-      ProductDetail: importData.ProductDetail.split(',').map(item => item.trim()), // Convert comma-separated string to array
+      ProductList: productList,  // Store ProductList as a dictionary
       TotalProduct: Number(importData.totalProduct), // Convert to number if applicable
       TotalMeter: importData.TotalMeter,
       Status: 'Import' // Hardcoded status as 'Import'
@@ -116,7 +122,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
           <input
             type="text"
             name="ProductDetail"
-            placeholder="Product Detail (comma-separated)"
+            placeholder="Product Detail"
             value={importData.ProductDetail}
             onChange={handleInputChange}
           />
