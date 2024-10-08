@@ -7,7 +7,7 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     TotalAmount: '',
     Color: '',
     ProductDetail: [],
-    SelectedProductDetails: [], // Store selected product details
+    SelectedProductDetails: [], // Store selected product details with unique identifiers
     totalProduct: 0,
     TotalMeter: 0,
     Status: 'Export', // Set default status to 'Export'
@@ -36,7 +36,7 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             const parsedData = typeof data.body === 'string' ? JSON.parse(data.body) : data;
             const matchingItem = parsedData.find(item => item.Color === exportData.Color);
             if (matchingItem) {
-              setAvailableProductDetails(matchingItem.ProductDetail || []);
+              setAvailableProductDetails(matchingItem.ProductDetail.map((value, index) => ({ value, index })));
             }
           } else {
             setAvailableProductDetails([]);
@@ -55,16 +55,18 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   // Handle the selection of product details from availableProductDetails
   const handleSelectProductDetail = (selectedDetail) => {
     setExportData((prev) => {
-      const alreadySelected = prev.SelectedProductDetails.includes(selectedDetail);
+      const alreadySelected = prev.SelectedProductDetails.some(detail => detail.index === selectedDetail.index);
       const updatedSelection = alreadySelected
-        ? prev.SelectedProductDetails.filter(detail => detail !== selectedDetail)
+        ? prev.SelectedProductDetails.filter(detail => detail.index !== selectedDetail.index)
         : [...prev.SelectedProductDetails, selectedDetail];
+
+      const totalMeter = updatedSelection.reduce((acc, item) => acc + item.value, 0);
 
       return {
         ...prev,
         SelectedProductDetails: updatedSelection,
         totalProduct: updatedSelection.length,
-        TotalMeter: updatedSelection.reduce((acc, value) => acc + value, 0)
+        TotalMeter: totalMeter
       };
     });
   };
@@ -77,7 +79,7 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     const requestBody = {
       Customer: exportData.Customer,
       TotalAmount: Number(exportData.TotalAmount),
-      ProductList: { [exportData.Color]: exportData.SelectedProductDetails }, // Include selected product details
+      ProductList: { [exportData.Color]: exportData.SelectedProductDetails.map(detail => detail.value) }, // Include only the selected values
       TotalProduct: exportData.totalProduct,
       TotalMeter: `${exportData.TotalMeter} meters`,
       Status: exportData.Status,
@@ -166,13 +168,13 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             <div className="available-products">
               <h4>Available Product Details for {exportData.Color}:</h4>
               <div className="product-detail-list">
-                {availableProductDetails.map((detail, index) => (
+                {availableProductDetails.map((detail) => (
                   <div
-                    key={index}
-                    className={`product-detail-item ${exportData.SelectedProductDetails.includes(detail) ? 'selected' : ''}`}
+                    key={`${detail.index}-${detail.value}`}
+                    className={`product-detail-item ${exportData.SelectedProductDetails.some(selected => selected.index === detail.index) ? 'selected' : ''}`}
                     onClick={() => handleSelectProductDetail(detail)}
                   >
-                    {detail} meters
+                    {detail.value} meters
                   </div>
                 ))}
               </div>
@@ -184,8 +186,8 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             <div className="selected-products">
               <h4>Selected Product Details:</h4>
               <ul>
-                {exportData.SelectedProductDetails.map((detail, index) => (
-                  <li key={`${detail}-${index}`}>{detail} meters</li>
+                {exportData.SelectedProductDetails.map((detail) => (
+                  <li key={`${detail.index}-${detail.value}`}>{detail.value} meters</li>
                 ))}
               </ul>
             </div>
