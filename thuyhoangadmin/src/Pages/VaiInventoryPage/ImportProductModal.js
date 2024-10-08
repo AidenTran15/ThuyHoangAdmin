@@ -5,11 +5,11 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   const [importData, setImportData] = useState({
     Customer: '',
     TotalAmount: '',
-    ProductDetail: '',  // Temporary field for product details
+    ProductDetail: '',  // Temporary field for product details as string
     Color: '',          // Temporary field for selected color
-    ProductList: {},    // Dictionary to store color as key and product details as value
-    totalProduct: '',
-    TotalMeter: '',
+    ProductList: {},    // Dictionary to store color as key and product details as value (list of numbers)
+    totalProduct: 0,    // Total count of all products across colors
+    TotalMeter: 0,      // Total sum of all product meters
     Status: 'Import'    // Set default status as 'Import'
   });
 
@@ -22,18 +22,48 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     }));
   };
 
+  // Calculate total product count and total meters based on ProductList
+  const calculateTotals = (productList) => {
+    let totalProduct = 0;
+    let totalMeter = 0;
+
+    // Iterate through each color's product list
+    for (const color in productList) {
+      const productValues = productList[color];
+      
+      // Ensure all values in productValues are valid numbers
+      const numericValues = productValues.filter(value => !isNaN(value) && value > 0);
+
+      // Sum the number of items (length) and total meters (sum of all numbers in the list)
+      totalProduct += numericValues.length;
+      totalMeter += numericValues.reduce((acc, value) => acc + value, 0);
+    }
+
+    return { totalProduct, totalMeter };
+  };
+
   // Add selected color and product detail to the ProductList
   const handleAddProduct = () => {
     if (importData.Color && importData.ProductDetail) {
+      // Convert ProductDetail string into a list of numbers (e.g., "50,30,20" => [50, 30, 20])
+      const productValues = importData.ProductDetail.split(',').map((item) => parseFloat(item.trim()) || 0);
+
       // Add the new color and product detail to the ProductList dictionary
+      const updatedProductList = {
+        ...importData.ProductList,
+        [importData.Color]: productValues
+      };
+
+      // Calculate totals after adding the new product
+      const { totalProduct, totalMeter } = calculateTotals(updatedProductList);
+
       setImportData((prev) => ({
         ...prev,
-        ProductList: {
-          ...prev.ProductList,
-          [importData.Color]: importData.ProductDetail
-        },
-        Color: '',           // Reset Color field
-        ProductDetail: ''     // Reset ProductDetail field
+        ProductList: updatedProductList, // Update the ProductList
+        totalProduct,                    // Update total product count
+        TotalMeter: totalMeter,          // Update total meter count
+        Color: '',                       // Reset Color field
+        ProductDetail: ''                // Reset ProductDetail field
       }));
     }
   };
@@ -45,8 +75,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       Customer: importData.Customer,
       TotalAmount: Number(importData.TotalAmount), // Convert to number
       ProductList: importData.ProductList,         // Pass the ProductList dictionary
-      TotalProduct: Number(importData.totalProduct), // Convert to number if applicable
-      TotalMeter: importData.TotalMeter,
+      TotalProduct: importData.totalProduct,       // Total product count
+      TotalMeter: `${importData.TotalMeter} meters`,  // Convert total meters to string with unit
       Status: 'Import' // Hardcoded status as 'Import'
     };
 
@@ -83,8 +113,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
         TotalAmount: '',
         ProductDetail: '',
         ProductList: {},
-        totalProduct: '',
-        TotalMeter: '',
+        totalProduct: 0,
+        TotalMeter: 0,
         Status: 'Import' // Reset status to 'Import'
       });
     }
@@ -124,7 +154,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
           <input
             type="text"
             name="ProductDetail"
-            placeholder="Product Detail"
+            placeholder="Product Detail (comma-separated numbers)"
             value={importData.ProductDetail}
             onChange={handleInputChange}
           />
@@ -140,10 +170,16 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             <ul>
               {Object.keys(importData.ProductList).map((color, index) => (
                 <li key={index}>
-                  <strong>{color}</strong>: {importData.ProductList[color]}
+                  <strong>{color}</strong>: {importData.ProductList[color].join(', ')}
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Display calculated total product and total meter */}
+          <div className="totals">
+            <p><strong>Total Product:</strong> {importData.totalProduct}</p>
+            <p><strong>Total Meter:</strong> {importData.TotalMeter} meters</p>
           </div>
 
           {/* Input for Total Amount */}
@@ -152,24 +188,6 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             name="TotalAmount"
             placeholder="Total Amount"
             value={importData.TotalAmount}
-            onChange={handleInputChange}
-          />
-
-          {/* Input for Total Product */}
-          <input
-            type="number"
-            name="totalProduct"
-            placeholder="Total Product"
-            value={importData.totalProduct}
-            onChange={handleInputChange}
-          />
-
-          {/* Input for Total Meter */}
-          <input
-            type="text"
-            name="TotalMeter"
-            placeholder="Total Meter (e.g., '200 meters')"
-            value={importData.TotalMeter}
             onChange={handleInputChange}
           />
 
