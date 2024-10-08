@@ -14,6 +14,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     Note: ''            // New field for user note
   });
 
+  const [errorMessage, setErrorMessage] = useState('');  // To display error messages
+
   // Handle input changes for import data
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -71,8 +73,9 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     }
   };
 
-  // Save the import data to DynamoDB using the provided REST API
   const handleSave = async () => {
+    setErrorMessage(''); // Reset error message before saving
+  
     // Calculate the Detail field based on the ProductList
     const detail = {};
     Object.keys(importData.ProductList).forEach((color) => {
@@ -82,42 +85,126 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
         TotalMeter: `${colorTotalMeter} meters`
       };
     });
-
-    // Prepare the request body to match the DynamoDB table structure
-    const requestBody = {
-      Customer: importData.Customer,
-      TotalAmount: Number(importData.TotalAmount),  // Convert to number
-      ProductList: importData.ProductList,          // Pass the ProductList dictionary
-      TotalProduct: importData.totalProduct,        // Total product count
-      TotalMeter: `${importData.TotalMeter} meters`,  // Convert total meters to string with unit
-      Status: importData.Status,                    // Import/Export status
-      Note: importData.Note || '',                  // Optional note field
-      Detail: detail                                // Detailed breakdown of total product and meters for each color
-    };
-
+  
     try {
-      // Make a POST request to the provided API URL
-      const response = await fetch('https://towbaoz4e2.execute-api.ap-southeast-2.amazonaws.com/prod/add-tranking-invent', {
+      // Prepare the request body to match the DynamoDB table structure for TrackingInventory
+      const requestBody = {
+        Customer: importData.Customer,
+        TotalAmount: Number(importData.TotalAmount),  // Convert to number
+        ProductList: importData.ProductList,          // Pass the ProductList dictionary
+        TotalProduct: importData.totalProduct,        // Total product count
+        TotalMeter: `${importData.TotalMeter} meters`,  // Convert total meters to string with unit
+        Status: importData.Status,                    // Import/Export status
+        Note: importData.Note || '',                  // Optional note field
+        Detail: detail                                // Detailed breakdown of total product and meters for each color
+      };
+  
+      // Make a POST request to add the data to TrackingInventory
+      const trackingResponse = await fetch('https://towbaoz4e2.execute-api.ap-southeast-2.amazonaws.com/prod/add-tranking-invent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
       });
-
-      // Check if the response is successful
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Data added successfully:', data);
-        onSave(importData); // Pass the data back to parent component if needed
-        handleClose(); // Close the modal after successful save
-      } else {
-        console.error('Failed to add data. Response status:', response.status);
+  
+      if (!trackingResponse.ok) {
+        throw new Error(`Failed to add data to TrackingInventory. Status: ${trackingResponse.status}`);
       }
+  
+      console.log('Data added successfully to TrackingInventory.');
+  
+      // Update VaiInventory based on the product colors and details
+      const updateVaiInventory = async () => {
+        const vaiInventoryUpdatePromises = Object.keys(importData.ProductList).map(async (color) => {
+          const newProductDetails = importData.ProductList[color]; // New product details for the current color
+  
+          // First, fetch existing product details for the color from VaiInventory
+          let productID = '';
+          try {
+            console.log(`Fetching existing details for color: ${color}`);
+            const fetchResponse = await fetch(`https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get?color=${encodeURIComponent(color)}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+  
+            if (fetchResponse.ok) {
+              const data = await fetchResponse.json();
+              console.log(`Fetched data for color ${color}:`, data);
+  
+              // Check if data is a valid JSON string and parse it
+              const parsedData = typeof data.body === 'string' ? JSON.parse(data.body) : data;
+  
+              // Find the ProductID for the color in the parsed data
+              const matchingItem = parsedData.find(item => item.Color === color);
+              if (matchingItem && matchingItem.ProductID) {
+                productID = matchingItem.ProductID;
+                console.log(`Found existing ProductID: ${productID} for color ${color}`);
+              } else {
+                console.warn(`No existing ProductID found for color ${color}. Data structure:`, parsedData);
+              }
+            } else {
+              console.warn(`Failed to fetch details for color ${color}. Status: ${fetchResponse.status}`);
+            }
+          } catch (error) {
+            console.error(`Error fetching existing ProductID for color ${color}:`, error);
+          }
+  
+          // If no existing ProductID is found, create a new one
+          if (!productID) {
+            productID = `PROD_${color}_${Date.now()}`;
+            console.log(`Generated new ProductID: ${productID} for color ${color}`);
+          }
+  
+          // Prepare request body for VaiInventory update
+          const updateBody = {
+            ProductID: productID,  // Use retrieved or new Product ID
+            Color: color,
+            totalProduct: newProductDetails.length,
+            ProductDetail: newProductDetails,
+            TotalMeter: `${newProductDetails.reduce((sum, num) => sum + num, 0)} meters`  // Calculate total meter
+          };
+  
+          try {
+            // Make a PUT request to update VaiInventory for each color
+            const vaiResponse = await fetch('https://2t6r0vxhzf.execute-api.ap-southeast-2.amazonaws.com/prod/update', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(updateBody),
+            });
+  
+            if (!vaiResponse.ok) {
+              throw new Error(`Failed to update VaiInventory for color ${color}. Status: ${vaiResponse.status}`);
+            }
+  
+            console.log(`Successfully updated VaiInventory for color ${color}.`);
+  
+          } catch (error) {
+            console.error(`Error updating VaiInventory for color ${color}:`, error);
+          }
+        });
+  
+        // Await all update promises
+        await Promise.all(vaiInventoryUpdatePromises);
+      };
+  
+      await updateVaiInventory();
+  
+      console.log('Data added successfully to both TrackingInventory and VaiInventory.');
+      onSave(importData); // Pass the data back to parent component if needed
+      handleClose(); // Close the modal after successful save
+  
     } catch (error) {
-      console.error('Error while adding data:', error);
+      console.error('Error while adding or updating data:', error);
+      setErrorMessage(`Error: ${error.message}`);
     }
   };
+  
+  
 
   useEffect(() => {
     // Reset the import data when modal is opened or closed
@@ -141,6 +228,9 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       <div className="import-modal">
         <div className="modal-content">
           <h3>Import Product</h3>
+
+          {/* Display error message, if any */}
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
 
           {/* Input for Customer Name */}
           <input
@@ -188,7 +278,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               {Object.keys(importData.ProductList).map((color, index) => {
                 const { colorTotalProduct, colorTotalMeter } = calculateColorTotals(importData.ProductList[color]);
                 return (
-                  <li key={index}>
+                  <li key={`${color}-${index}`}> {/* Use unique keys for each list element */}
                     <strong>{color}</strong>: {importData.ProductList[color].join(', ')}
                     <p> - Total Product: {colorTotalProduct}</p>
                     <p> - Total Meter: {colorTotalMeter} meters</p>
