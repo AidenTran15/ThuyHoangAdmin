@@ -4,9 +4,10 @@ import './ImportProductModal.css'; // Import styles for the modal
 const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   const [importData, setImportData] = useState({
     Customer: '',
-    Color: '',
     TotalAmount: '',
-    ProductDetail: '',  // ProductDetail will be a string input
+    ProductDetail: '',  // Temporary field for product details
+    Color: '',          // Temporary field for selected color
+    ProductList: {},    // Dictionary to store color as key and product details as value
     totalProduct: '',
     TotalMeter: '',
     Status: 'Import'    // Set default status as 'Import'
@@ -21,20 +22,29 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     }));
   };
 
+  // Add selected color and product detail to the ProductList
+  const handleAddProduct = () => {
+    if (importData.Color && importData.ProductDetail) {
+      // Add the new color and product detail to the ProductList dictionary
+      setImportData((prev) => ({
+        ...prev,
+        ProductList: {
+          ...prev.ProductList,
+          [importData.Color]: importData.ProductDetail
+        },
+        Color: '',           // Reset Color field
+        ProductDetail: ''     // Reset ProductDetail field
+      }));
+    }
+  };
+
   // Save the import data to DynamoDB using the provided REST API
   const handleSave = async () => {
-    // Convert Color and ProductDetail into ProductList format
-    const productList = {};
-    if (importData.Color && importData.ProductDetail) {
-      productList[importData.Color] = importData.ProductDetail;
-    }
-
     // Prepare the request body to match the DynamoDB table structure
     const requestBody = {
       Customer: importData.Customer,
-      Color: importData.Color,
       TotalAmount: Number(importData.TotalAmount), // Convert to number
-      ProductList: productList,  // Store ProductList as a dictionary
+      ProductList: importData.ProductList,         // Pass the ProductList dictionary
       TotalProduct: Number(importData.totalProduct), // Convert to number if applicable
       TotalMeter: importData.TotalMeter,
       Status: 'Import' // Hardcoded status as 'Import'
@@ -72,6 +82,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
         Color: '',
         TotalAmount: '',
         ProductDetail: '',
+        ProductList: {},
         totalProduct: '',
         TotalMeter: '',
         Status: 'Import' // Reset status to 'Import'
@@ -109,21 +120,38 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             )}
           </select>
 
+          {/* Input for Product Detail */}
+          <input
+            type="text"
+            name="ProductDetail"
+            placeholder="Product Detail"
+            value={importData.ProductDetail}
+            onChange={handleInputChange}
+          />
+
+          {/* Add Product Button */}
+          <button onClick={handleAddProduct} disabled={!importData.Color || !importData.ProductDetail}>
+            Add Product
+          </button>
+
+          {/* Display list of added colors and product details */}
+          <div className="product-list">
+            <h4>Added Products</h4>
+            <ul>
+              {Object.keys(importData.ProductList).map((color, index) => (
+                <li key={index}>
+                  <strong>{color}</strong>: {importData.ProductList[color]}
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {/* Input for Total Amount */}
           <input
             type="number"
             name="TotalAmount"
             placeholder="Total Amount"
             value={importData.TotalAmount}
-            onChange={handleInputChange}
-          />
-
-          {/* Input for Product Detail (comma-separated string) */}
-          <input
-            type="text"
-            name="ProductDetail"
-            placeholder="Product Detail"
-            value={importData.ProductDetail}
             onChange={handleInputChange}
           />
 
@@ -152,6 +180,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             value={importData.Status}
           />
 
+          {/* Modal buttons for save and cancel */}
           <div className="modal-buttons">
             <button onClick={handleSave}>Save</button>
             <button onClick={handleClose}>Cancel</button>
