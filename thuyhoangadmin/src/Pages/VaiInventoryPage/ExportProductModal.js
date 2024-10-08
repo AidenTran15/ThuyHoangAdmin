@@ -5,15 +5,15 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   const [exportData, setExportData] = useState({
     Customer: '',
     TotalAmount: '',
+    ProductDetails: [],  // Store multiple products details
+    currentProductDetail: [],  // Store current selected product details
     Color: '',
-    ProductDetail: [],
-    SelectedProductDetails: [], // Store selected product details with unique identifiers
     totalProduct: 0,
     TotalMeter: 0,
-    Status: 'Export', // Set default status to 'Export'
-    Note: ''          // New field for user note
+    Status: 'Export',
+    Note: ''
   });
-  const [availableProductDetails, setAvailableProductDetails] = useState([]); // Store available product details for selected color
+  const [availableProductDetails, setAvailableProductDetails] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
   // Handle input changes for export data
@@ -25,7 +25,7 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     }));
   };
 
-  // Handle the selection of a color to fetch existing product details
+  // Fetch product details for selected color
   useEffect(() => {
     const fetchProductDetails = async () => {
       if (exportData.Color) {
@@ -36,7 +36,12 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             const parsedData = typeof data.body === 'string' ? JSON.parse(data.body) : data;
             const matchingItem = parsedData.find(item => item.Color === exportData.Color);
             if (matchingItem) {
-              setAvailableProductDetails(matchingItem.ProductDetail.map((value, index) => ({ value, index })));
+              // Include an ID property to differentiate identical product details
+              const productDetailsWithId = matchingItem.ProductDetail.map((item, index) => ({
+                id: `${matchingItem.Color}-${index}`,  // Unique ID for each product detail
+                value: item
+              }));
+              setAvailableProductDetails(productDetailsWithId);
             }
           } else {
             setAvailableProductDetails([]);
@@ -52,43 +57,54 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     fetchProductDetails();
   }, [exportData.Color]);
 
-  // Handle the selection of product details from availableProductDetails
+  // Handle selecting a product detail
   const handleSelectProductDetail = (selectedDetail) => {
     setExportData((prev) => {
-      const alreadySelected = prev.SelectedProductDetails.some(detail => detail.index === selectedDetail.index);
+      const alreadySelected = prev.currentProductDetail.some(item => item.id === selectedDetail.id);
       const updatedSelection = alreadySelected
-        ? prev.SelectedProductDetails.filter(detail => detail.index !== selectedDetail.index)
-        : [...prev.SelectedProductDetails, selectedDetail];
-
-      const totalMeter = updatedSelection.reduce((acc, item) => acc + item.value, 0);
+        ? prev.currentProductDetail.filter(detail => detail.id !== selectedDetail.id)
+        : [...prev.currentProductDetail, selectedDetail];
 
       return {
         ...prev,
-        SelectedProductDetails: updatedSelection,
+        currentProductDetail: updatedSelection,
         totalProduct: updatedSelection.length,
-        TotalMeter: totalMeter
+        TotalMeter: updatedSelection.reduce((acc, item) => acc + item.value, 0)
       };
     });
   };
 
-  // Save the export data
-  const handleSave = async () => {
-    setErrorMessage(''); // Reset error message before saving
+  // Handle saving the current product and adding more
+  const handleAddMore = () => {
+    if (exportData.Color && exportData.currentProductDetail.length > 0) {
+      setExportData((prev) => ({
+        ...prev,
+        ProductDetails: [...prev.ProductDetails, {
+          Color: prev.Color,
+          ProductDetail: prev.currentProductDetail.map(item => item.value)  // Only store values
+        }],
+        Color: '',  // Reset color
+        currentProductDetail: [],  // Reset selected details
+        totalProduct: 0,
+        TotalMeter: 0
+      }));
+      setAvailableProductDetails([]);  // Clear available details for next selection
+    }
+  };
 
-    // Prepare the request body to match the DynamoDB table structure
+  // Save export data
+  const handleSave = async () => {
+    setErrorMessage('');
+    
     const requestBody = {
       Customer: exportData.Customer,
       TotalAmount: Number(exportData.TotalAmount),
-      ProductList: { [exportData.Color]: exportData.SelectedProductDetails.map(detail => detail.value) }, // Include only the selected values
-      TotalProduct: exportData.totalProduct,
-      TotalMeter: `${exportData.TotalMeter} meters`,
+      ProductDetails: exportData.ProductDetails,
       Status: exportData.Status,
-      Note: exportData.Note || '',
-      Detail: { [exportData.Color]: { TotalProduct: exportData.totalProduct, TotalMeter: `${exportData.TotalMeter} meters` } }
+      Note: exportData.Note || ''
     };
 
     try {
-      // Make a POST request to add the data to TrackingInventory
       const trackingResponse = await fetch('https://towbaoz4e2.execute-api.ap-southeast-2.amazonaws.com/prod/add-tranking-invent', {
         method: 'POST',
         headers: {
@@ -102,9 +118,8 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       }
 
       console.log('Data added successfully to TrackingInventory.');
-      onSave(exportData); // Pass the data back to parent component if needed
-      handleClose(); // Close the modal after successful save
-
+      onSave(exportData);
+      handleClose();
     } catch (error) {
       console.error('Error while adding data:', error);
       setErrorMessage(`Error: ${error.message}`);
@@ -112,14 +127,13 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   };
 
   useEffect(() => {
-    // Reset the export data and available product details when modal is opened or closed
     if (!isVisible) {
       setExportData({
         Customer: '',
-        Color: '',
         TotalAmount: '',
-        ProductDetail: [],
-        SelectedProductDetails: [],
+        ProductDetails: [],
+        currentProductDetail: [],
+        Color: '',
         totalProduct: 0,
         TotalMeter: 0,
         Status: 'Export',
@@ -134,11 +148,8 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       <div className="export-modal">
         <div className="modal-content">
           <h3>Export Product</h3>
-
-          {/* Display error message, if any */}
           {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-          {/* Input for Customer Name */}
           <input
             type="text"
             name="Customer"
@@ -147,7 +158,6 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
-          {/* Dropdown for Color selection populated with colors from parent component */}
           <select
             name="Color"
             value={exportData.Color}
@@ -163,15 +173,14 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             )}
           </select>
 
-          {/* Display available product details for the selected color */}
           {availableProductDetails.length > 0 && (
             <div className="available-products">
               <h4>Available Product Details for {exportData.Color}:</h4>
               <div className="product-detail-list">
                 {availableProductDetails.map((detail) => (
                   <div
-                    key={`${detail.index}-${detail.value}`}
-                    className={`product-detail-item ${exportData.SelectedProductDetails.some(selected => selected.index === detail.index) ? 'selected' : ''}`}
+                    key={detail.id}
+                    className={`product-detail-item ${exportData.currentProductDetail.some(item => item.id === detail.id) ? 'selected' : ''}`}
                     onClick={() => handleSelectProductDetail(detail)}
                   >
                     {detail.value} meters
@@ -181,25 +190,37 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             </div>
           )}
 
-          {/* Display selected product details */}
-          {exportData.SelectedProductDetails.length > 0 && (
+          {exportData.currentProductDetail.length > 0 && (
             <div className="selected-products">
-              <h4>Selected Product Details:</h4>
+              <h4>Selected Product Details for {exportData.Color}:</h4>
               <ul>
-                {exportData.SelectedProductDetails.map((detail) => (
-                  <li key={`${detail.index}-${detail.value}`}>{detail.value} meters</li>
+                {exportData.currentProductDetail.map((detail, index) => (
+                  <li key={`${detail.id}-${index}`}>{detail.value} meters</li>
+                ))}
+              </ul>
+              <p><strong>Overall Total Product:</strong> {exportData.totalProduct}</p>
+              <p><strong>Overall Total Meter:</strong> {exportData.TotalMeter} meters</p>
+            </div>
+          )}
+
+          {exportData.currentProductDetail.length > 0 && (
+            <button className="add-more-button" onClick={handleAddMore}>Add More</button>
+          )}
+
+          {/* Display summary of all selected products */}
+          {exportData.ProductDetails.length > 0 && (
+            <div className="selected-summary">
+              <h4>Selected Products Summary:</h4>
+              <ul>
+                {exportData.ProductDetails.map((item, index) => (
+                  <li key={`${item.Color}-${index}`}>
+                    <strong>Color:</strong> {item.Color}, <strong>Details:</strong> {item.ProductDetail.join(', ')} meters
+                  </li>
                 ))}
               </ul>
             </div>
           )}
 
-          {/* Display calculated overall total product and total meter */}
-          <div className="totals">
-            <p><strong>Overall Total Product:</strong> {exportData.totalProduct}</p>
-            <p><strong>Overall Total Meter:</strong> {exportData.TotalMeter} meters</p>
-          </div>
-
-          {/* Input for Total Amount */}
           <input
             type="number"
             name="TotalAmount"
@@ -208,7 +229,6 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
-          {/* Input for Note */}
           <textarea
             name="Note"
             placeholder="Additional Note"
@@ -217,7 +237,6 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             rows="3"
           />
 
-          {/* Modal buttons for save and cancel */}
           <div className="modal-buttons">
             <button onClick={handleSave}>Save</button>
             <button onClick={handleClose}>Cancel</button>
