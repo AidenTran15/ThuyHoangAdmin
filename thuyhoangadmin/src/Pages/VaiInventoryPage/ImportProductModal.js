@@ -27,14 +27,9 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     let totalProduct = 0;
     let totalMeter = 0;
 
-    // Iterate through each color's product list
     for (const color in productList) {
       const productValues = productList[color];
-
-      // Ensure all values in productValues are valid numbers
       const numericValues = productValues.filter(value => !isNaN(value) && value > 0);
-
-      // Sum the number of items (length) and total meters (sum of all numbers in the list)
       totalProduct += numericValues.length;
       totalMeter += numericValues.reduce((acc, value) => acc + value, 0);
     }
@@ -44,19 +39,15 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 
   // Calculate total product and meters for a specific color
   const calculateColorTotals = (productValues) => {
-    // Ensure all values in productValues are valid numbers
     const numericValues = productValues.filter(value => !isNaN(value) && value > 0);
-
     const colorTotalProduct = numericValues.length;
     const colorTotalMeter = numericValues.reduce((acc, value) => acc + value, 0);
-
     return { colorTotalProduct, colorTotalMeter };
   };
 
   // Add selected color and product detail to the ProductList
   const handleAddProduct = () => {
     if (importData.Color && importData.ProductDetail) {
-      // Convert ProductDetail string into a list of numbers (e.g., "50,30,20" => [50, 30, 20])
       const productValues = importData.ProductDetail.split(',').map((item) => parseFloat(item.trim()) || 0);
 
       // Add the new color and product detail to the ProductList dictionary
@@ -81,14 +72,26 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 
   // Save the import data to DynamoDB using the provided REST API
   const handleSave = async () => {
+    // Calculate the Detail field based on the ProductList
+    const detail = {};
+    Object.keys(importData.ProductList).forEach((color) => {
+      const { colorTotalProduct, colorTotalMeter } = calculateColorTotals(importData.ProductList[color]);
+      detail[color] = {
+        TotalProduct: colorTotalProduct,
+        TotalMeter: `${colorTotalMeter} meters`
+      };
+    });
+
     // Prepare the request body to match the DynamoDB table structure
     const requestBody = {
       Customer: importData.Customer,
-      TotalAmount: Number(importData.TotalAmount), // Convert to number
-      ProductList: importData.ProductList,         // Pass the ProductList dictionary
-      TotalProduct: importData.totalProduct,       // Total product count
+      TotalAmount: Number(importData.TotalAmount),  // Convert to number
+      ProductList: importData.ProductList,          // Pass the ProductList dictionary
+      TotalProduct: importData.totalProduct,        // Total product count
       TotalMeter: `${importData.TotalMeter} meters`,  // Convert total meters to string with unit
-      Status: 'Import' // Hardcoded status as 'Import'
+      Status: importData.Status,                    // Import/Export status
+      Note: importData.Note || '',                  // Optional note field
+      Detail: detail                                // Detailed breakdown of total product and meters for each color
     };
 
     try {
@@ -136,7 +139,6 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       <div className="import-modal">
         <div className="modal-content">
           <h3>Import Product</h3>
-          {/* Input for Customer Name */}
           <input
             type="text"
             name="Customer"
@@ -145,7 +147,6 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
-          {/* Dropdown for Color selection populated with colors from parent component */}
           <select
             name="Color"
             value={importData.Color}
@@ -161,7 +162,6 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             )}
           </select>
 
-          {/* Input for Product Detail */}
           <input
             type="text"
             name="ProductDetail"
@@ -170,12 +170,10 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
-          {/* Add Product Button */}
           <button onClick={handleAddProduct} disabled={!importData.Color || !importData.ProductDetail}>
             Add Product
           </button>
 
-          {/* Display list of added colors and product details */}
           <div className="product-list">
             <h4>Added Products</h4>
             <ul>
@@ -192,13 +190,11 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             </ul>
           </div>
 
-          {/* Display calculated overall total product and total meter */}
           <div className="totals">
             <p><strong>Overall Total Product:</strong> {importData.totalProduct}</p>
             <p><strong>Overall Total Meter:</strong> {importData.TotalMeter} meters</p>
           </div>
 
-          {/* Input for Total Amount */}
           <input
             type="number"
             name="TotalAmount"
@@ -207,14 +203,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
           />
 
-          {/* Hidden Input for Status - Hardcoded as 'Import' */}
-          <input
-            type="hidden"
-            name="Status"
-            value={importData.Status}
-          />
+          <input type="hidden" name="Status" value={importData.Status} />
 
-          {/* Modal buttons for save and cancel */}
           <div className="modal-buttons">
             <button onClick={handleSave}>Save</button>
             <button onClick={handleClose}>Cancel</button>
