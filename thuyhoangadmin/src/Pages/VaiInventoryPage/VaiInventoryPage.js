@@ -1,8 +1,8 @@
-// VaiInventoryPage.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './VaiInventoryPage.css'; // Import CSS for styling
-import ImportProductModal from './ImportProductModal'; // Import the new modal component
+import ImportProductModal from './ImportProductModal'; // Import the import modal component
+import ExportProductModal from './ExportProductModal'; // Import the export modal component
 
 const VaiInventoryPage = () => {
   const [products, setProducts] = useState([]);
@@ -20,6 +20,7 @@ const VaiInventoryPage = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
   const [isImportModalVisible, setIsImportModalVisible] = useState(false); // State for Import modal visibility
+  const [isExportModalVisible, setIsExportModalVisible] = useState(false); // State for Export modal visibility
   const [colors, setColors] = useState([]); // State to store unique colors
 
   useEffect(() => {
@@ -138,12 +139,18 @@ const VaiInventoryPage = () => {
     setProducts((prev) => [...prev, importData]);
   };
 
+  const handleExportSave = (exportData) => {
+    // Add the new export data to the product list or handle export-specific logic here
+    setProducts((prev) => [...prev, exportData]);
+  };
+
   return (
     <div className="vai-inventory-page">
       <div className="header-container">
         <h2>Quản Lý Tồn Kho</h2>
         <button onClick={() => { setIsAddingNew(true); setIsEditing(false); }} className="add-new-button">Tạo Mới</button>
         <button onClick={() => setIsImportModalVisible(true)} className="import-button">Import</button> {/* Import Button */}
+        <button onClick={() => setIsExportModalVisible(true)} className="export-button">Export</button> {/* New Export Button */}
       </div>
 
       {isLoading ? <p>Loading...</p> : (
@@ -256,6 +263,16 @@ const VaiInventoryPage = () => {
           isVisible={isImportModalVisible}
           handleClose={() => setIsImportModalVisible(false)}
           onSave={handleImportSave} // Define this function to handle imported data saving
+          colors={colors} // Pass colors state from VaiInventoryPage
+        />
+      )}
+
+      {/* Export Product Modal */}
+      {isExportModalVisible && (
+        <ExportProductModal
+          isVisible={isExportModalVisible}
+          handleClose={() => setIsExportModalVisible(false)}
+          onSave={handleExportSave} // Define this function to handle exported data saving
           colors={colors} // Pass colors state from VaiInventoryPage
         />
       )}
