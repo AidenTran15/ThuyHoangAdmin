@@ -6,9 +6,10 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     Customer: '',
     Color: '',
     TotalAmount: '',
-    ProductDetail: [],
+    ProductDetail: '',  // Updated to handle input as a single string
     totalProduct: '',
-    TotalMeter: ''
+    TotalMeter: '',
+    Status: 'Import'    // Set default status as 'Import'
   });
 
   // Handle input changes for import data
@@ -20,11 +21,41 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     }));
   };
 
-  // Save the import data and close the modal
-  const handleSave = () => {
-    // Pass the importData back to the parent component
-    onSave(importData);
-    handleClose(); // Close the modal after saving
+  // Save the import data to DynamoDB using the provided REST API
+  const handleSave = async () => {
+    // Prepare the request body to match the DynamoDB table structure
+    const requestBody = {
+      Customer: importData.Customer,
+      Color: importData.Color,
+      TotalAmount: Number(importData.TotalAmount), // Convert to number
+      ProductDetail: importData.ProductDetail.split(',').map(item => item.trim()), // Convert comma-separated string to array
+      TotalProduct: Number(importData.totalProduct), // Convert to number if applicable
+      TotalMeter: importData.TotalMeter,
+      Status: 'Import' // Hardcoded status as 'Import'
+    };
+
+    try {
+      // Make a POST request to the provided API URL
+      const response = await fetch('https://towbaoz4e2.execute-api.ap-southeast-2.amazonaws.com/prod/add-tranking-invent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      // Check if the response is successful
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Data added successfully:', data);
+        onSave(importData); // Pass the data back to parent component if needed
+        handleClose(); // Close the modal after successful save
+      } else {
+        console.error('Failed to add data. Response status:', response.status);
+      }
+    } catch (error) {
+      console.error('Error while adding data:', error);
+    }
   };
 
   useEffect(() => {
@@ -34,9 +65,10 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
         Customer: '',
         Color: '',
         TotalAmount: '',
-        ProductDetail: [],
+        ProductDetail: '',
         totalProduct: '',
-        TotalMeter: ''
+        TotalMeter: '',
+        Status: 'Import' // Reset status to 'Import'
       });
     }
   }, [isVisible]);
@@ -46,6 +78,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       <div className="import-modal">
         <div className="modal-content">
           <h3>Import Product</h3>
+          {/* Input for Customer Name */}
           <input
             type="text"
             name="Customer"
@@ -53,7 +86,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             value={importData.Customer}
             onChange={handleInputChange}
           />
-          {/* Color Dropdown populated with colors from parent component */}
+
+          {/* Dropdown for Color selection populated with colors from parent component */}
           <select
             name="Color"
             value={importData.Color}
@@ -68,6 +102,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               <option value="">No colors available</option>
             )}
           </select>
+
+          {/* Input for Total Amount */}
           <input
             type="number"
             name="TotalAmount"
@@ -75,7 +111,41 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             value={importData.TotalAmount}
             onChange={handleInputChange}
           />
-          {/* ProductDetail, totalProduct, and TotalMeter remain unchanged */}
+
+          {/* Input for Product Detail (comma-separated string) */}
+          <input
+            type="text"
+            name="ProductDetail"
+            placeholder="Product Detail (comma-separated)"
+            value={importData.ProductDetail}
+            onChange={handleInputChange}
+          />
+
+          {/* Input for Total Product */}
+          <input
+            type="number"
+            name="totalProduct"
+            placeholder="Total Product"
+            value={importData.totalProduct}
+            onChange={handleInputChange}
+          />
+
+          {/* Input for Total Meter */}
+          <input
+            type="text"
+            name="TotalMeter"
+            placeholder="Total Meter (e.g., '200 meters')"
+            value={importData.TotalMeter}
+            onChange={handleInputChange}
+          />
+
+          {/* Hidden Input for Status - Hardcoded as 'Import' */}
+          <input
+            type="hidden"
+            name="Status"
+            value={importData.Status}
+          />
+
           <div className="modal-buttons">
             <button onClick={handleSave}>Save</button>
             <button onClick={handleClose}>Cancel</button>
