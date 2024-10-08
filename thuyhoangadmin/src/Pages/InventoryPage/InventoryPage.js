@@ -85,7 +85,7 @@ const InventoryPage = () => {
       <table className="inventory-table">
         <thead>
           <tr>
-            {/* Removed ID and added new headers */}
+            <th>ID</th> {/* New column for ID */}
             <th>Date & Time</th>
             <th>Customer</th>
             <th>Product List</th>
@@ -101,6 +101,7 @@ const InventoryPage = () => {
           {data.length > 0 ? (
             data.map((item, index) => (
               <tr key={index}>
+                <td>{item.ID}</td> {/* Displaying ID */}
                 <td>{item['Date&Time']}</td>
                 <td>{item.Customer}</td>
                 <td>{renderProductList(item.ProductList)}</td>
@@ -114,7 +115,7 @@ const InventoryPage = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="9">No data available</td>
+              <td colSpan="10">No data available</td> {/* Updated colspan to 10 */}
             </tr>
           )}
         </tbody>
