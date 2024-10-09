@@ -5,6 +5,8 @@ const InventoryPage = () => {
   const [data, setData] = useState([]); // Initialize data as an empty array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // State to track the current page
+  const itemsPerPage = 10; // Set items per page limit
 
   // Fetch data from the API when the component mounts
   useEffect(() => {
@@ -90,11 +92,29 @@ const InventoryPage = () => {
     );
   };
 
+  // Handle page navigation
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Calculate total pages and get items for the current page
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+
   // Render loading or error messages
   if (loading) return <div>Đang tải...</div>; // Loading
   if (error) return <div>Lỗi: {error}</div>;  // Error
 
-  // Render the table with fetched data
   return (
     <div className="inventory-page">
       <div className="header-container">
@@ -117,8 +137,8 @@ const InventoryPage = () => {
           </tr>
         </thead>
         <tbody>
-          {data.length > 0 ? (
-            data.map((item, index) => (
+          {currentItems.length > 0 ? (
+            currentItems.map((item, index) => (
               <tr key={index}>
                 <td>{item['Date&Time']}</td> {/* Display Date & Time */}
                 <td>{item.ID}</td> {/* Displaying ID */}
@@ -139,6 +159,17 @@ const InventoryPage = () => {
           )}
         </tbody>
       </table>
+
+      {/* Pagination Controls */}
+      <div className="pagination-controls">
+        <button onClick={goToPreviousPage} disabled={currentPage === 1}>
+          Trang trước
+        </button>
+        <span>Trang {currentPage} trên {totalPages}</span>
+        <button onClick={goToNextPage} disabled={currentPage === totalPages}>
+          Trang sau
+        </button>
+      </div>
     </div>
   );
 };
