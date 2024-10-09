@@ -1,291 +1,372 @@
 /* General Styles */
 .vai-inventory-page {
-    margin: 20px auto;
-    width: 80%;
-    font-family: Arial, sans-serif;
-  }
-  
-  .header-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f9f9f9;
-    padding: 12px 20px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-  }
-  
-  .header-container h2 {
-    margin: 0;
-    font-size: 22px;
-    color: #333;
-  }
-  
-  /* Add New Button */
-  .add-new-button {
-    background-color: #28a745; /* Green color */
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .add-new-button:hover {
-    background-color: #218838; /* Darker green on hover */
-  }
-  
-  /* Inventory Table */
-  .vai-inventory-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-  }
-  
-  .vai-inventory-table th,
-  .vai-inventory-table td {
-    padding: 12px 10px;
-    text-align: left;
-    border: 1px solid #ddd;
-  }
-  
-  .vai-inventory-table th {
-    background-color: #f9f9f9;
-    font-weight: 500;
-    text-align: center;
-    font-size: 16px;
-    color: #666;
-  }
-  
-  .vai-inventory-table td {
-    background-color: #fff;
-    text-align: center;
-    font-size: 14px;
-  }
-  
-  .vai-inventory-table tr:nth-child(even) {
-    background-color: #f7f7f7;
-  }
-  
-  .vai-inventory-table tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  /* Action Buttons */
-  .action-button {
-    margin: 3px;
-    padding: 6px 12px;
-    font-size: 13px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .edit-button {
-    background-color: #28a745; /* Green color for Edit button */
-    color: white;
-  }
-  
-  .edit-button:hover {
-    background-color: #218838; /* Darker green on hover */
-  }
-  
-  .delete-button {
-    background-color: #e74c3c;
-    color: white;
-  }
-  
-  .delete-button:hover {
-    background-color: #c0392b;
-  }
-  
-  /* Modal Styles */
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal-content {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 6px;
-    width: 420px;
-    max-width: 90%;
-    text-align: center; /* Center text inside the modal */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .modal-content h3 {
-    margin-bottom: 16px;
-    font-size: 18px;
-    color: #333;
-    text-align: center; /* Center the title text */
-  }
-  
-  .modal-content input {
-    width: 95%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease;
-  }
-  
-  .modal-content input:focus {
-    border-color: #333;
-    outline: none;
-  }
-  
-  .product-detail-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .add-detail-button {
-    background-color: #28a745 !important; /* Force Green color for Plus button */
-    color: white !important;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .add-detail-button:hover {
-    background-color: #218838 !important; /* Darker green on hover */
-  }
-  
-  /* Product Detail List */
-  .product-detail-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 10px 0 20px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background-color: #f9f9f9;
-    max-height: 300px; /* Increase height of the box */
-    overflow-y: auto;
-  }
-  
-  .product-detail-list li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* Vertically center items */
-    padding: 10px; /* Adjust padding for more space */
-    border-bottom: 1px solid #eee;
-    transition: background-color 0.3s ease;
-  }
-  
-  .product-detail-list li:last-child {
-    border-bottom: none;
-  }
-  
-  .product-detail-list li:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .product-detail-list li span {
-    flex-grow: 1; /* Allow text container to grow */
-  }
-  
-/* Remove Detail Button */
+  margin: 20px auto;
+  width: 80%;
+  font-family: Arial, sans-serif;
+}
 
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f9f9f9;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.header-container h2 {
+  margin: 0;
+  font-size: 26px;
+  /* Increase font size for header */
+  color: #333;
+}
+
+/* Add New Button */
+.add-new-button {
+  background-color: #28a745;
+  /* Green color */
+  color: white;
+  padding: 10px 20px;
+  /* Increase padding */
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  /* Increase font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-new-button:hover {
+  background-color: #218838;
+  /* Darker green on hover */
+}
+
+/* Import/Export Buttons */
+.import-button,
+.export-button {
+  background-color: #007bff;
+  /* Blue color */
+  color: white;
+  padding: 10px 20px;
+  /* Increase padding */
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  /* Increase font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.import-button:hover,
+.export-button:hover {
+  background-color: #0056b3;
+  /* Darker blue on hover */
+}
+
+/* Inventory Table */
+.vai-inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  /* Increase table font size */
+}
+
+.vai-inventory-table th,
+.vai-inventory-table td {
+  padding: 16px 12px;
+  /* Increase padding */
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.vai-inventory-table th {
+  background-color: #f9f9f9;
+  font-weight: 600;
+  text-align: center;
+  font-size: 18px;
+  /* Increase font size for table headers */
+  color: #666;
+}
+
+.vai-inventory-table td {
+  background-color: #fff;
+  text-align: center;
+  font-size: 16px;
+  /* Increase font size for table cells */
+}
+
+.vai-inventory-table tr:nth-child(even) {
+  background-color: #f7f7f7;
+}
+
+.vai-inventory-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Action Buttons */
+.action-button {
+  margin: 5px;
+  padding: 8px 16px;
+  /* Increase padding */
+  font-size: 15px;
+  /* Increase font size */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button {
+  background-color: #28a745;
+  /* Green color for Edit button */
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #218838;
+  /* Darker green on hover */
+}
+
+.delete-button {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px;
+  /* Increase padding */
+  border-radius: 8px;
+  width: 500px;
+  /* Increase modal width */
+  max-width: 90%;
+  text-align: center;
+  /* Center text inside the modal */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h3 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  /* Increase font size */
+  color: #333;
+  text-align: center;
+  /* Center the title text */
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 95%;
+  padding: 12px;
+  /* Increase padding */
+  margin-bottom: 16px;
+  /* Increase margin */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  /* Increase font size */
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+  border-color: #333;
+  outline: none;
+}
+
+/* Product Detail Section */
+.product-detail-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.add-detail-button {
+  background-color: #28a745 !important;
+  /* Force Green color for Plus button */
+  color: white !important;
+  padding: 10px 16px;
+  /* Increase padding */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 18px;
+  /* Increase font size */
+  transition: background-color 0.3s ease;
+}
+
+.add-detail-button:hover {
+  background-color: #218838 !important;
+  /* Darker green on hover */
+}
+
+/* Product Detail List */
+.product-detail-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 20px 0 30px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  max-height: 300px;
+  /* Increase height of the box */
+  overflow-y: auto;
+}
+
+.product-detail-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Vertically center items */
+  padding: 12px;
+  /* Increase padding */
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.3s ease;
+}
+
+.product-detail-list li:last-child {
+  border-bottom: none;
+}
+
+.product-detail-list li:hover {
+  background-color: #f1f1f1;
+}
+
+.product-detail-list li span {
+  flex-grow: 1;
+  /* Allow text container to grow */
+}
+
+/* Remove Detail Button */
 .remove-detail-button {
-    background-color: #e74c3c;
-    color: white;
-    width: 15px; /* Set a slightly larger fixed width */
-    height: 35px; /* Set fixed height */
-    min-width: 15px; /* Prevent the button from shrinking */
-    min-height: 15px; /* Prevent the button from shrinking */
-    padding: 0; /* Remove all padding */
-    border: none;
-    border-radius: 50%; /* Circular button */
-    font-size: 10px; /* Smaller font size */
-    line-height: 1; /* Line height for centering text */
-    display: flex; /* Flexbox for centering */
-    justify-content: center; /* Center text horizontally */
-    align-items: center; /* Center text vertically */
-    cursor: pointer;
-    text-align: center;
-    transition: background-color 0.3s ease;
-  }
-  
-  .remove-detail-button:hover {
-    background-color: #c0392b;
-  }
-  
-  
-  /* Total Fields Section */
-  .total-fields {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  
-  .total-fields div {
-    width: 48%;
-  }
-  
-  .total-fields label {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 5px;
-    display: block;
-  }
-  
-  .total-fields input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    color: #333;
-  }
-  
-  /* Modal Buttons */
-  .modal-buttons {
-    display: flex;
-    justify-content: center; /* Center the buttons */
-    gap: 10px; /* Add space between buttons */
-  }
-  
-  .modal-buttons button {
-    background-color: #28a745; /* Green color for Save button */
-    color: white;
-    width: 100px;
-    padding: 10px 15px;
-    margin: 15px 10px 0 0;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .modal-buttons button:hover {
-    background-color: #218838; /* Darker green on hover */
-  }
-  
-  .modal-buttons button:last-child {
-    background-color: #e74c3c;
-  }
-  
-  .modal-buttons button:last-child:hover {
-    background-color: #c0392b;
-  }
-  
+  background-color: #e74c3c;
+  color: white;
+  width: 18px;
+  /* Increase button size */
+  height: 18px;
+  /* Increase button size */
+  padding: 0;
+  /* Remove all padding */
+  border: none;
+  border-radius: 50%;
+  /* Circular button */
+  font-size: 12px;
+  /* Increase font size */
+  line-height: 1;
+  /* Line height for centering text */
+  display: flex;
+  /* Flexbox for centering */
+  justify-content: center;
+  /* Center text horizontally */
+  align-items: center;
+  /* Center text vertically */
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.remove-detail-button:hover {
+  background-color: #c0392b;
+}
+
+/* Total Fields Section */
+.total-fields {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  /* Increase spacing */
+}
+
+.total-fields div {
+  width: 48%;
+}
+
+.total-fields label {
+  font-size: 16px;
+  /* Increase font size */
+  color: #555;
+  margin-bottom: 8px;
+  /* Increase spacing */
+  display: block;
+}
+
+.total-fields input {
+  width: 100%;
+  padding: 10px;
+  /* Increase padding */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  /* Increase font size */
+  color: #333;
+}
+
+/* Modal Buttons */
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  /* Center the buttons */
+  gap: 15px;
+  /* Add space between buttons */
+}
+
+.modal-buttons button {
+  background-color: #28a745;
+  /* Green color for Save button */
+  color: white;
+  width: 120px;
+  /* Increase button width */
+  padding: 12px 16px;
+  /* Increase padding */
+  margin: 20px 10px 0 0;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  /* Increase font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-buttons button:hover {
+  background-color: #218838;
+  /* Darker green on hover */
+}
+
+.modal-buttons button:last-child {
+  background-color: #e74c3c;
+}
+
+.modal-buttons button:last-child:hover {
+  background-color: #c0392b;
+}
+
+/* Error Message Styling */
+.error-message {
+  color: #d9534f;
+  font-weight: bold;
+  text-align: center;
+  margin: 10px 0;
+  font-size: 16px;
+  /* Increase font size */
+}
