@@ -267,38 +267,36 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     isVisible && (
       <div className="export-modal">
         <div className="modal-content">
-          <h3>Export Product</h3>
-
-          {/* Display error message, if any */}
+          <h3>Xuất Sản Phẩm</h3> {/* Export Product */}
+  
           {errorMessage && <p className="error-message">{errorMessage}</p>}
-
-          {/* Input for Customer Name */}
+  
+          {/* Customer Name Input */}
+          <label>Tên Khách Hàng</label> {/* Customer Name */}
           <input
             type="text"
             name="Customer"
-            placeholder="Customer Name"
+            placeholder="Nhập tên khách hàng"
             value={exportData.Customer}
             onChange={handleInputChange}
+            className="modal-input"
           />
-
-          {/* Dropdown for Color selection populated with colors from parent component */}
-          <select name="Color" value={exportData.Color} onChange={handleInputChange}>
-            <option value="">Select Color</option>
-            {colors && colors.length > 0 ? (
-              colors.map((color, index) => (
-                <option key={index} value={color}>
-                  {color}
-                </option>
-              ))
-            ) : (
-              <option value="">No colors available</option>
-            )}
+  
+          {/* Select Color Dropdown */}
+          <label>Chọn Màu</label> {/* Select Color */}
+          <select name="Color" value={exportData.Color} onChange={handleInputChange} className="modal-input">
+            <option value="">Chọn màu</option> {/* Choose a color */}
+            {colors.map((color, index) => (
+              <option key={index} value={color}>
+                {color}
+              </option>
+            ))}
           </select>
-
-          {/* Display available product details for the selected color */}
+  
+          {/* Display Available Product Details */}
           {availableProductDetails.length > 0 && (
             <div className="available-products">
-              <h4>Available Product Details for {exportData.Color}:</h4>
+              <h4>Chi Tiết Số Mét Của Màu {exportData.Color}:</h4> {/* Available Product Details */}
               <div className="product-detail-list">
                 {availableProductDetails.map((detail, index) => (
                   <div
@@ -314,73 +312,82 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
                     }`}
                     onClick={() => handleSelectProductDetail(detail, index)}
                   >
-                    {detail} meters
+                    {detail} mét {/* {detail} meters */}
                   </div>
                 ))}
               </div>
             </div>
           )}
-
-          {/* Display selected products */}
+  
+          {/* Display Selected Products Section */}
           {exportData.SelectedProducts.length > 0 && (
             <div className="selected-products">
-              <h4>Current Selections:</h4>
-              <ul>
-                {exportData.SelectedProducts.map((selection, index) => (
-                  <li key={index}>
-                    <strong>Color:</strong> {selection.Color},{' '}
-                    <strong>Details:</strong>{' '}
-                    {selection.ProductDetail.map((detail) => detail.value).join(', ')}
-                  </li>
-                ))}
-              </ul>
+              <h4>Sản Phẩm Đã Chọn</h4> {/* Current Selections */}
+  
+              {/* Display Each Selected Color and Its Details */}
+              {exportData.SelectedProducts.map((selection, index) => (
+                <div key={index} className="product-item">
+                  <strong>{selection.Color}:</strong> {/* Display Color Name */}
+                  <ul className="product-details">
+                    {selection.ProductDetail.map((detail, index) => (
+                      <li key={index}>{detail.value} mét</li> /* {detail} meters */
+                    ))}
+                  </ul>
+                </div>
+              ))}
+  
+              {/* Totals Section - Similar to Import Modal */}
+              <div className="totals-section">
+                <div className="metric">
+                  <span className="metric-value">Tổng Số Lượng Sản Phẩm: {exportData.totalProduct}</span> {/* Overall Total Product */}
+                </div>
+                <div className="metric">
+                  <span className="metric-value">Tổng Số Mét: {exportData.TotalMeter} mét</span> {/* Overall Total Meter */}
+                </div>
+              </div>
             </div>
           )}
-
-          {/* Display calculated overall total product and total meter */}
-          <div className="totals">
-            <p>
-              <strong>Overall Total Product:</strong> {exportData.totalProduct}
-            </p>
-            <p>
-              <strong>Overall Total Meter:</strong> {exportData.TotalMeter} meters
-            </p>
-          </div>
-
-          {/* Add More Button */}
+  
+          {/* Move the Add More Button Here */}
           {showAddMore && (
             <button onClick={handleAddMore} className="add-more-button">
-              Add More
+              Thêm Màu Khác {/* Add More */}
             </button>
           )}
-
-          {/* Input for Total Amount */}
+  
+          {/* Total Amount Input */}
+          <label>Tổng Số Tiền</label> {/* Total Amount */}
           <input
             type="number"
             name="TotalAmount"
-            placeholder="Total Amount"
+            placeholder="Tổng số tiền"
             value={exportData.TotalAmount}
             onChange={handleInputChange}
+            className="modal-input"
           />
-
-          {/* Input for Note */}
+  
+          {/* Additional Note Textarea */}
+          <label>Ghi Chú Thêm</label> {/* Additional Note */}
           <textarea
             name="Note"
-            placeholder="Additional Note"
+            placeholder="Thông tin bổ sung..."
             value={exportData.Note}
             onChange={handleInputChange}
             rows="3"
+            className="modal-input"
           />
-
-          {/* Modal buttons for save and cancel */}
+  
+          {/* Save and Cancel Buttons */}
           <div className="modal-buttons">
-            <button onClick={handleSave}>Save</button>
-            <button onClick={handleClose}>Cancel</button>
+            <button onClick={handleSave}>Lưu</button> {/* Save */}
+            <button onClick={handleClose}>Hủy</button> {/* Cancel */}
           </div>
         </div>
       </div>
     )
   );
+  
+  
 };
 
 export default ExportProductModal;
