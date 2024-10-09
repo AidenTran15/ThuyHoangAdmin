@@ -243,111 +243,135 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     await Promise.all(vaiInventoryUpdatePromises);
   };
 
-  return (
-    isVisible && (
-      <div className="import-modal">
-        <div className="modal-content">
-          <h3>Import Product</h3>
 
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
-
-          <label>Customer Name</label>
-          <input
-            type="text"
-            name="Customer"
-            placeholder="Enter customer name"
-            value={importData.Customer}
-            onChange={handleInputChange}
-            className="modal-input"
-          />
-
-          <label>Select Color</label>
-          <select name="Color" value={importData.Color} onChange={handleInputChange} className="modal-input">
-            <option value="">Choose a color</option>
-            {colors.map((color, index) => (
-              <option key={index} value={color}>
-                {color}
-              </option>
-            ))}
-          </select>
-
-          <div className="product-detail-section">
+  
+    return (
+      isVisible && (
+        <div className="import-modal">
+          <div className="modal-content">
+            <h3>Import Product</h3>
+    
+            {errorMessage && <p className="error-message">{errorMessage}</p>}
+    
+            {/* Customer Name Input */}
+            <label>Customer Name</label>
             <input
-              type="number"
-              placeholder="Enter Product Detail (e.g., 10)"
-              value={currentDetail}
-              onChange={(e) => setCurrentDetail(e.target.value)}
+              type="text"
+              name="Customer"
+              placeholder="Enter customer name"
+              value={importData.Customer}
+              onChange={handleInputChange}
               className="modal-input"
             />
-            <button className="add-detail-button" onClick={handleAddProductDetail}>
-              <FiPlus />
-            </button>
-          </div>
-
-          <ul className="product-detail-list">
-            {Array.isArray(importData.ProductDetail) &&
-              importData.ProductDetail.map((detail, index) => (
-                <li key={index}>
-                  {detail} meters
-                  <button className="remove-detail-button" onClick={() => handleRemoveDetail(index)}>
-                    <FiX />
-                  </button>
-                </li>
+    
+            {/* Select Color Dropdown */}
+            <label>Select Color</label>
+            <select name="Color" value={importData.Color} onChange={handleInputChange} className="modal-input">
+              <option value="">Choose a color</option>
+              {colors.map((color, index) => (
+                <option key={index} value={color}>
+                  {color}
+                </option>
               ))}
-          </ul>
-
-          <button onClick={handleAddProduct} disabled={!importData.Color || importData.ProductDetail.length === 0}>
-            Add Product to List
-          </button>
-
-          <div className="product-list">
-            <h4>Added Products</h4>
-            <ul>
-              {Object.keys(importData.ProductList).map((color) => (
-                <li key={color}>
-                  <strong>{color}:</strong> {importData.ProductList[color].join(', ')}
-                </li>
-              ))}
+            </select>
+    
+            {/* Product Detail Input and Add Button */}
+            <div className="product-detail-section">
+              <input
+                type="number"
+                placeholder="Enter Product Detail (e.g., 10)"
+                value={currentDetail}
+                onChange={(e) => setCurrentDetail(e.target.value)}
+                className="modal-input"
+              />
+              <button className="add-detail-button" onClick={handleAddProductDetail}>
+                + {/* Using a "+" sign instead of an icon */}
+              </button>
+            </div>
+    
+            {/* Product Detail List for Current Color */}
+            <ul className="product-detail-list">
+              {Array.isArray(importData.ProductDetail) &&
+                importData.ProductDetail.map((detail, index) => (
+                  <li key={index}>
+                    {detail} meters
+                    <button className="remove-detail-button" onClick={() => handleRemoveDetail(index)}>
+                      x {/* Using an "x" sign instead of an icon */}
+                    </button>
+                  </li>
+                ))}
             </ul>
-          </div>
-
-          <div className="totals">
-            <p>
-              <strong>Overall Total Product:</strong> {importData.totalProduct}
-            </p>
-            <p>
-              <strong>Overall Total Meter:</strong> {importData.TotalMeter} meters
-            </p>
-          </div>
-
-          <label>Total Amount</label>
-          <input
-            type="number"
-            name="TotalAmount"
-            placeholder="Total Amount"
-            value={importData.TotalAmount}
-            onChange={handleInputChange}
-            className="modal-input"
-          />
-
-          <label>Additional Note</label>
-          <textarea
-            name="Note"
-            placeholder="Any additional information..."
-            value={importData.Note}
-            onChange={handleInputChange}
-            rows="3"
-            className="modal-input"
-          />
-
-          <div className="modal-buttons">
-            <button onClick={handleSave}>Save</button>
-            <button onClick={handleClose}>Cancel</button>
+    
+            {/* Add Product to List Button */}
+            <button onClick={handleAddProduct} disabled={!importData.Color || importData.ProductDetail.length === 0}>
+              Add Product to List
+            </button>
+    
+            {/* Added Products Section */}
+            <div className="added-products-card">
+              <h4>Added Products</h4>
+    
+              {/* Display Product Details by Color */}
+              {Object.keys(importData.ProductList).length > 0 && (
+                <div className="product-list">
+                  {Object.keys(importData.ProductList).map((color) => (
+                    <div key={color} className="product-item">
+                      <strong>{color}:</strong> {/* Display Color Name */}
+                      <ul className="product-details">
+                        {importData.ProductList[color].map((detail, index) => (
+                          <li key={index}>{detail} meters</li> /* Display Product Detail */
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+    
+              {/* Totals Section */}
+              <div className="totals-section">
+                <div className="metric">
+                  <span className="metric-value">Overall Total Product: {importData.totalProduct}</span>
+                </div>
+                <div className="metric">
+                  <span className="metric-value">Overall Total Meter: {importData.TotalMeter} meters</span>
+                </div>
+              </div>
+            </div>
+    
+            {/* Total Amount Input */}
+            <label>Total Amount</label>
+            <input
+              type="number"
+              name="TotalAmount"
+              placeholder="Total Amount"
+              value={importData.TotalAmount}
+              onChange={handleInputChange}
+              className="modal-input"
+            />
+    
+            {/* Additional Note Textarea */}
+            <label>Additional Note</label>
+            <textarea
+              name="Note"
+              placeholder="Any additional information..."
+              value={importData.Note}
+              onChange={handleInputChange}
+              rows="3"
+              className="modal-input"
+            />
+    
+            {/* Save and Cancel Buttons */}
+            <div className="modal-buttons">
+              <button onClick={handleSave}>Save</button>
+              <button onClick={handleClose}>Cancel</button>
+            </div>
           </div>
         </div>
-      </div>
-    )
-  );
+      )
+    );
+    
+  
+  
 };
 
 export default ImportProductModal;

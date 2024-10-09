@@ -1,5 +1,6 @@
 /* ImportProductModal.css */
 
+/* Modal Overlay */
 .import-modal {
   position: fixed;
   top: 0;
@@ -15,6 +16,7 @@
   transition: all 0.3s ease-in-out;
 }
 
+/* Modal Content */
 .modal-content {
   background: linear-gradient(135deg, #ffffff, #f0f4f8);
   /* Subtle gradient */
@@ -35,6 +37,7 @@
   transform: translateY(0);
 }
 
+/* Modal Header */
 .modal-content h3 {
   color: #2c3e50;
   font-size: 22px;
@@ -46,6 +49,7 @@
   /* Slight letter spacing */
 }
 
+/* Label Styling */
 .modal-content label {
   display: block;
   text-align: left;
@@ -56,6 +60,7 @@
   /* Bold weight for labels */
 }
 
+/* Input, Select, and Textarea Styles */
 .modal-content input,
 .modal-content select,
 .modal-content textarea {
@@ -73,6 +78,7 @@
   /* Slight inner shadow */
 }
 
+/* Input Focus Styles */
 .modal-content input:focus,
 .modal-content select:focus,
 .modal-content textarea:focus {
@@ -82,50 +88,35 @@
   outline: none;
 }
 
-/* Custom Styling for Select Dropdown */
+/* Custom Select Dropdown Styling */
 .modal-content select {
   appearance: none;
-  /* Remove default dropdown appearance */
   -webkit-appearance: none;
-  /* For Safari */
   -moz-appearance: none;
-  /* For Firefox */
   background-color: #f9f9f9;
-  /* Set a matching background color */
   border: 1px solid #e1e4e8;
-  /* Border color to match input fields */
   border-radius: 8px;
-  /* Round the corners */
   padding: 14px;
-  /* Add padding */
   font-size: 15px;
-  /* Set font size */
   color: #333;
-  /* Text color */
   cursor: pointer;
-  /* Pointer cursor for dropdown */
   height: 50px;
-  /* Increase the height of the dropdown */
+  /* Increase height */
   line-height: 1.5;
-  /* Adjust line height */
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   position: relative;
 }
 
+/* Select Dropdown Options */
 .modal-content select option {
   background-color: #ffffff;
-  /* White background for options */
   color: #333;
-  /* Option text color */
   font-size: 15px;
-  /* Match font size with dropdown */
   padding: 10px;
-  /* Add padding to each option */
   height: 30px;
-  /* Set height for each option to ensure visibility */
 }
 
-/* Input Section Styling */
+/* Product Detail Section */
 .product-detail-section {
   display: flex;
   align-items: center;
@@ -138,6 +129,7 @@
   flex: 1;
 }
 
+/* Add Detail Button */
 .add-detail-button {
   background: #3498db;
   color: #fff;
@@ -155,6 +147,7 @@
   /* Scale effect */
 }
 
+/* Product Detail List */
 .product-detail-list {
   list-style-type: none;
   padding: 0;
@@ -163,9 +156,7 @@
 
 .product-detail-list li {
   padding: 12px;
-  /* More padding */
   margin-bottom: 8px;
-  /* Slight spacing */
   background: #eaf1f8;
   /* Light background */
   border-radius: 8px;
@@ -174,6 +165,7 @@
   align-items: center;
 }
 
+/* Remove Detail Button */
 .remove-detail-button {
   background: #e74c3c;
   color: #fff;
@@ -188,6 +180,82 @@
   background: #c0392b;
 }
 
+/* Added Products Section */
+.added-products-card {
+  background: #f4f7fa;
+  /* Light background to differentiate from modal */
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow */
+  margin: 20px 0;
+  text-align: left;
+  /* Align text to left */
+}
+
+/* Product List Styling */
+.product-list {
+  margin: 20px 0;
+}
+
+.product-item {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.product-item strong {
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.product-details {
+  padding-left: 20px;
+  /* Indent the product details */
+}
+
+.product-details li {
+  list-style-type: disc;
+  /* Use disc style for product details */
+  margin: 5px 0;
+}
+
+/* Totals Section */
+.totals-section {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  padding: 10px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e1e4e8;
+}
+
+.totals-section .metric {
+  display: flex;
+  align-items: center;
+}
+
+.totals-section .metric-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Responsive Styling for Totals Section */
+@media (max-width: 768px) {
+  .totals-section {
+    flex-direction: column;
+    /* Stack elements on smaller screens */
+    align-items: flex-start;
+  }
+}
+
+/* Product List */
 .product-list {
   margin: 20px 0;
 }
@@ -199,6 +267,7 @@
   /* Darker color */
 }
 
+/* Totals Styling */
 .totals {
   margin: 20px 0;
   text-align: center;
@@ -211,6 +280,7 @@
   font-weight: 600;
 }
 
+/* Modal Buttons */
 .modal-buttons {
   display: flex;
   justify-content: space-between;
@@ -252,6 +322,7 @@
   /* Downward shift on click */
 }
 
+/* Error Message Styling */
 .error-message {
   color: #e74c3c;
   margin-bottom: 20px;
