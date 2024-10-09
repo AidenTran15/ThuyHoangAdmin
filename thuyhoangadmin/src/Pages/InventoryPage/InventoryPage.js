@@ -36,9 +36,17 @@ const InventoryPage = () => {
     fetchData();
   }, []);
 
-  // Render loading or error messages
-  if (loading) return <div>Đang tải...</div>; // Loading
-  if (error) return <div>Lỗi: {error}</div>;  // Error
+  // Helper function to translate Status
+  const translateStatus = (status) => {
+    switch (status) {
+      case 'Import':
+        return 'Nhập Hàng';
+      case 'Export':
+        return 'Xuất Hàng';
+      default:
+        return status;
+    }
+  };
 
   // Helper function to render ProductList as formatted text
   const renderProductList = (productList) => {
@@ -67,17 +75,24 @@ const InventoryPage = () => {
       <ul>
         {Object.keys(detail).map((color, index) => (
           <li key={index}>
-            <strong>{color}:</strong> Tổng Số Lượng: {detail[color].TotalProduct}, Tổng Mét: {detail[color].TotalMeter}
+            <strong>{color}:</strong> Tổng Số Cây: {detail[color].TotalProduct}, Tổng Mét: {detail[color].TotalMeter}
           </li>
         ))}
       </ul>
     );
   };
 
+  // Render loading or error messages
+  if (loading) return <div>Đang tải...</div>; // Loading
+  if (error) return <div>Lỗi: {error}</div>;  // Error
+
   // Render the table with fetched data
   return (
     <div className="inventory-page">
-      <h2>Quản Lý Tồn Kho</h2> {/* Updated title to match other pages */}
+      <div className="header-container">
+        <h2>Quản Lý Tồn Kho</h2> {/* Updated title to match other pages */}
+      </div>
+
       <table className="inventory-table">
         <thead>
           <tr>
@@ -85,11 +100,11 @@ const InventoryPage = () => {
             <th>ID</th>
             <th>Trạng Thái</th> {/* Status */}
             <th>Khách Hàng</th> {/* Customer */}
-            <th>Danh Sách Sản Phẩm</th> {/* Product List */}
+            <th>Danh Sách Hàng Hoá</th> {/* Product List */}
             <th>Tổng Số Tiền</th> {/* Total Amount */}
             <th>Tổng Mét</th> {/* Total Meter */}
             <th>Tổng Số Lượng</th> {/* Total Product */}
-            <th>Chi Tiết</th> {/* Detail */}
+            <th>Chi Tiết Hàng Hoá</th> {/* Detail */}
             <th>Ghi Chú</th> {/* Note */}
           </tr>
         </thead>
@@ -99,7 +114,7 @@ const InventoryPage = () => {
               <tr key={index}>
                 <td>{item['Date&Time']}</td> {/* Display Date & Time */}
                 <td>{item.ID}</td> {/* Displaying ID */}
-                <td>{item.Status}</td> {/* Displaying Status */}
+                <td>{translateStatus(item.Status)}</td> {/* Translated Status */}
                 <td>{item.Customer}</td> {/* Displaying Customer */}
                 <td>{renderProductList(item.ProductList)}</td> {/* Displaying Product List */}
                 <td>{item.TotalAmount}</td> {/* Displaying Total Amount */}
