@@ -48,6 +48,14 @@ const InventoryPage = () => {
     }
   };
 
+  // Helper function to replace "meters" with "mét"
+  const replaceMetersWithMet = (text) => {
+    if (typeof text === 'string') {
+      return text.replace(/meters/g, 'mét');
+    }
+    return text;
+  };
+
   // Helper function to render ProductList as formatted text
   const renderProductList = (productList) => {
     if (!productList || Object.keys(productList).length === 0) {
@@ -65,7 +73,7 @@ const InventoryPage = () => {
     );
   };
 
-  // Helper function to render Detail as formatted text
+  // Helper function to render Detail as formatted text with translated meters
   const renderDetail = (detail) => {
     if (!detail || Object.keys(detail).length === 0) {
       return 'N/A';
@@ -75,7 +83,7 @@ const InventoryPage = () => {
       <ul>
         {Object.keys(detail).map((color, index) => (
           <li key={index}>
-            <strong>{color}:</strong> Tổng Số Cây: {detail[color].TotalProduct}, Tổng Mét: {detail[color].TotalMeter}
+            <strong>{color}:</strong> Tổng Số Cây: {detail[color].TotalProduct}, Tổng Mét: {replaceMetersWithMet(detail[color].TotalMeter)}
           </li>
         ))}
       </ul>
@@ -118,7 +126,7 @@ const InventoryPage = () => {
                 <td>{item.Customer}</td> {/* Displaying Customer */}
                 <td>{renderProductList(item.ProductList)}</td> {/* Displaying Product List */}
                 <td>{item.TotalAmount}</td> {/* Displaying Total Amount */}
-                <td>{item.TotalMeter}</td> {/* Displaying Total Meter */}
+                <td>{replaceMetersWithMet(item.TotalMeter)}</td> {/* Replacing meters with mét */}
                 <td>{item.TotalProduct}</td> {/* Displaying Total Product */}
                 <td>{renderDetail(item.Detail)}</td> {/* Displaying Detail */}
                 <td>{item.Note || 'N/A'}</td> {/* Displaying Note */}
