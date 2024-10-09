@@ -245,130 +245,131 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 
 
   
-    return (
-      isVisible && (
-        <div className="import-modal">
-          <div className="modal-content">
-            <h3>Import Product</h3>
-    
-            {errorMessage && <p className="error-message">{errorMessage}</p>}
-    
-            {/* Customer Name Input */}
-            <label>Customer Name</label>
-            <input
-              type="text"
-              name="Customer"
-              placeholder="Enter customer name"
-              value={importData.Customer}
-              onChange={handleInputChange}
-              className="modal-input"
-            />
-    
-            {/* Select Color Dropdown */}
-            <label>Select Color</label>
-            <select name="Color" value={importData.Color} onChange={handleInputChange} className="modal-input">
-              <option value="">Choose a color</option>
-              {colors.map((color, index) => (
-                <option key={index} value={color}>
-                  {color}
-                </option>
-              ))}
-            </select>
-    
-            {/* Product Detail Input and Add Button */}
-            <div className="product-detail-section">
-              <input
-                type="number"
-                placeholder="Enter Product Detail (e.g., 10)"
-                value={currentDetail}
-                onChange={(e) => setCurrentDetail(e.target.value)}
-                className="modal-input"
-              />
-              <button className="add-detail-button" onClick={handleAddProductDetail}>
-                + {/* Using a "+" sign instead of an icon */}
-              </button>
-            </div>
-    
-            {/* Product Detail List for Current Color */}
-            <ul className="product-detail-list">
-              {Array.isArray(importData.ProductDetail) &&
-                importData.ProductDetail.map((detail, index) => (
-                  <li key={index}>
-                    {detail} meters
-                    <button className="remove-detail-button" onClick={() => handleRemoveDetail(index)}>
-                      x {/* Using an "x" sign instead of an icon */}
-                    </button>
-                  </li>
-                ))}
-            </ul>
-    
-            {/* Add Product to List Button */}
-            <button onClick={handleAddProduct} disabled={!importData.Color || importData.ProductDetail.length === 0}>
-              Add Product to List
-            </button>
-    
-            {/* Added Products Section */}
-            <div className="added-products-card">
-              <h4>Added Products</h4>
-    
-              {/* Display Product Details by Color */}
-              {Object.keys(importData.ProductList).length > 0 && (
-                <div className="product-list">
-                  {Object.keys(importData.ProductList).map((color) => (
-                    <div key={color} className="product-item">
-                      <strong>{color}:</strong> {/* Display Color Name */}
-                      <ul className="product-details">
-                        {importData.ProductList[color].map((detail, index) => (
-                          <li key={index}>{detail} meters</li> /* Display Product Detail */
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              )}
-    
-              {/* Totals Section */}
-              <div className="totals-section">
-                <div className="metric">
-                  <span className="metric-value">Overall Total Product: {importData.totalProduct}</span>
-                </div>
-                <div className="metric">
-                  <span className="metric-value">Overall Total Meter: {importData.TotalMeter} meters</span>
-                </div>
-              </div>
-            </div>
-    
-            {/* Total Amount Input */}
-            <label>Total Amount</label>
+  return (
+    isVisible && (
+      <div className="import-modal">
+        <div className="modal-content">
+          <h3>Nhập Sản Phẩm</h3>
+  
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+  
+          {/* Customer Name Input */}
+          <label>Tên Khách Hàng</label>
+          <input
+            type="text"
+            name="Customer"
+            placeholder="Nhập tên khách hàng"
+            value={importData.Customer}
+            onChange={handleInputChange}
+            className="modal-input"
+          />
+  
+          {/* Select Color Dropdown */}
+          <label>Chọn Màu</label>
+          <select name="Color" value={importData.Color} onChange={handleInputChange} className="modal-input">
+            <option value="">Chọn màu</option>
+            {colors.map((color, index) => (
+              <option key={index} value={color}>
+                {color}
+              </option>
+            ))}
+          </select>
+  
+          {/* Product Detail Input and Add Button */}
+          <div className="product-detail-section">
             <input
               type="number"
-              name="TotalAmount"
-              placeholder="Total Amount"
-              value={importData.TotalAmount}
-              onChange={handleInputChange}
+              placeholder="Nhập số mét mỗi cây"
+              value={currentDetail}
+              onChange={(e) => setCurrentDetail(e.target.value)}
               className="modal-input"
             />
-    
-            {/* Additional Note Textarea */}
-            <label>Additional Note</label>
-            <textarea
-              name="Note"
-              placeholder="Any additional information..."
-              value={importData.Note}
-              onChange={handleInputChange}
-              rows="3"
-              className="modal-input"
-            />
-    
-            {/* Save and Cancel Buttons */}
-            <div className="modal-buttons">
-              <button onClick={handleSave}>Save</button>
-              <button onClick={handleClose}>Cancel</button>
+            <button className="add-detail-button" onClick={handleAddProductDetail}>
+              +
+            </button>
+          </div>
+  
+          {/* Product Detail List for Current Color */}
+          <ul className="product-detail-list">
+            {Array.isArray(importData.ProductDetail) &&
+              importData.ProductDetail.map((detail, index) => (
+                <li key={index}>
+                  {detail} mét
+                  <button className="remove-detail-button" onClick={() => handleRemoveDetail(index)}>
+                    x
+                  </button>
+                </li>
+              ))}
+          </ul>
+  
+          {/* Add Product to List Button */}
+          <button onClick={handleAddProduct} disabled={!importData.Color || importData.ProductDetail.length === 0}>
+            Màu Khác
+          </button>
+  
+          {/* Added Products Section */}
+          <div className="added-products-card">
+            <h4>Sản Phẩm Đã Thêm</h4>
+  
+            {/* Display Product Details by Color */}
+            {Object.keys(importData.ProductList).length > 0 && (
+              <div className="product-list">
+                {Object.keys(importData.ProductList).map((color) => (
+                  <div key={color} className="product-item">
+                    <strong>{color}:</strong>
+                    <ul className="product-details">
+                      {importData.ProductList[color].map((detail, index) => (
+                        <li key={index}>{detail} mét</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
+  
+            {/* Totals Section */}
+            <div className="totals-section">
+              <div className="metric">
+                <span className="metric-value">Tổng Số Cây: {importData.totalProduct}</span>
+              </div>
+              <div className="metric">
+                <span className="metric-value">Tổng Số Mét: {importData.TotalMeter} mét</span>
+              </div>
             </div>
           </div>
+  
+          {/* Total Amount Input */}
+          <label>Tổng Số Tiền</label>
+          <input
+            type="number"
+            name="TotalAmount"
+            placeholder="Tổng số tiền"
+            value={importData.TotalAmount}
+            onChange={handleInputChange}
+            className="modal-input"
+          />
+  
+          {/* Additional Note Textarea */}
+          <label>Ghi Chú Thêm</label>
+          <textarea
+            name="Note"
+            placeholder="Thông tin bổ sung..."
+            value={importData.Note}
+            onChange={handleInputChange}
+            rows="3"
+            className="modal-input"
+          />
+  
+          {/* Save and Cancel Buttons */}
+          <div className="modal-buttons">
+            <button onClick={handleSave}>Lưu</button>
+            <button onClick={handleClose}>Hủy</button>
+          </div>
         </div>
-      )
-    );
+      </div>
+    )
+  );
+  
     
   
   

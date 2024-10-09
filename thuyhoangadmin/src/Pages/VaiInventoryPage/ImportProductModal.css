@@ -1,6 +1,5 @@
 /* ImportProductModal.css */
 
-/* Modal Overlay */
 .import-modal {
   position: fixed;
   top: 0;
@@ -11,10 +10,15 @@
   /* Darker overlay */
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  /* Align items to top to allow space for scroll */
+  padding: 20px;
+  /* Padding to create space between the modal and screen edges */
+  overflow-y: auto;
+  /* Enable scrolling for the entire modal container */
   z-index: 1000;
-  transition: all 0.3s ease-in-out;
 }
+
 
 /* Modal Content */
 .modal-content {
