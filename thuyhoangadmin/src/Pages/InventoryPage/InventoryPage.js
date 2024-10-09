@@ -5,8 +5,10 @@ const InventoryPage = () => {
   const [data, setData] = useState([]); // Initialize data as an empty array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('All'); // State to store the selected status filter
+  const [filteredData, setFilteredData] = useState([]); // State to store filtered data
   const [currentPage, setCurrentPage] = useState(1); // State to track the current page
-  const itemsPerPage = 10; // Set items per page limit
+  const itemsPerPage = 10; // Number of items to display per page
 
   // Fetch data from the API when the component mounts
   useEffect(() => {
@@ -23,6 +25,7 @@ const InventoryPage = () => {
         // Set data if it exists, otherwise log an error and set to an empty array
         if (parsedBody && parsedBody.data) {
           setData(parsedBody.data);
+          setFilteredData(parsedBody.data); // Initially, set filteredData to the fetched data
         } else {
           console.error('Unexpected data structure:', parsedBody);
           setData([]);
@@ -38,7 +41,7 @@ const InventoryPage = () => {
     fetchData();
   }, []);
 
-  // Helper function to translate Status
+  // Function to translate status
   const translateStatus = (status) => {
     switch (status) {
       case 'Import':
@@ -48,6 +51,31 @@ const InventoryPage = () => {
       default:
         return status;
     }
+  };
+
+  // Handle filtering the data based on the selected status
+  useEffect(() => {
+    if (statusFilter === 'All') {
+      setFilteredData(data); // Show all data when filter is set to 'All'
+    } else {
+      setFilteredData(data.filter((item) => translateStatus(item.Status) === statusFilter));
+    }
+    setCurrentPage(1); // Reset to the first page when the filter changes
+  }, [statusFilter, data]);
+
+  // Handle pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
   // Helper function to replace "meters" with "mét"
@@ -92,33 +120,28 @@ const InventoryPage = () => {
     );
   };
 
-  // Handle page navigation
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  // Calculate total pages and get items for the current page
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
-
   // Render loading or error messages
   if (loading) return <div>Đang tải...</div>; // Loading
   if (error) return <div>Lỗi: {error}</div>;  // Error
 
+  // Render the table with fetched data
   return (
     <div className="inventory-page">
-      <div className="header-container">
-        <h2>Quản Lý Tồn Kho</h2> {/* Updated title to match other pages */}
+      <h2>Quản Lý Tồn Kho</h2> {/* Updated title to match other pages */}
+
+      {/* Status Filter Dropdown */}
+      <div className="filter-container">
+        <label htmlFor="statusFilter">Lọc Theo Trạng Thái: </label>
+        <select
+          id="statusFilter"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="filter-dropdown"
+        >
+          <option value="All">Tất Cả</option>
+          <option value="Nhập Hàng">Nhập Hàng</option>
+          <option value="Xuất Hàng">Xuất Hàng</option>
+        </select>
       </div>
 
       <table className="inventory-table">
@@ -163,11 +186,11 @@ const InventoryPage = () => {
       {/* Pagination Controls */}
       <div className="pagination-controls">
         <button onClick={goToPreviousPage} disabled={currentPage === 1}>
-          Trang trước
+          Trang Trước
         </button>
-        <span>Trang {currentPage} trên {totalPages}</span>
+        <span>Trang {currentPage} trong {totalPages}</span>
         <button onClick={goToNextPage} disabled={currentPage === totalPages}>
-          Trang sau
+          Trang Sau
         </button>
       </div>
     </div>

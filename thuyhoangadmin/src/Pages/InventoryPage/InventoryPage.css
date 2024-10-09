@@ -109,3 +109,19 @@
 .pagination-controls span {
   font-size: 18px;
 }
+
+.filter-dropdown {
+  width: 150px;
+  /* Adjust this value to your desired width */
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-dropdown:hover {
+  border-color: #007bff;
+  /* Change border color on hover */
+}
