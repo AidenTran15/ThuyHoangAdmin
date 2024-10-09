@@ -35,7 +35,7 @@ const VaiInventoryPage = () => {
         setIsLoading(false);
       })
       .catch((error) => {
-        console.error('Error fetching the products!', error);
+        console.error('Lỗi khi tải sản phẩm!', error);
         setIsLoading(false);
       });
   }, []);
@@ -56,7 +56,7 @@ const VaiInventoryPage = () => {
         return {
           ...prev,
           ProductDetail: updatedProductDetail,
-          TotalMeter: `${totalMeter} meters`, // Update TotalMeter automatically
+          TotalMeter: `${totalMeter} mét`, // Update TotalMeter automatically with translated unit
           totalProduct: totalProductCount // Update totalProduct automatically
         };
       });
@@ -72,7 +72,7 @@ const VaiInventoryPage = () => {
       return {
         ...prev,
         ProductDetail: updatedProductDetail,
-        TotalMeter: `${totalMeter} meters`,
+        TotalMeter: `${totalMeter} mét`,
         totalProduct: updatedProductDetail.length
       };
     });
@@ -80,7 +80,7 @@ const VaiInventoryPage = () => {
 
   const handleSaveProduct = () => {
     if (!newProduct.ProductID) {
-      alert('ProductID is required!');
+      alert('Mã sản phẩm là bắt buộc!');
       return;
     }
 
@@ -101,7 +101,7 @@ const VaiInventoryPage = () => {
         setIsAddingNew(false);
         setIsEditing(false);
       })
-      .catch((error) => console.error(`Error ${isEditing ? 'updating' : 'adding'} the product:`, error));
+      .catch((error) => console.error(`Lỗi khi ${isEditing ? 'cập nhật' : 'thêm'} sản phẩm:`, error));
   };
 
   const handleDeleteProduct = () => {
@@ -116,59 +116,42 @@ const VaiInventoryPage = () => {
         setIsDeleteModalVisible(false);
         setProductToDelete(null);
       })
-      .catch((error) => console.error(`Error deleting product ${productToDelete}:`, error));
-  };
-
-  const handleEditClick = (productId) => {
-    const productToEdit = products.find((product) => product.ProductID === productId);
-    if (productToEdit) {
-      setNewProduct({
-        ProductID: productToEdit.ProductID,
-        Color: productToEdit.Color,
-        totalProduct: productToEdit.totalProduct,
-        ProductDetail: productToEdit.ProductDetail,
-        TotalMeter: productToEdit.TotalMeter
-      });
-      setIsAddingNew(true);
-      setIsEditing(true);
-    }
+      .catch((error) => console.error(`Lỗi khi xóa sản phẩm ${productToDelete}:`, error));
   };
 
   const handleImportSave = (importData) => {
-    // Add the new import data to the product list
     setProducts((prev) => [...prev, importData]);
   };
 
   const handleExportSave = (exportData) => {
-    // Update the product list with the new export data
     setProducts((prev) => [...prev, exportData]);
   };
 
   return (
     <div className="vai-inventory-page">
       <div className="header-container">
-        <h2>Quản Lý Tồn Kho</h2>
+        <h2>Quản Lý Tồn Kho</h2> {/* Translated title */}
         <button onClick={() => { setIsAddingNew(true); setIsEditing(false); }} className="add-new-button">Tạo Mới</button>
-        <button onClick={() => setIsImportModalVisible(true)} className="import-button">Nhập Hàng</button> {/* Import Button */}
-        <button onClick={() => setIsExportModalVisible(true)} className="export-button">Xuất Hàng</button> {/* Export Button */}
+        <button onClick={() => setIsImportModalVisible(true)} className="import-button">Nhập Hàng</button> {/* Translated Import Button */}
+        <button onClick={() => setIsExportModalVisible(true)} className="export-button">Xuất Hàng</button> {/* Translated Export Button */}
       </div>
 
-      {isLoading ? <p>Loading...</p> : (
+      {isLoading ? <p>Đang tải...</p> : (  // Translated loading message
         <table className="vai-inventory-table">
           <thead>
-            <tr><th>Product ID</th><th>Color</th><th>Total Product</th><th>Product Detail</th><th>Total Meter</th><th>Action</th></tr>
+            <tr><th>Mã Sản Phẩm</th><th>Màu</th><th>Chi Tiết Số Mét Từng Cây</th><th>Tổng Số Cây</th><th>Tổng Mét</th><th>Xoá Hàng</th></tr> {/* Translated headers */}
           </thead>
           <tbody>
             {products.map((product) => (
               <tr key={product.ProductID}>
                 <td>{product.ProductID}</td>
                 <td>{product.Color}</td>
-                <td>{product.totalProduct}</td>
                 <td>{Array.isArray(product.ProductDetail) ? product.ProductDetail.join(', ') : product.ProductDetail}</td>
+                <td>{product.totalProduct}</td>
                 <td>{product.TotalMeter}</td>
                 <td>
-                  <button className="action-button edit-button" onClick={() => handleEditClick(product.ProductID)}>Edit</button>
-                  <button className="action-button delete-button" onClick={() => { setProductToDelete(product.ProductID); setIsDeleteModalVisible(true); }}>Delete</button>
+                  {/* Removed the Edit button */}
+                  <button className="action-button delete-button" onClick={() => { setProductToDelete(product.ProductID); setIsDeleteModalVisible(true); }}>Xóa</button> {/* Translated Delete button */}
                 </td>
               </tr>
             ))}
@@ -210,11 +193,11 @@ const VaiInventoryPage = () => {
             <ul className="product-detail-list">
               {newProduct.ProductDetail.map((detail, index) => (
                 <li key={index}>
-                  {detail} meters
+                  {detail} mét
                   <button
                     className="remove-detail-button"
                     onClick={() => handleRemoveDetail(index)}
-                    title="Remove Detail"
+                    title="Xóa Chi Tiết"
                   >
                     &times;
                   </button>
@@ -224,7 +207,7 @@ const VaiInventoryPage = () => {
 
             <div className="total-fields">
               <div>
-                <label>Tổng Sản Phẩm:</label>
+                <label>Tổng Số Cây:</label>
                 <input type="text" name="totalProduct" value={newProduct.totalProduct} readOnly />
               </div>
               <div>
