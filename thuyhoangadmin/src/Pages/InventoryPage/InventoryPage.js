@@ -50,7 +50,7 @@ const InventoryPage = () => {
       <ul>
         {Object.keys(productList).map((color, index) => (
           <li key={index}>
-            <strong>{color}:</strong> {productList[color]}
+            <strong>{color}:</strong> {productList[color].map((num) => num.toLocaleString()).join(', ')}
           </li>
         ))}
       </ul>
