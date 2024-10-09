@@ -149,8 +149,8 @@ const VaiInventoryPage = () => {
       <div className="header-container">
         <h2>Quản Lý Tồn Kho</h2>
         <button onClick={() => { setIsAddingNew(true); setIsEditing(false); }} className="add-new-button">Tạo Mới</button>
-        <button onClick={() => setIsImportModalVisible(true)} className="import-button">Import</button> {/* Import Button */}
-        <button onClick={() => setIsExportModalVisible(true)} className="export-button">Export</button> {/* Export Button */}
+        <button onClick={() => setIsImportModalVisible(true)} className="import-button">Nhập Hàng</button> {/* Import Button */}
+        <button onClick={() => setIsExportModalVisible(true)} className="export-button">Xuất Hàng</button> {/* Export Button */}
       </div>
 
       {isLoading ? <p>Loading...</p> : (

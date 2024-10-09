@@ -15,7 +15,8 @@ const NavBar = () => {
         <li><Link to="/history">Lịch Sử</Link></li>
         <li><Link to="/customer">Khách Hàng</Link></li>
         <li><Link to="/product">Sản Phẩm</Link></li>
-        <li><Link to="/inventory">Inventory</Link></li> {/* New link for inventory */}
+        <li><Link to="/inventory">Kho Vải</Link></li>
+        <li><Link to="/tracking-inventory">Sao Kê Vải</Link></li>
       </ul>
     </nav>
   );
