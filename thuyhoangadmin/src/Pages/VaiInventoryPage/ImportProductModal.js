@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ImportProductModal.css'; // Import styles for the modal
+import { FiPlus, FiX } from 'react-icons/fi'; // Import icons for add and remove buttons
 
 const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   // Initialize ProductDetail as an empty array instead of an empty string
@@ -248,22 +249,21 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
         <div className="modal-content">
           <h3>Import Product</h3>
 
-          {/* Display error message, if any */}
           {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-          {/* Input for Customer Name */}
+          <label>Customer Name</label>
           <input
             type="text"
             name="Customer"
-            placeholder="Customer Name"
+            placeholder="Enter customer name"
             value={importData.Customer}
             onChange={handleInputChange}
             className="modal-input"
           />
 
-          {/* Dropdown for Color selection */}
+          <label>Select Color</label>
           <select name="Color" value={importData.Color} onChange={handleInputChange} className="modal-input">
-            <option value="">Select Color</option>
+            <option value="">Choose a color</option>
             {colors.map((color, index) => (
               <option key={index} value={color}>
                 {color}
@@ -271,7 +271,6 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             ))}
           </select>
 
-          {/* Product detail section with individual input */}
           <div className="product-detail-section">
             <input
               type="number"
@@ -281,30 +280,26 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               className="modal-input"
             />
             <button className="add-detail-button" onClick={handleAddProductDetail}>
-              +
+              <FiPlus />
             </button>
           </div>
 
-          {/* Display list of product details */}
           <ul className="product-detail-list">
-            {/* Ensure ProductDetail is an array before mapping */}
             {Array.isArray(importData.ProductDetail) &&
               importData.ProductDetail.map((detail, index) => (
                 <li key={index}>
                   {detail} meters
                   <button className="remove-detail-button" onClick={() => handleRemoveDetail(index)}>
-                    &times;
+                    <FiX />
                   </button>
                 </li>
               ))}
           </ul>
 
-          {/* Button to add product details to ProductList */}
           <button onClick={handleAddProduct} disabled={!importData.Color || importData.ProductDetail.length === 0}>
             Add Product to List
           </button>
 
-          {/* Display list of added products for each color */}
           <div className="product-list">
             <h4>Added Products</h4>
             <ul>
@@ -316,7 +311,6 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             </ul>
           </div>
 
-          {/* Display total product and total meter */}
           <div className="totals">
             <p>
               <strong>Overall Total Product:</strong> {importData.totalProduct}
@@ -326,7 +320,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             </p>
           </div>
 
-          {/* Input for Total Amount */}
+          <label>Total Amount</label>
           <input
             type="number"
             name="TotalAmount"
@@ -336,17 +330,16 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             className="modal-input"
           />
 
-          {/* Input for Note */}
+          <label>Additional Note</label>
           <textarea
             name="Note"
-            placeholder="Additional Note"
+            placeholder="Any additional information..."
             value={importData.Note}
             onChange={handleInputChange}
             rows="3"
             className="modal-input"
           />
 
-          {/* Modal buttons */}
           <div className="modal-buttons">
             <button onClick={handleSave}>Save</button>
             <button onClick={handleClose}>Cancel</button>
@@ -358,3 +351,4 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 };
 
 export default ImportProductModal;
+
