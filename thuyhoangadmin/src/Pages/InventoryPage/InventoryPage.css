@@ -1,22 +1,49 @@
-/* General Page Styles */
 .inventory-page {
   padding: 30px;
   background-color: #f4f7f9;
-  /* Light background color */
   border-radius: 12px;
   margin: 20px auto;
   width: 90%;
-  /* Adjusted width */
   font-family: Arial, sans-serif;
 }
 
-/* Page Title */
-.inventory-page h2 {
-  font-size: 26px;
-  /* Increased font size for consistency */
-  color: #2c3e50;
+/* Header Container Styles */
+.header-container {
   text-align: center;
+  background-color: #f2f4f8;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
   margin-bottom: 20px;
+}
+
+/* Header Title */
+.header-container h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Filter Container Styles */
+.filter-container {
+  display: flex;
+  justify-content: right;
+  align-items: right;
+  margin-bottom: 20px;
+}
+
+.filter-dropdown {
+  width: 150px;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-dropdown:hover {
+  border-color: #007bff;
 }
 
 /* Inventory Table Styles */
@@ -25,35 +52,28 @@
   border-collapse: collapse;
   margin-top: 20px;
   background: #ffffff;
-  /* White background for table */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  /* Subtle shadow */
   border-radius: 8px;
   overflow: hidden;
-  /* Hide overflow for border-radius */
 }
 
 .inventory-table th,
 .inventory-table td {
   padding: 12px 16px;
-  /* Increased padding */
   border: 1px solid #ddd;
   text-align: left;
   font-size: 16px;
-  /* Font size for consistency */
 }
 
 .inventory-table th {
   background-color: #f9f9f9;
   font-weight: 600;
   color: #666;
-  text-align: center;
 }
 
 .inventory-table td {
   background-color: #fff;
   color: #333;
-  text-align: center;
 }
 
 .inventory-table tr:nth-child(even) {
@@ -64,25 +84,7 @@
   background-color: #eaf1f8;
 }
 
-/* Product List and Detail Styles */
-.inventory-table ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.inventory-table li {
-  padding: 6px 0;
-}
-
-/* No Data Row */
-.inventory-table tbody tr td[colspan="10"] {
-  text-align: center;
-  color: #999;
-  font-size: 18px;
-  padding: 20px;
-}
-
+/* Pagination Styles */
 .pagination-controls {
   display: flex;
   justify-content: center;
@@ -108,20 +110,4 @@
 
 .pagination-controls span {
   font-size: 18px;
-}
-
-.filter-dropdown {
-  width: 150px;
-  /* Adjust this value to your desired width */
-  padding: 8px;
-  font-size: 16px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  outline: none;
-  cursor: pointer;
-}
-
-.filter-dropdown:hover {
-  border-color: #007bff;
-  /* Change border color on hover */
 }

@@ -127,10 +127,8 @@ const InventoryPage = () => {
   // Render the table with fetched data
   return (
     <div className="inventory-page">
-      <h2>Quản Lý Tồn Kho</h2> {/* Updated title to match other pages */}
-
-      {/* Status Filter Dropdown */}
-      <div className="filter-container">
+            {/* Status Filter Dropdown */}
+            <div className="filter-container">
         <label htmlFor="statusFilter">Lọc Theo Trạng Thái: </label>
         <select
           id="statusFilter"
@@ -143,6 +141,11 @@ const InventoryPage = () => {
           <option value="Xuất Hàng">Xuất Hàng</option>
         </select>
       </div>
+      <div className="header-container">
+        <h2>Quản Lý Tồn Kho</h2>
+      </div>
+
+
 
       <table className="inventory-table">
         <thead>
