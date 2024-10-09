@@ -14,20 +14,16 @@ const InventoryPage = () => {
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
-        
-        const result = await response.json();
-        console.log('Raw API Response:', result);
 
-        // Parse the body field since it is a JSON string
+        const result = await response.json();
         const parsedBody = JSON.parse(result.body);
-        console.log('Parsed Body:', parsedBody);
 
         // Set data if it exists, otherwise log an error and set to an empty array
         if (parsedBody && parsedBody.data) {
           setData(parsedBody.data);
         } else {
           console.error('Unexpected data structure:', parsedBody);
-          setData([]); // Set empty array if structure is unexpected
+          setData([]);
         }
       } catch (err) {
         setError(err.message);
@@ -41,8 +37,8 @@ const InventoryPage = () => {
   }, []);
 
   // Render loading or error messages
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div>Đang tải...</div>; // Loading
+  if (error) return <div>Lỗi: {error}</div>;  // Error
 
   // Helper function to render ProductList as formatted text
   const renderProductList = (productList) => {
@@ -71,7 +67,7 @@ const InventoryPage = () => {
       <ul>
         {Object.keys(detail).map((color, index) => (
           <li key={index}>
-            <strong>{color}:</strong> Total Product: {detail[color].TotalProduct}, Total Meter: {detail[color].TotalMeter}
+            <strong>{color}:</strong> Tổng Số Lượng: {detail[color].TotalProduct}, Tổng Mét: {detail[color].TotalMeter}
           </li>
         ))}
       </ul>
@@ -81,41 +77,41 @@ const InventoryPage = () => {
   // Render the table with fetched data
   return (
     <div className="inventory-page">
-      <h2>Tracking Inventory</h2>
+      <h2>Quản Lý Tồn Kho</h2> {/* Updated title to match other pages */}
       <table className="inventory-table">
         <thead>
           <tr>
-            <th>ID</th> {/* New column for ID */}
-            <th>Date & Time</th>
-            <th>Customer</th>
-            <th>Product List</th>
-            <th>Status</th>
-            <th>Total Amount</th>
-            <th>Total Meter</th>
-            <th>Total Product</th>
-            <th>Detail</th> {/* New column for Detail */}
-            <th>Note</th>    {/* New column for Note */}
+            <th>Ngày & Giờ</th> {/* Date & Time */}
+            <th>ID</th>
+            <th>Trạng Thái</th> {/* Status */}
+            <th>Khách Hàng</th> {/* Customer */}
+            <th>Danh Sách Sản Phẩm</th> {/* Product List */}
+            <th>Tổng Số Tiền</th> {/* Total Amount */}
+            <th>Tổng Mét</th> {/* Total Meter */}
+            <th>Tổng Số Lượng</th> {/* Total Product */}
+            <th>Chi Tiết</th> {/* Detail */}
+            <th>Ghi Chú</th> {/* Note */}
           </tr>
         </thead>
         <tbody>
           {data.length > 0 ? (
             data.map((item, index) => (
               <tr key={index}>
+                <td>{item['Date&Time']}</td> {/* Display Date & Time */}
                 <td>{item.ID}</td> {/* Displaying ID */}
-                <td>{item['Date&Time']}</td>
-                <td>{item.Customer}</td>
-                <td>{renderProductList(item.ProductList)}</td>
-                <td>{item.Status}</td>
-                <td>{item.TotalAmount}</td>
-                <td>{item.TotalMeter}</td>
-                <td>{item.TotalProduct}</td>
+                <td>{item.Status}</td> {/* Displaying Status */}
+                <td>{item.Customer}</td> {/* Displaying Customer */}
+                <td>{renderProductList(item.ProductList)}</td> {/* Displaying Product List */}
+                <td>{item.TotalAmount}</td> {/* Displaying Total Amount */}
+                <td>{item.TotalMeter}</td> {/* Displaying Total Meter */}
+                <td>{item.TotalProduct}</td> {/* Displaying Total Product */}
                 <td>{renderDetail(item.Detail)}</td> {/* Displaying Detail */}
-                <td>{item.Note || 'N/A'}</td>         {/* Displaying Note */}
+                <td>{item.Note || 'N/A'}</td> {/* Displaying Note */}
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="10">No data available</td> {/* Updated colspan to 10 */}
+              <td colSpan="10">Không có dữ liệu</td> {/* Updated colspan to 10 */}
             </tr>
           )}
         </tbody>
