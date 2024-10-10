@@ -174,11 +174,15 @@
   background: #e74c3c;
   color: #fff;
   border: none;
-  padding: 8px;
+  padding: 16px;
+  /* Increase the padding to make the button larger */
   border-radius: 50%;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
+  /* Alternatively, you can use specific height and width */
+  height: 40px;
 }
+
 
 .remove-detail-button:hover {
   background: #c0392b;
