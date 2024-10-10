@@ -19,6 +19,12 @@ const HomePage = () => {
         <Link to="/history" className="page-button">
           Lịch Sử Đơn Hàng
         </Link>
+        <Link to="/inventory" className="page-button">
+          Quản Lý Kho Vải
+        </Link>
+        <Link to="/tracking-inventory" className="page-button">
+          Lịch Sử Hàng Hoá
+        </Link>
       </div>
     </div>
   );
