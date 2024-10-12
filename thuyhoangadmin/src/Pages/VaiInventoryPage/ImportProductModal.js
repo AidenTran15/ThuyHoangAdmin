@@ -168,7 +168,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 
       // Close the modal and reset data
       handleClose();
-      onSave(importData); // Optional: pass data back to parent component if needed
+      onSave(); // No longer passing importData
     } catch (error) {
       console.error('Error while adding or updating data:', error);
       setErrorMessage(`Error: ${error.message}`);
@@ -243,16 +243,14 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     await Promise.all(vaiInventoryUpdatePromises);
   };
 
-
-  
   return (
     isVisible && (
       <div className="import-modal">
         <div className="modal-content">
           <h3>Nhập Sản Phẩm</h3>
-  
+
           {errorMessage && <p className="error-message">{errorMessage}</p>}
-  
+
           {/* Customer Name Input */}
           <label>Tên Khách Hàng</label>
           <input
@@ -263,7 +261,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
             className="modal-input"
           />
-  
+
           {/* Select Color Dropdown */}
           <label>Chọn Màu</label>
           <select name="Color" value={importData.Color} onChange={handleInputChange} className="modal-input">
@@ -274,7 +272,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               </option>
             ))}
           </select>
-  
+
           {/* Product Detail Input and Add Button */}
           <div className="product-detail-section">
             <input
@@ -288,7 +286,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               +
             </button>
           </div>
-  
+
           {/* Product Detail List for Current Color */}
           <ul className="product-detail-list">
             {Array.isArray(importData.ProductDetail) &&
@@ -301,16 +299,16 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
                 </li>
               ))}
           </ul>
-  
+
           {/* Add Product to List Button */}
           <button onClick={handleAddProduct} disabled={!importData.Color || importData.ProductDetail.length === 0}>
             Màu Khác
           </button>
-  
+
           {/* Added Products Section */}
           <div className="added-products-card">
             <h4>Sản Phẩm Đã Thêm</h4>
-  
+
             {/* Display Product Details by Color */}
             {Object.keys(importData.ProductList).length > 0 && (
               <div className="product-list">
@@ -326,7 +324,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
                 ))}
               </div>
             )}
-  
+
             {/* Totals Section */}
             <div className="totals-section">
               <div className="metric">
@@ -337,7 +335,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               </div>
             </div>
           </div>
-  
+
           {/* Total Amount Input */}
           <label>Tổng Số Tiền</label>
           <input
@@ -348,7 +346,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
             className="modal-input"
           />
-  
+
           {/* Additional Note Textarea */}
           <label>Ghi Chú Thêm</label>
           <textarea
@@ -359,7 +357,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             rows="3"
             className="modal-input"
           />
-  
+
           {/* Save and Cancel Buttons */}
           <div className="modal-buttons">
             <button onClick={handleSave}>Lưu</button>
@@ -369,11 +367,6 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       </div>
     )
   );
-  
-    
-  
-  
 };
 
 export default ImportProductModal;
-

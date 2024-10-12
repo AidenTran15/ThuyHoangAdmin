@@ -23,21 +23,31 @@ const VaiInventoryPage = () => {
   const [isExportModalVisible, setIsExportModalVisible] = useState(false); // State for Export modal visibility
   const [colors, setColors] = useState([]); // State to store unique colors
 
-  useEffect(() => {
-    // Fetch products from the API and extract unique colors
+  // Function to fetch products from the API
+  const fetchProducts = () => {
+    setIsLoading(true);
     axios
       .get('https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your Lambda URL
       .then((response) => {
         const productData = JSON.parse(response.data.body);
-        setProducts(Array.isArray(productData) ? productData : []);
-        const uniqueColors = [...new Set(productData.map((product) => product.Color))]; // Extract unique colors
-        setColors(uniqueColors); // Set colors state
+        console.log('Fetched product data:', productData); // Add logging
+        const validProducts = Array.isArray(productData)
+          ? productData.filter((product) => product && product.ProductID)
+          : [];
+        setProducts(validProducts);
+        const uniqueColors = [...new Set(validProducts.map((product) => product.Color))]; // Use validProducts here
+        setColors(uniqueColors);
         setIsLoading(false);
       })
       .catch((error) => {
-        console.error('Lỗi khi tải sản phẩm!', error);
+        console.error('Error fetching products!', error);
         setIsLoading(false);
       });
+  };
+
+  useEffect(() => {
+    // Fetch products from the API and extract unique colors
+    fetchProducts();
   }, []);
 
   // Handle input changes for adding or editing a product
@@ -96,7 +106,11 @@ const VaiInventoryPage = () => {
       { headers: { 'Content-Type': 'application/json' } }
     )
       .then(() => {
-        setProducts((prev) => (isEditing ? prev.map((p) => (p.ProductID === newProduct.ProductID ? newProduct : p)) : [...prev, newProduct]));
+        setProducts((prev) =>
+          isEditing
+            ? prev.map((p) => (p.ProductID === newProduct.ProductID ? newProduct : p))
+            : [...prev, newProduct]
+        );
         setNewProduct({ ProductID: '', Color: '', totalProduct: '', ProductDetail: [], TotalMeter: '' });
         setIsAddingNew(false);
         setIsEditing(false);
@@ -119,12 +133,13 @@ const VaiInventoryPage = () => {
       .catch((error) => console.error(`Lỗi khi xóa sản phẩm ${productToDelete}:`, error));
   };
 
-  const handleImportSave = (importData) => {
-    setProducts((prev) => [...prev, importData]);
+  // Updated handleImportSave function
+  const handleImportSave = () => {
+    fetchProducts(); // Fetch updated products after import
   };
 
-  const handleExportSave = (exportData) => {
-    setProducts((prev) => [...prev, exportData]);
+  const handleExportSave = () => {
+    fetchProducts(); // Fetch updated products after export
   };
 
   return (
@@ -136,25 +151,54 @@ const VaiInventoryPage = () => {
         <button onClick={() => setIsExportModalVisible(true)} className="export-button">Xuất Hàng</button> {/* Translated Export Button */}
       </div>
 
-      {isLoading ? <p>Đang tải...</p> : (  // Translated loading message
+      {isLoading ? (
+        <p>Đang tải...</p> // Translated loading message
+      ) : (
         <table className="vai-inventory-table">
           <thead>
-            <tr><th>Mã Sản Phẩm</th><th>Màu</th><th>Chi Tiết Số Mét Từng Cây</th><th>Tổng Số Cây</th><th>Tổng Mét</th><th>Xoá Hàng</th></tr> {/* Translated headers */}
+            <tr>
+              <th>Mã Sản Phẩm</th>
+              <th>Màu</th>
+              <th>Chi Tiết Số Mét Từng Cây</th>
+              <th>Tổng Số Cây</th>
+              <th>Tổng Mét</th>
+              <th>Xoá Hàng</th>
+            </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
-              <tr key={product.ProductID}>
-                <td>{product.ProductID}</td>
-                <td>{product.Color}</td>
-                <td>{Array.isArray(product.ProductDetail) ? product.ProductDetail.join(', ') : product.ProductDetail}</td>
-                <td>{product.totalProduct}</td>
-                <td>{product.TotalMeter}</td>
-                <td>
-                  {/* Removed the Edit button */}
-                  <button className="action-button delete-button" onClick={() => { setProductToDelete(product.ProductID); setIsDeleteModalVisible(true); }}>Xóa</button> {/* Translated Delete button */}
-                </td>
+            {products.length > 0 ? (
+              products.map((product) =>
+                product && product.ProductID ? (
+                  <tr key={product.ProductID}>
+                    <td>{product.ProductID}</td>
+                    <td>{product.Color}</td>
+                    <td>
+                      {Array.isArray(product.ProductDetail)
+                        ? product.ProductDetail.join(', ')
+                        : product.ProductDetail || 'No details'}
+                    </td>
+                    <td>{product.totalProduct}</td>
+                    <td>{product.TotalMeter}</td>
+                    <td>
+                      {/* Removed the Edit button */}
+                      <button
+                        className="action-button delete-button"
+                        onClick={() => {
+                          setProductToDelete(product.ProductID);
+                          setIsDeleteModalVisible(true);
+                        }}
+                      >
+                        Xóa
+                      </button>
+                    </td>
+                  </tr>
+                ) : null
+              )
+            ) : (
+              <tr>
+                <td colSpan="6">Không có sản phẩm để hiển thị.</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       )}
@@ -218,7 +262,12 @@ const VaiInventoryPage = () => {
 
             <div className="modal-buttons">
               <button onClick={handleSaveProduct}>{isEditing ? 'Cập Nhật' : 'Lưu'}</button>
-              <button onClick={() => { setIsAddingNew(false); setIsEditing(false); }}>
+              <button
+                onClick={() => {
+                  setIsAddingNew(false);
+                  setIsEditing(false);
+                }}
+              >
                 Huỷ
               </button>
             </div>
@@ -245,7 +294,7 @@ const VaiInventoryPage = () => {
         <ImportProductModal
           isVisible={isImportModalVisible}
           handleClose={() => setIsImportModalVisible(false)}
-          onSave={handleImportSave} // Define this function to handle imported data saving
+          onSave={handleImportSave} // No longer passing importData
           colors={colors} // Pass colors state from VaiInventoryPage
         />
       )}
