@@ -86,7 +86,7 @@ const VaiInventoryPage = () => {
 
   const handleSaveProduct = () => {
     if (!newProduct.ProductID) {
-      alert('Mã sản phẩm là bắt buộc!');
+      alert('Mã màu là bắt buộc!');
       return;
     }
 
@@ -157,7 +157,7 @@ const VaiInventoryPage = () => {
         <table className="vai-inventory-table">
           <thead>
             <tr>
-              <th>Mã Sản Phẩm</th>
+              <th>Mã Màu</th>
               <th>Màu</th>
               <th>Chi Tiết Số Mét Từng Cây</th>
               <th>Tổng Số Cây</th>
@@ -209,7 +209,7 @@ const VaiInventoryPage = () => {
             <input
               type="text"
               name="ProductID"
-              placeholder="Mã Sản Phẩm"
+              placeholder="Mã Màu"
               value={newProduct.ProductID}
               onChange={handleNewProductChange}
               readOnly={isEditing}
@@ -224,7 +224,7 @@ const VaiInventoryPage = () => {
             <div className="product-detail-section">
               <input
                 type="number"
-                placeholder="Nhập Chi Tiết Sản Phẩm"
+                placeholder="Nhập Số Mét"
                 value={currentDetail}
                 onChange={(e) => setCurrentDetail(e.target.value)}
               />

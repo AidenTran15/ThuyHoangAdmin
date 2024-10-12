@@ -325,12 +325,12 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 
           {/* Add Product to List Button */}
           <button onClick={handleAddProduct} disabled={!importData.Color || importData.ProductDetail.length === 0 || isLoading}>
-            Màu Khác
+            Thêm Màu
           </button>
 
           {/* Added Products Section */}
           <div className="added-products-card">
-            <h4>Sản Phẩm Đã Thêm</h4>
+            <h4>Hàng Đã Thêm</h4>
 
             {/* Display Product Details by Color */}
             {Object.keys(importData.ProductList).length > 0 && (
