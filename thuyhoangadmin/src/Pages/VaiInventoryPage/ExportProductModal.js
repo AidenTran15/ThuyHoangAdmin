@@ -17,7 +17,6 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [showAddMore, setShowAddMore] = useState(false); // Show Add More button
   const [productIDs, setProductIDs] = useState({}); // Store ProductIDs for colors
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   useEffect(() => {
     // Fetch product details and ProductID based on selected color
@@ -71,8 +70,6 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   };
 
   const handleSelectProductDetail = (selectedDetail, index) => {
-    if (isLoading) return; // Prevent interaction during loading
-
     setExportData((prev) => {
       // Check if the product detail is already selected for the current color
       const currentColorSelection = prev.SelectedProducts.find(
@@ -109,17 +106,12 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             { Color: prev.Color, ProductDetail: updatedProductDetails }
           ];
 
-      // Remove color from SelectedProducts if no ProductDetail selected
-      const finalSelections = updatedSelections.filter(
-        (selection) => selection.ProductDetail.length > 0
-      );
-
       // Calculate the overall total product count and total meters
-      const overallTotalProduct = finalSelections.reduce(
+      const overallTotalProduct = updatedSelections.reduce(
         (total, selection) => total + selection.ProductDetail.length,
         0
       );
-      const overallTotalMeter = finalSelections.reduce(
+      const overallTotalMeter = updatedSelections.reduce(
         (total, selection) =>
           total +
           selection.ProductDetail.reduce((acc, val) => acc + val.value, 0),
@@ -127,17 +119,16 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       );
 
       // Determine whether to show the Add More button
-      const showAddMoreButton = finalSelections.length > 0 && overallTotalProduct > 0;
-
-      setShowAddMore(showAddMoreButton); // Show Add More button when a product is selected
+      const showAddMoreButton = updatedSelections.length > 0 && overallTotalProduct > 0;
 
       return {
         ...prev,
-        SelectedProducts: finalSelections,
+        SelectedProducts: updatedSelections,
         totalProduct: overallTotalProduct,
         TotalMeter: overallTotalMeter
       };
     });
+    setShowAddMore(true); // Show Add More button when a product is selected
   };
 
   const handleAddMore = () => {
@@ -152,14 +143,6 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 
   const handleSave = async () => {
     setErrorMessage(''); // Reset error message before saving
-
-    // Validate required fields
-    if (!exportData.Customer || !exportData.TotalAmount || exportData.totalProduct === 0) {
-      setErrorMessage('Vui lòng điền đầy đủ thông tin trước khi lưu.');
-      return;
-    }
-
-    setIsLoading(true); // Start loading
 
     const requestBody = {
       Customer: exportData.Customer,
@@ -211,62 +194,27 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 
       console.log('Data added successfully to TrackingInventory.');
 
-      // For each selected color, update the product database
+      // For each selected color, call the lambda function to update the product database
       for (const selection of exportData.SelectedProducts) {
         const productID = productIDs[selection.Color];
         if (!productID) {
           throw new Error(`ProductID not found for color ${selection.Color}`);
         }
 
-        // Fetch existing product details to update the inventory correctly
-        const fetchResponse = await fetch(
-          `https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get?color=${encodeURIComponent(
-            selection.Color
-          )}`
-        );
-
-        if (!fetchResponse.ok) {
-          throw new Error(
-            `Failed to fetch existing product details for color ${selection.Color}. Status: ${fetchResponse.status}`
-          );
-        }
-
-        const data = await fetchResponse.json();
-        const parsedData =
-          typeof data.body === 'string' ? JSON.parse(data.body) : data;
-        const matchingItem = parsedData.find(
-          (item) => item.Color === selection.Color
-        );
-
-        if (!matchingItem) {
-          throw new Error(`No existing product found for color ${selection.Color}`);
-        }
-
-        // Remove selected product details from existing product details
-        const updatedProductDetails = matchingItem.ProductDetail.filter(
-          (detail, index) => {
-            // Check if this detail was not selected for export
-            return !selection.ProductDetail.some(
-              (selectedDetail) =>
-                selectedDetail.value === detail &&
-                selectedDetail.index === index
-            );
-          }
-        );
-
-        const totalMeter = updatedProductDetails.reduce((sum, num) => sum + num, 0);
-
         const updateRequestBody = {
           ProductID: productID,
           Color: selection.Color,
-          ProductDetail: updatedProductDetails,
-          totalProduct: updatedProductDetails.length,
-          TotalMeter: `${totalMeter} meters`
+          ProductDetail: selection.ProductDetail.map((detail) => detail.value),
+          totalProduct: selection.ProductDetail.length,
+          TotalMeter: `${selection.ProductDetail.reduce(
+            (acc, val) => acc + val.value,
+            0
+          )} meters`
         };
 
-        // Make a PUT request to update the product database
+        // Make a POST request to the lambda function to update the product database
         const updateResponse = await fetch(
-          'https://2t6r0vxhzf.execute-api.ap-southeast-2.amazonaws.com/prod/update',
+          'https://zvflcuqc6c.execute-api.ap-southeast-2.amazonaws.com/prod/export', // Replace with your actual lambda function URL
           {
             method: 'PUT',
             headers: {
@@ -287,14 +235,11 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
         );
       }
 
-      // Close the modal after successful save
-      handleClose();
-      onSave(); // Call onSave without parameters
+      onSave(exportData); // Pass the data back to parent component if needed
+      handleClose(); // Close the modal after successful save
     } catch (error) {
       console.error('Error while saving data:', error);
       setErrorMessage(`Error: ${error.message}`);
-    } finally {
-      setIsLoading(false); // Stop loading
     }
   };
 
@@ -315,8 +260,6 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       setAvailableProductDetails([]);
       setShowAddMore(false);
       setProductIDs({});
-      setErrorMessage('');
-      setIsLoading(false);
     }
   }, [isVisible]);
 
@@ -325,9 +268,9 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       <div className="export-modal">
         <div className="modal-content">
           <h3>Xuất Sản Phẩm</h3> {/* Export Product */}
-
+  
           {errorMessage && <p className="error-message">{errorMessage}</p>}
-
+  
           {/* Customer Name Input */}
           <label>Tên Khách Hàng</label> {/* Customer Name */}
           <input
@@ -337,18 +280,11 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             value={exportData.Customer}
             onChange={handleInputChange}
             className="modal-input"
-            disabled={isLoading}
           />
-
+  
           {/* Select Color Dropdown */}
           <label>Chọn Màu</label> {/* Select Color */}
-          <select
-            name="Color"
-            value={exportData.Color}
-            onChange={handleInputChange}
-            className="modal-input"
-            disabled={isLoading}
-          >
+          <select name="Color" value={exportData.Color} onChange={handleInputChange} className="modal-input">
             <option value="">Chọn màu</option> {/* Choose a color */}
             {colors.map((color, index) => (
               <option key={index} value={color}>
@@ -356,7 +292,7 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               </option>
             ))}
           </select>
-
+  
           {/* Display Available Product Details */}
           {availableProductDetails.length > 0 && (
             <div className="available-products">
@@ -374,7 +310,7 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
                         ? 'selected'
                         : ''
                     }`}
-                    onClick={!isLoading ? () => handleSelectProductDetail(detail, index) : null}
+                    onClick={() => handleSelectProductDetail(detail, index)}
                   >
                     {detail} mét {/* {detail} meters */}
                   </div>
@@ -382,25 +318,25 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               </div>
             </div>
           )}
-
+  
           {/* Display Selected Products Section */}
           {exportData.SelectedProducts.length > 0 && (
             <div className="selected-products">
-              <h4>Sản Phẩm Đã Chọn</h4> {/* Selected Products */}
-
+              <h4>Sản Phẩm Đã Chọn</h4> {/* Current Selections */}
+  
               {/* Display Each Selected Color and Its Details */}
               {exportData.SelectedProducts.map((selection, index) => (
                 <div key={index} className="product-item">
                   <strong>{selection.Color}:</strong> {/* Display Color Name */}
                   <ul className="product-details">
-                    {selection.ProductDetail.map((detail, idx) => (
-                      <li key={idx}>{detail.value} mét</li> /* {detail} meters */
+                    {selection.ProductDetail.map((detail, index) => (
+                      <li key={index}>{detail.value} mét</li> /* {detail} meters */
                     ))}
                   </ul>
                 </div>
               ))}
-
-              {/* Totals Section */}
+  
+              {/* Totals Section - Similar to Import Modal */}
               <div className="totals-section">
                 <div className="metric">
                   <span className="metric-value">Tổng Số Lượng Sản Phẩm: {exportData.totalProduct}</span> {/* Overall Total Product */}
@@ -411,14 +347,14 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               </div>
             </div>
           )}
-
-          {/* Add More Button */}
+  
+          {/* Move the Add More Button Here */}
           {showAddMore && (
-            <button onClick={handleAddMore} className="add-more-button" disabled={isLoading}>
+            <button onClick={handleAddMore} className="add-more-button">
               Thêm Màu Khác {/* Add More */}
             </button>
           )}
-
+  
           {/* Total Amount Input */}
           <label>Tổng Số Tiền</label> {/* Total Amount */}
           <input
@@ -428,9 +364,8 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             value={exportData.TotalAmount}
             onChange={handleInputChange}
             className="modal-input"
-            disabled={isLoading}
           />
-
+  
           {/* Additional Note Textarea */}
           <label>Ghi Chú Thêm</label> {/* Additional Note */}
           <textarea
@@ -440,22 +375,19 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
             rows="3"
             className="modal-input"
-            disabled={isLoading}
           />
-
+  
           {/* Save and Cancel Buttons */}
           <div className="modal-buttons">
-            <button onClick={handleSave} disabled={isLoading}>
-              {isLoading ? 'Đang lưu...' : 'Lưu'} {/* Save */}
-            </button>
-            <button onClick={handleClose} disabled={isLoading}>
-              Hủy
-            </button>
+            <button onClick={handleSave}>Lưu</button> {/* Save */}
+            <button onClick={handleClose}>Hủy</button> {/* Cancel */}
           </div>
         </div>
       </div>
     )
   );
+  
+  
 };
 
 export default ExportProductModal;
