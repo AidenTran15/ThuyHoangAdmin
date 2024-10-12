@@ -18,6 +18,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
 
   const [currentDetail, setCurrentDetail] = useState(''); // Track current product detail input
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
 
   // Handle input changes for import data
   const handleInputChange = (e) => {
@@ -111,6 +112,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
         Status: 'Import',
         Note: '',
       });
+      setErrorMessage('');
+      setIsLoading(false); // Reset loading state
     }
   }, [isVisible]);
 
@@ -118,6 +121,13 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
   const handleSave = async () => {
     setErrorMessage(''); // Reset error message before saving
 
+    // Validate required fields
+    if (!importData.Customer || !importData.TotalAmount || importData.totalProduct === 0) {
+      setErrorMessage('Vui lòng điền đầy đủ thông tin trước khi lưu.');
+      return;
+    }
+
+    setIsLoading(true); // Start loading
     // Calculate the Detail field based on the ProductList
     const detail = {};
     Object.keys(importData.ProductList).forEach((color) => {
@@ -172,6 +182,8 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     } catch (error) {
       console.error('Error while adding or updating data:', error);
       setErrorMessage(`Error: ${error.message}`);
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -181,6 +193,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
       const newProductDetails = importData.ProductList[color];
 
       let productID = '';
+      let existingProductDetails = [];
       try {
         console.log(`Fetching existing details for color: ${color}`);
         const fetchResponse = await fetch(
@@ -200,6 +213,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
           const matchingItem = parsedData.find((item) => item.Color === color);
           if (matchingItem && matchingItem.ProductID) {
             productID = matchingItem.ProductID;
+            existingProductDetails = matchingItem.ProductDetail || [];
           }
         }
       } catch (error) {
@@ -210,12 +224,16 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
         productID = `PROD_${color}_${Date.now()}`;
       }
 
+      // Combine existing and new product details
+      const combinedProductDetails = [...existingProductDetails, ...newProductDetails];
+      const totalMeter = combinedProductDetails.reduce((sum, num) => sum + num, 0);
+
       const updateBody = {
         ProductID: productID,
         Color: color,
-        totalProduct: newProductDetails.length,
-        ProductDetail: newProductDetails,
-        TotalMeter: `${newProductDetails.reduce((sum, num) => sum + num, 0)} meters`,
+        totalProduct: combinedProductDetails.length,
+        ProductDetail: combinedProductDetails,
+        TotalMeter: `${totalMeter} meters`,
       };
 
       try {
@@ -260,11 +278,18 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             value={importData.Customer}
             onChange={handleInputChange}
             className="modal-input"
+            disabled={isLoading} // Disable input during loading
           />
 
           {/* Select Color Dropdown */}
           <label>Chọn Màu</label>
-          <select name="Color" value={importData.Color} onChange={handleInputChange} className="modal-input">
+          <select
+            name="Color"
+            value={importData.Color}
+            onChange={handleInputChange}
+            className="modal-input"
+            disabled={isLoading} // Disable input during loading
+          >
             <option value="">Chọn màu</option>
             {colors.map((color, index) => (
               <option key={index} value={color}>
@@ -281,8 +306,9 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               value={currentDetail}
               onChange={(e) => setCurrentDetail(e.target.value)}
               className="modal-input"
+              disabled={isLoading} // Disable input during loading
             />
-            <button className="add-detail-button" onClick={handleAddProductDetail}>
+            <button className="add-detail-button" onClick={handleAddProductDetail} disabled={isLoading}>
               +
             </button>
           </div>
@@ -293,7 +319,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
               importData.ProductDetail.map((detail, index) => (
                 <li key={index}>
                   {detail} mét
-                  <button className="remove-detail-button" onClick={() => handleRemoveDetail(index)}>
+                  <button className="remove-detail-button" onClick={() => handleRemoveDetail(index)} disabled={isLoading}>
                     x
                   </button>
                 </li>
@@ -301,7 +327,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
           </ul>
 
           {/* Add Product to List Button */}
-          <button onClick={handleAddProduct} disabled={!importData.Color || importData.ProductDetail.length === 0}>
+          <button onClick={handleAddProduct} disabled={!importData.Color || importData.ProductDetail.length === 0 || isLoading}>
             Màu Khác
           </button>
 
@@ -345,6 +371,7 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             value={importData.TotalAmount}
             onChange={handleInputChange}
             className="modal-input"
+            disabled={isLoading} // Disable input during loading
           />
 
           {/* Additional Note Textarea */}
@@ -356,12 +383,17 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
             onChange={handleInputChange}
             rows="3"
             className="modal-input"
+            disabled={isLoading} // Disable input during loading
           />
 
           {/* Save and Cancel Buttons */}
           <div className="modal-buttons">
-            <button onClick={handleSave}>Lưu</button>
-            <button onClick={handleClose}>Hủy</button>
+            <button onClick={handleSave} disabled={isLoading}>
+              {isLoading ? 'Đang lưu...' : 'Lưu'} {/* Show loading text */}
+            </button>
+            <button onClick={handleClose} disabled={isLoading}>
+              Hủy
+            </button>
           </div>
         </div>
       </div>
