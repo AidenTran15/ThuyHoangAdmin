@@ -305,23 +305,34 @@ const ExportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
           {exportData.SelectedProducts.length > 0 && (
             <div className="selected-products">
               <h4>Sản Phẩm Đã Chọn</h4>
-              {exportData.SelectedProducts.map((selection, index) => (
-                <div key={index} className="product-item">
-                  <strong>{selection.Color}:</strong>
-                  <ul className="product-details">
-                    {selection.ProductDetail.map((detail, index) => (
-                      <li key={index}>{detail.value} mét</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+              {exportData.SelectedProducts.map((selection, index) => {
+                const colorTotalProduct = selection.ProductDetail.length;
+                const colorTotalMeter = selection.ProductDetail.reduce(
+                  (acc, detail) => acc + detail.value,
+                  0
+                );
+                return (
+                  <div key={index} className="product-item">
+                    <strong>{selection.Color}:</strong>
+                    <ul className="product-details">
+                      {selection.ProductDetail.map((detail, index) => (
+                        <li key={index}>{detail.value} mét</li>
+                      ))}
+                    </ul>
+                    <div className="color-totals">
+                      <p><strong>Tổng số cây:</strong> {colorTotalProduct}</p>
+                      <p><strong>Tổng số mét:</strong> {colorTotalMeter} mét</p>
+                    </div>
+                  </div>
+                );
+              })}
 
               <div className="totals-section">
                 <div className="metric">
-                  <span className="metric-value">Tổng Số Lượng Sản Phẩm: {exportData.totalProduct}</span>
+                  <span className="metric-value"><strong>Tổng Số Lượng Sản Phẩm:</strong> {exportData.totalProduct}</span>
                 </div>
                 <div className="metric">
-                  <span className="metric-value">Tổng Số Mét: {exportData.TotalMeter} mét</span>
+                  <span className="metric-value"><strong>Tổng Số Mét:</strong> {exportData.TotalMeter} mét</span>
                 </div>
               </div>
             </div>
