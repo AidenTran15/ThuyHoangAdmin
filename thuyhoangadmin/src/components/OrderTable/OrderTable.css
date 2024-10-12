@@ -290,9 +290,9 @@ button {
 }
 
 .add-button {
-  background-color: #56ccf2;
+  background-color: #56ccf2 !important;
   color: white;
-  margin-top: 22px;
+  margin-top: 48px !important;
 }
 
 .add-button:hover {
