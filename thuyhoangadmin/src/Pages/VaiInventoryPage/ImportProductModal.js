@@ -187,79 +187,79 @@ const ImportProductModal = ({ isVisible, handleClose, onSave, colors }) => {
     }
   };
 
-  // Function to update VaiInventory based on the product colors and details
-  const updateVaiInventory = async () => {
-    const vaiInventoryUpdatePromises = Object.keys(importData.ProductList).map(async (color) => {
-      const newProductDetails = importData.ProductList[color];
+ // In ImportProductModal.js
+const updateVaiInventory = async () => {
+  const vaiInventoryUpdatePromises = Object.keys(importData.ProductList).map(async (color) => {
+    const newProductDetails = importData.ProductList[color];
 
-      let productID = '';
-      let existingProductDetails = [];
-      try {
-        console.log(`Fetching existing details for color: ${color}`);
-        const fetchResponse = await fetch(
-          `https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get?color=${encodeURIComponent(color)}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (fetchResponse.ok) {
-          const data = await fetchResponse.json();
-          const parsedData = typeof data.body === 'string' ? JSON.parse(data.body) : data;
-
-          const matchingItem = parsedData.find((item) => item.Color === color);
-          if (matchingItem && matchingItem.ProductID) {
-            productID = matchingItem.ProductID;
-            existingProductDetails = matchingItem.ProductDetail || [];
-          }
+    let productID = '';
+    // Removed fetching existingProductDetails
+    try {
+      console.log(`Fetching existing details for color: ${color}`);
+      const fetchResponse = await fetch(
+        `https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get?color=${encodeURIComponent(color)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
-      } catch (error) {
-        console.error(`Error fetching existing ProductID for color ${color}:`, error);
-      }
+      );
 
-      if (!productID) {
-        productID = `PROD_${color}_${Date.now()}`;
-      }
+      if (fetchResponse.ok) {
+        const data = await fetchResponse.json();
+        const parsedData = typeof data.body === 'string' ? JSON.parse(data.body) : data;
 
-      // Combine existing and new product details
-      const combinedProductDetails = [...existingProductDetails, ...newProductDetails];
-      const totalMeter = combinedProductDetails.reduce((sum, num) => sum + num, 0);
-
-      const updateBody = {
-        ProductID: productID,
-        Color: color,
-        totalProduct: combinedProductDetails.length,
-        ProductDetail: combinedProductDetails,
-        TotalMeter: `${totalMeter} meters`,
-      };
-
-      try {
-        const vaiResponse = await fetch(
-          'https://2t6r0vxhzf.execute-api.ap-southeast-2.amazonaws.com/prod/update',
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updateBody),
-          }
-        );
-
-        if (!vaiResponse.ok) {
-          throw new Error(`Failed to update VaiInventory for color ${color}. Status: ${vaiResponse.status}`);
+        const matchingItem = parsedData.find((item) => item.Color === color);
+        if (matchingItem && matchingItem.ProductID) {
+          productID = matchingItem.ProductID;
+          // Do not retrieve existingProductDetails
         }
-
-        console.log(`Successfully updated VaiInventory for color ${color}.`);
-      } catch (error) {
-        console.error(`Error updating VaiInventory for color ${color}:`, error);
       }
-    });
+    } catch (error) {
+      console.error(`Error fetching existing ProductID for color ${color}:`, error);
+    }
 
-    await Promise.all(vaiInventoryUpdatePromises);
-  };
+    if (!productID) {
+      productID = `PROD_${color}_${Date.now()}`;
+    }
+
+    // Use only newProductDetails
+    const totalMeter = newProductDetails.reduce((sum, num) => sum + num, 0);
+
+    const updateBody = {
+      ProductID: productID,
+      Color: color,
+      totalProduct: newProductDetails.length,
+      ProductDetail: newProductDetails,
+      TotalMeter: `${totalMeter} meters`,
+    };
+
+    try {
+      const vaiResponse = await fetch(
+        'https://2t6r0vxhzf.execute-api.ap-southeast-2.amazonaws.com/prod/update',
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateBody),
+        }
+      );
+
+      if (!vaiResponse.ok) {
+        throw new Error(`Failed to update VaiInventory for color ${color}. Status: ${vaiResponse.status}`);
+      }
+
+      console.log(`Successfully updated VaiInventory for color ${color}.`);
+    } catch (error) {
+      console.error(`Error updating VaiInventory for color ${color}:`, error);
+    }
+  });
+
+  await Promise.all(vaiInventoryUpdatePromises);
+};
+
 
   return (
     isVisible && (
