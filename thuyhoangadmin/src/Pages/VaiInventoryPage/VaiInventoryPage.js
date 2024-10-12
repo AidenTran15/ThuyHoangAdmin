@@ -16,6 +16,7 @@ const VaiInventoryPage = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false); // New state for tracking save process
   const [currentDetail, setCurrentDetail] = useState('');
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
@@ -30,7 +31,6 @@ const VaiInventoryPage = () => {
       .get('https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your Lambda URL
       .then((response) => {
         const productData = JSON.parse(response.data.body);
-        console.log('Fetched product data:', productData); // Add logging
         const validProducts = Array.isArray(productData)
           ? productData.filter((product) => product && product.ProductID)
           : [];
@@ -46,23 +46,20 @@ const VaiInventoryPage = () => {
   };
 
   useEffect(() => {
-    // Fetch products from the API and extract unique colors
     fetchProducts();
   }, []);
 
-  // Handle input changes for adding or editing a product
   const handleNewProductChange = (e) => {
     const { name, value } = e.target;
     setNewProduct((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle adding a new detail to ProductDetail array
   const handleAddProductDetail = () => {
     if (currentDetail && !isNaN(currentDetail)) {
       setNewProduct((prev) => {
         const updatedProductDetail = [...prev.ProductDetail, parseFloat(currentDetail)];
         const totalMeter = updatedProductDetail.reduce((sum, num) => sum + num, 0); // Calculate total meter
-        const totalProductCount = updatedProductDetail.length; // Calculate total number of items
+        const totalProductCount = updatedProductDetail.length;
         return {
           ...prev,
           ProductDetail: updatedProductDetail,
@@ -70,11 +67,10 @@ const VaiInventoryPage = () => {
           totalProduct: totalProductCount // Update totalProduct automatically
         };
       });
-      setCurrentDetail(''); // Clear the input field after adding
+      setCurrentDetail('');
     }
   };
 
-  // Handle removing a product detail from ProductDetail array
   const handleRemoveDetail = (index) => {
     setNewProduct((prev) => {
       const updatedProductDetail = prev.ProductDetail.filter((_, i) => i !== index);
@@ -94,11 +90,13 @@ const VaiInventoryPage = () => {
       return;
     }
 
+    setIsSaving(true); // Start loading spinner when saving
+
     const apiUrl = isEditing
       ? `https://2t6r0vxhzf.execute-api.ap-southeast-2.amazonaws.com/prod/update`
       : `https://goq3m8d3ve.execute-api.ap-southeast-2.amazonaws.com/prod/add`;
 
-    const requestMethod = isEditing ? axios.put : axios.post; // Use PUT for editing, POST for adding
+    const requestMethod = isEditing ? axios.put : axios.post;
 
     requestMethod(
       apiUrl,
@@ -115,7 +113,10 @@ const VaiInventoryPage = () => {
         setIsAddingNew(false);
         setIsEditing(false);
       })
-      .catch((error) => console.error(`Lỗi khi ${isEditing ? 'cập nhật' : 'thêm'} sản phẩm:`, error));
+      .catch((error) => console.error(`Lỗi khi ${isEditing ? 'cập nhật' : 'thêm'} sản phẩm:`, error))
+      .finally(() => {
+        setIsSaving(false); // Stop loading spinner after saving
+      });
   };
 
   const handleDeleteProduct = () => {
@@ -133,26 +134,25 @@ const VaiInventoryPage = () => {
       .catch((error) => console.error(`Lỗi khi xóa sản phẩm ${productToDelete}:`, error));
   };
 
-  // Updated handleImportSave function
   const handleImportSave = () => {
-    fetchProducts(); // Fetch updated products after import
+    fetchProducts();
   };
 
   const handleExportSave = () => {
-    fetchProducts(); // Fetch updated products after export
+    fetchProducts();
   };
 
   return (
     <div className="vai-inventory-page">
       <div className="header-container">
-        <h2>Quản Lý Tồn Kho</h2> {/* Translated title */}
+        <h2>Quản Lý Tồn Kho</h2>
         <button onClick={() => { setIsAddingNew(true); setIsEditing(false); }} className="add-new-button">Tạo Mới</button>
-        <button onClick={() => setIsImportModalVisible(true)} className="import-button">Nhập Hàng</button> {/* Translated Import Button */}
-        <button onClick={() => setIsExportModalVisible(true)} className="export-button">Xuất Hàng</button> {/* Translated Export Button */}
+        <button onClick={() => setIsImportModalVisible(true)} className="import-button">Nhập Hàng</button>
+        <button onClick={() => setIsExportModalVisible(true)} className="export-button">Xuất Hàng</button>
       </div>
 
       {isLoading ? (
-        <p>Đang tải...</p> // Translated loading message
+        <p>Đang tải...</p>
       ) : (
         <table className="vai-inventory-table">
           <thead>
@@ -180,7 +180,6 @@ const VaiInventoryPage = () => {
                     <td>{product.totalProduct}</td>
                     <td>{product.TotalMeter}</td>
                     <td>
-                      {/* Removed the Edit button */}
                       <button
                         className="action-button delete-button"
                         onClick={() => {
@@ -203,7 +202,6 @@ const VaiInventoryPage = () => {
         </table>
       )}
 
-      {/* Add/Edit Product Modal */}
       {isAddingNew && (
         <div className="modal">
           <div className="modal-content">
@@ -261,7 +259,9 @@ const VaiInventoryPage = () => {
             </div>
 
             <div className="modal-buttons">
-              <button onClick={handleSaveProduct}>{isEditing ? 'Cập Nhật' : 'Lưu'}</button>
+              <button onClick={handleSaveProduct} disabled={isSaving}>
+                {isSaving ? <div className="spinner"></div> : isEditing ? 'Cập Nhật' : 'Lưu'}
+              </button>
               <button
                 onClick={() => {
                   setIsAddingNew(false);
@@ -275,7 +275,6 @@ const VaiInventoryPage = () => {
         </div>
       )}
 
-      {/* Confirm Delete Modal */}
       {isDeleteModalVisible && (
         <div className="modal">
           <div className="modal-content">
@@ -289,23 +288,21 @@ const VaiInventoryPage = () => {
         </div>
       )}
 
-      {/* Import Product Modal */}
       {isImportModalVisible && (
         <ImportProductModal
           isVisible={isImportModalVisible}
           handleClose={() => setIsImportModalVisible(false)}
-          onSave={handleImportSave} // No longer passing importData
-          colors={colors} // Pass colors state from VaiInventoryPage
+          onSave={handleImportSave}
+          colors={colors}
         />
       )}
 
-      {/* Export Product Modal */}
       {isExportModalVisible && (
         <ExportProductModal
           isVisible={isExportModalVisible}
           handleClose={() => setIsExportModalVisible(false)}
-          onSave={handleExportSave} // Define this function to handle exported data saving
-          colors={colors} // Pass colors state from VaiInventoryPage
+          onSave={handleExportSave}
+          colors={colors}
         />
       )}
     </div>
