@@ -34,8 +34,12 @@ const VaiInventoryPage = () => {
         const validProducts = Array.isArray(productData)
           ? productData.filter((product) => product && product.ProductID)
           : [];
+          
+        // Sort the products by ProductID in ascending order (small to large)
+        validProducts.sort((a, b) => a.ProductID.localeCompare(b.ProductID, undefined, { numeric: true }));
+  
         setProducts(validProducts);
-        const uniqueColors = [...new Set(validProducts.map((product) => product.Color))]; // Use validProducts here
+        const uniqueColors = [...new Set(validProducts.map((product) => product.Color))];
         setColors(uniqueColors);
         setIsLoading(false);
       })
@@ -44,6 +48,7 @@ const VaiInventoryPage = () => {
         setIsLoading(false);
       });
   };
+  
 
   useEffect(() => {
     fetchProducts();
