@@ -16,28 +16,27 @@ const VaiInventoryPage = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false); // New state for tracking save process
+  const [isSaving, setIsSaving] = useState(false);
   const [currentDetail, setCurrentDetail] = useState('');
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
-  const [isImportModalVisible, setIsImportModalVisible] = useState(false); // State for Import modal visibility
-  const [isExportModalVisible, setIsExportModalVisible] = useState(false); // State for Export modal visibility
-  const [colors, setColors] = useState([]); // State to store unique colors
+  const [isImportModalVisible, setIsImportModalVisible] = useState(false);
+  const [isExportModalVisible, setIsExportModalVisible] = useState(false);
+  const [colors, setColors] = useState([]);
 
   // Function to fetch products from the API
   const fetchProducts = () => {
     setIsLoading(true);
     axios
-      .get('https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get') // Replace with your Lambda URL
+      .get('https://04r3lehsc8.execute-api.ap-southeast-2.amazonaws.com/prod/get')
       .then((response) => {
         const productData = JSON.parse(response.data.body);
         const validProducts = Array.isArray(productData)
           ? productData.filter((product) => product && product.ProductID)
           : [];
-          
+
         // Sort the products by ProductID in ascending order (small to large)
         validProducts.sort((a, b) => a.ProductID.localeCompare(b.ProductID, undefined, { numeric: true }));
-  
         setProducts(validProducts);
         const uniqueColors = [...new Set(validProducts.map((product) => product.Color))];
         setColors(uniqueColors);
@@ -48,7 +47,6 @@ const VaiInventoryPage = () => {
         setIsLoading(false);
       });
   };
-  
 
   useEffect(() => {
     fetchProducts();
@@ -63,13 +61,13 @@ const VaiInventoryPage = () => {
     if (currentDetail && !isNaN(currentDetail)) {
       setNewProduct((prev) => {
         const updatedProductDetail = [...prev.ProductDetail, parseFloat(currentDetail)];
-        const totalMeter = updatedProductDetail.reduce((sum, num) => sum + num, 0); // Calculate total meter
+        const totalMeter = updatedProductDetail.reduce((sum, num) => sum + num, 0);
         const totalProductCount = updatedProductDetail.length;
         return {
           ...prev,
           ProductDetail: updatedProductDetail,
-          TotalMeter: `${totalMeter} mét`, // Update TotalMeter automatically with translated unit
-          totalProduct: totalProductCount // Update totalProduct automatically
+          TotalMeter: `${totalMeter} mét`,
+          totalProduct: totalProductCount
         };
       });
       setCurrentDetail('');
@@ -95,7 +93,7 @@ const VaiInventoryPage = () => {
       return;
     }
 
-    setIsSaving(true); // Start loading spinner when saving
+    setIsSaving(true);
 
     const apiUrl = isEditing
       ? `https://2t6r0vxhzf.execute-api.ap-southeast-2.amazonaws.com/prod/update`
@@ -120,7 +118,7 @@ const VaiInventoryPage = () => {
       })
       .catch((error) => console.error(`Lỗi khi ${isEditing ? 'cập nhật' : 'thêm'} sản phẩm:`, error))
       .finally(() => {
-        setIsSaving(false); // Stop loading spinner after saving
+        setIsSaving(false);
       });
   };
 
@@ -147,6 +145,13 @@ const VaiInventoryPage = () => {
     fetchProducts();
   };
 
+  // Calculate the total products and total meters
+  const totalProducts = products.reduce((sum, product) => sum + (parseInt(product.totalProduct) || 0), 0);
+  const totalMeters = products.reduce((sum, product) => {
+    const meterValue = parseFloat(product.TotalMeter) || 0;
+    return sum + meterValue;
+  }, 0);
+
   return (
     <div className="vai-inventory-page">
       <div className="header-container">
@@ -159,52 +164,60 @@ const VaiInventoryPage = () => {
       {isLoading ? (
         <p>Đang tải...</p>
       ) : (
-        <table className="vai-inventory-table">
-          <thead>
-            <tr>
-              <th>Mã Màu</th>
-              <th>Màu</th>
-              <th>Chi Tiết Số Mét Từng Cây</th>
-              <th>Tổng Số Cây</th>
-              <th>Tổng Mét</th>
-              <th>Xoá Hàng</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.length > 0 ? (
-              products.map((product) =>
-                product && product.ProductID ? (
-                  <tr key={product.ProductID}>
-                    <td>{product.ProductID}</td>
-                    <td>{product.Color}</td>
-                    <td>
-                      {Array.isArray(product.ProductDetail)
-                        ? product.ProductDetail.join(', ')
-                        : product.ProductDetail || 'No details'}
-                    </td>
-                    <td>{product.totalProduct}</td>
-                    <td>{product.TotalMeter}</td>
-                    <td>
-                      <button
-                        className="action-button delete-button"
-                        onClick={() => {
-                          setProductToDelete(product.ProductID);
-                          setIsDeleteModalVisible(true);
-                        }}
-                      >
-                        Xóa
-                      </button>
-                    </td>
-                  </tr>
-                ) : null
-              )
-            ) : (
+        <>
+          <table className="vai-inventory-table">
+            <thead>
               <tr>
-                <td colSpan="6">Không có sản phẩm để hiển thị.</td>
+                <th>Mã Màu</th>
+                <th>Màu</th>
+                <th>Chi Tiết Số Mét Từng Cây</th>
+                <th>Tổng Số Cây</th>
+                <th>Tổng Mét</th>
+                <th>Xoá Hàng</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {products.length > 0 ? (
+                products.map((product) =>
+                  product && product.ProductID ? (
+                    <tr key={product.ProductID}>
+                      <td>{product.ProductID}</td>
+                      <td>{product.Color}</td>
+                      <td>
+                        {Array.isArray(product.ProductDetail)
+                          ? product.ProductDetail.join(', ')
+                          : product.ProductDetail || 'No details'}
+                      </td>
+                      <td>{product.totalProduct}</td>
+                      <td>{product.TotalMeter}</td>
+                      <td>
+                        <button
+                          className="action-button delete-button"
+                          onClick={() => {
+                            setProductToDelete(product.ProductID);
+                            setIsDeleteModalVisible(true);
+                          }}
+                        >
+                          Xóa
+                        </button>
+                      </td>
+                    </tr>
+                  ) : null
+                )
+              ) : (
+                <tr>
+                  <td colSpan="6">Không có sản phẩm để hiển thị.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          {/* Section to display total products and total meters */}
+          <div className="totals-section">
+            <p><strong>Tổng Số Cây:</strong> {totalProducts}</p>
+            <p><strong>Tổng Mét:</strong> {totalMeters} mét</p>
+          </div>
+        </>
       )}
 
       {isAddingNew && (
