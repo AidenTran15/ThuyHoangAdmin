@@ -16,7 +16,7 @@ const NavBar = () => {
         <li><Link to="/customer">Khách Hàng</Link></li>
         <li><Link to="/product">Sản Phẩm</Link></li>
         <li><Link to="/inventory">Kho Vải</Link></li>
-        <li><Link to="/tracking-inventory">Sao Kê Vải</Link></li>
+        <li><Link to="/tracking-inventory">Lịch Sử Kho Vải</Link></li>
       </ul>
     </nav>
   );

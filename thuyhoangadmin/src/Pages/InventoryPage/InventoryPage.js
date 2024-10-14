@@ -24,8 +24,9 @@ const InventoryPage = () => {
 
         // Set data if it exists, otherwise log an error and set to an empty array
         if (parsedBody && parsedBody.data) {
-          setData(parsedBody.data);
-          setFilteredData(parsedBody.data); // Initially, set filteredData to the fetched data
+          const sortedData = parsedBody.data.sort((a, b) => new Date(b['Date&Time']) - new Date(a['Date&Time'])); // Sort by Date&Time
+          setData(sortedData);
+          setFilteredData(sortedData); // Initially, set filteredData to the sorted data
         } else {
           console.error('Unexpected data structure:', parsedBody);
           setData([]);
@@ -127,8 +128,8 @@ const InventoryPage = () => {
   // Render the table with fetched data
   return (
     <div className="inventory-page">
-            {/* Status Filter Dropdown */}
-            <div className="filter-container">
+      {/* Status Filter Dropdown */}
+      <div className="filter-container">
         <label htmlFor="statusFilter">Lọc Theo Trạng Thái: </label>
         <select
           id="statusFilter"
@@ -144,8 +145,6 @@ const InventoryPage = () => {
       <div className="header-container">
         <h2>Quản Lý Tồn Kho</h2>
       </div>
-
-
 
       <table className="inventory-table">
         <thead>

@@ -23,7 +23,7 @@ const HomePage = () => {
           Quản Lý Kho Vải
         </Link>
         <Link to="/tracking-inventory" className="page-button">
-          Lịch Sử Hàng Hoá
+          Lịch Sử Kho Vải
         </Link>
       </div>
     </div>
