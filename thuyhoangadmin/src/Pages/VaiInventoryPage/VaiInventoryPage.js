@@ -155,7 +155,7 @@ const VaiInventoryPage = () => {
   return (
     <div className="vai-inventory-page">
       <div className="header-container">
-        <h2>Quản Lý Tồn Kho</h2>
+        <h2>Quản Lý Kho Vải</h2>
         <button onClick={() => { setIsAddingNew(true); setIsEditing(false); }} className="add-new-button">Tạo Mới</button>
         <button onClick={() => setIsImportModalVisible(true)} className="import-button">Nhập Hàng</button>
         <button onClick={() => setIsExportModalVisible(true)} className="export-button">Xuất Hàng</button>
