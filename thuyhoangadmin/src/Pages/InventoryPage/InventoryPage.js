@@ -1,16 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import './InventoryPage.css'; // Import CSS for styling if needed
+import './InventoryPage.css'; // Import CSS cho việc styling nếu cần
 
 const InventoryPage = () => {
-  const [data, setData] = useState([]); // Initialize data as an empty array
+  const [data, setData] = useState([]); // Khởi tạo data là một mảng rỗng
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [statusFilter, setStatusFilter] = useState('All'); // State to store the selected status filter
-  const [filteredData, setFilteredData] = useState([]); // State to store filtered data
-  const [currentPage, setCurrentPage] = useState(1); // State to track the current page
-  const itemsPerPage = 10; // Number of items to display per page
+  const [statusFilter, setStatusFilter] = useState('All'); // Trạng thái bộ lọc được chọn
+  const [filteredData, setFilteredData] = useState([]); // Dữ liệu đã được lọc
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const itemsPerPage = 10; // Số lượng mục hiển thị trên mỗi trang
 
-  // Fetch data from the API when the component mounts
+  // Hàm phân tích chuỗi ngày giờ
+  const parseDateString = (dateString) => {
+    // dateString có định dạng 'dd/mm/yyyy hh:mm'
+    const [datePart, timePart] = dateString.split(' ');
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hour, minute] = timePart.split(':').map(Number);
+    return new Date(year, month - 1, day, hour, minute);
+  };
+
+  // Hàm sắp xếp theo 'Date&Time' giảm dần
+  const sortByDateDescending = (dataArray) => {
+    return dataArray.sort((a, b) => parseDateString(b['Date&Time']) - parseDateString(a['Date&Time']));
+  };
+
+  // Fetch dữ liệu từ API khi component được mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -22,11 +36,12 @@ const InventoryPage = () => {
         const result = await response.json();
         const parsedBody = JSON.parse(result.body);
 
-        // Set data if it exists, otherwise log an error and set to an empty array
+        // Set data nếu tồn tại, nếu không log lỗi và set thành mảng rỗng
         if (parsedBody && parsedBody.data) {
-          const sortedData = parsedBody.data.sort((a, b) => new Date(b['Date&Time']) - new Date(a['Date&Time'])); // Sort by Date&Time
+          // Sắp xếp data theo 'Date&Time' giảm dần (mới nhất trước)
+          const sortedData = sortByDateDescending(parsedBody.data);
           setData(sortedData);
-          setFilteredData(sortedData); // Initially, set filteredData to the sorted data
+          setFilteredData(sortedData); // Ban đầu, set filteredData thành dữ liệu đã sắp xếp
         } else {
           console.error('Unexpected data structure:', parsedBody);
           setData([]);
@@ -42,7 +57,7 @@ const InventoryPage = () => {
     fetchData();
   }, []);
 
-  // Function to translate status
+  // Hàm dịch trạng thái
   const translateStatus = (status) => {
     switch (status) {
       case 'Import':
@@ -54,17 +69,21 @@ const InventoryPage = () => {
     }
   };
 
-  // Handle filtering the data based on the selected status
+  // Xử lý lọc dữ liệu dựa trên trạng thái được chọn
   useEffect(() => {
+    let newFilteredData;
     if (statusFilter === 'All') {
-      setFilteredData(data); // Show all data when filter is set to 'All'
+      newFilteredData = data; // Hiển thị tất cả dữ liệu khi bộ lọc là 'All'
     } else {
-      setFilteredData(data.filter((item) => translateStatus(item.Status) === statusFilter));
+      newFilteredData = data.filter((item) => translateStatus(item.Status) === statusFilter);
     }
-    setCurrentPage(1); // Reset to the first page when the filter changes
+    // Sắp xếp dữ liệu đã lọc theo 'Date&Time' giảm dần
+    const sortedFilteredData = sortByDateDescending(newFilteredData);
+    setFilteredData(sortedFilteredData);
+    setCurrentPage(1); // Reset về trang đầu tiên khi thay đổi bộ lọc
   }, [statusFilter, data]);
 
-  // Handle pagination
+  // Xử lý phân trang
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
@@ -79,7 +98,7 @@ const InventoryPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
-  // Helper function to replace "meters" with "mét"
+  // Hàm thay thế "meters" bằng "mét"
   const replaceMetersWithMet = (text) => {
     if (typeof text === 'string') {
       return text.replace(/meters/g, 'mét');
@@ -87,7 +106,7 @@ const InventoryPage = () => {
     return text;
   };
 
-  // Helper function to render ProductList as formatted text
+  // Hàm hiển thị ProductList dưới dạng văn bản có định dạng
   const renderProductList = (productList) => {
     if (!productList || Object.keys(productList).length === 0) {
       return 'N/A';
@@ -104,7 +123,7 @@ const InventoryPage = () => {
     );
   };
 
-  // Helper function to render Detail as formatted text with translated meters
+  // Hàm hiển thị Detail dưới dạng văn bản có định dạng và dịch "meters"
   const renderDetail = (detail) => {
     if (!detail || Object.keys(detail).length === 0) {
       return 'N/A';
@@ -121,14 +140,14 @@ const InventoryPage = () => {
     );
   };
 
-  // Render loading or error messages
+  // Hiển thị thông báo loading hoặc lỗi
   if (loading) return <div>Đang tải...</div>; // Loading
   if (error) return <div>Lỗi: {error}</div>;  // Error
 
-  // Render the table with fetched data
+  // Hiển thị bảng với dữ liệu đã fetch
   return (
     <div className="inventory-page">
-      {/* Status Filter Dropdown */}
+      {/* Dropdown Lọc Trạng Thái */}
       <div className="filter-container">
         <label htmlFor="statusFilter">Lọc Theo Trạng Thái: </label>
         <select
@@ -165,27 +184,27 @@ const InventoryPage = () => {
           {currentItems.length > 0 ? (
             currentItems.map((item, index) => (
               <tr key={index}>
-                <td>{item['Date&Time']}</td> {/* Display Date & Time */}
-                <td>{item.ID}</td> {/* Displaying ID */}
-                <td>{translateStatus(item.Status)}</td> {/* Translated Status */}
-                <td>{item.Customer}</td> {/* Displaying Customer */}
-                <td>{renderProductList(item.ProductList)}</td> {/* Displaying Product List */}
-                <td>{item.TotalAmount}</td> {/* Displaying Total Amount */}
-                <td>{replaceMetersWithMet(item.TotalMeter)}</td> {/* Replacing meters with mét */}
-                <td>{item.TotalProduct}</td> {/* Displaying Total Product */}
-                <td>{renderDetail(item.Detail)}</td> {/* Displaying Detail */}
-                <td>{item.Note || 'N/A'}</td> {/* Displaying Note */}
+                <td>{item['Date&Time']}</td> {/* Hiển thị Ngày & Giờ */}
+                <td>{item.ID}</td> {/* Hiển thị ID */}
+                <td>{translateStatus(item.Status)}</td> {/* Trạng Thái đã dịch */}
+                <td>{item.Customer}</td> {/* Hiển thị Khách Hàng */}
+                <td>{renderProductList(item.ProductList)}</td> {/* Hiển thị Danh Sách Hàng Hoá */}
+                <td>{item.TotalAmount}</td> {/* Hiển thị Tổng Số Tiền */}
+                <td>{replaceMetersWithMet(item.TotalMeter)}</td> {/* Thay thế "meters" bằng "mét" */}
+                <td>{item.TotalProduct}</td> {/* Hiển thị Tổng Số Lượng */}
+                <td>{renderDetail(item.Detail)}</td> {/* Hiển thị Chi Tiết Hàng Hoá */}
+                <td>{item.Note || 'N/A'}</td> {/* Hiển thị Ghi Chú */}
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="10">Không có dữ liệu</td> {/* Updated colspan to 10 */}
+              <td colSpan="10">Không có dữ liệu</td> {/* Cập nhật colspan thành 10 */}
             </tr>
           )}
         </tbody>
       </table>
 
-      {/* Pagination Controls */}
+      {/* Điều khiển Phân trang */}
       <div className="pagination-controls">
         <button onClick={goToPreviousPage} disabled={currentPage === 1}>
           Trang Trước
