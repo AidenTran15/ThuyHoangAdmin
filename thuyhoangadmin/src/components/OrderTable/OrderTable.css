@@ -458,3 +458,21 @@ button {
 .note-modal-content button:hover {
   background-color: #0056b3;
 }
+
+/* Add horizontal scroll for mobile */
+@media (max-width: 768px) {
+  .order-table {
+    overflow-x: auto; /* Enable horizontal scrolling on smaller screens */
+    display: block;
+  }
+
+  table {
+    display: block;
+    min-width: 800px; /* Set a minimum width for the table */
+  }
+
+  th,
+  td {
+    white-space: nowrap; /* Prevent text from wrapping */
+  }
+}
